@@ -1,9 +1,10 @@
-package com.mycompany.sonar.reference;
+package com.pablissimo.sonar.reference;
 
-import com.mycompany.sonar.reference.batch.ExampleSensor;
-import com.mycompany.sonar.reference.batch.RandomDecorator;
-import com.mycompany.sonar.reference.ui.ExampleFooter;
-import com.mycompany.sonar.reference.ui.ExampleRubyWidget;
+import com.pablissimo.sonar.reference.batch.ExampleSensor;
+import com.pablissimo.sonar.reference.batch.RandomDecorator;
+import com.pablissimo.sonar.reference.ui.ExampleFooter;
+import com.pablissimo.sonar.reference.ui.ExampleRubyWidget;
+
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.SonarPlugin;

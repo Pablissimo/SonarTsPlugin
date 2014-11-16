@@ -1,4 +1,4 @@
-package com.mycompany.sonar.reference;
+package com.pablissimo.sonar.reference;
 
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.Metric;

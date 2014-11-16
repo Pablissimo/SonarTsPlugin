@@ -1,4 +1,4 @@
-package com.mycompany.sonar.reference.ui;
+package com.pablissimo.sonar.reference.ui;
 
 import org.sonar.api.web.Footer;
 

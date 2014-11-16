@@ -1,6 +1,7 @@
-package com.mycompany.sonar.reference.batch;
+package com.pablissimo.sonar.reference.batch;
 
-import com.mycompany.sonar.reference.ExampleMetrics;
+import com.pablissimo.sonar.reference.ExampleMetrics;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.RandomUtils;
 import org.sonar.api.batch.Decorator;

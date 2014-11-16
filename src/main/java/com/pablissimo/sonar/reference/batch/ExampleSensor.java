@@ -1,7 +1,8 @@
-package com.mycompany.sonar.reference.batch;
+package com.pablissimo.sonar.reference.batch;
 
-import com.mycompany.sonar.reference.ExampleMetrics;
-import com.mycompany.sonar.reference.ExamplePlugin;
+import com.pablissimo.sonar.reference.ExampleMetrics;
+import com.pablissimo.sonar.reference.ExamplePlugin;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;

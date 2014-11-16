@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.codehaus.sonar.examples</groupId>
-  <artifactId>sonar-reference-plugin</artifactId>
+  <groupId>com.pablissimo.sonar</groupId>
+  <artifactId>sonar-typescript-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
   <version>0.1-SNAPSHOT</version>
 
-  <name>Sonar Examples :: Reference Plugin</name>
-  <description>Plugin description will be displayed in SonarQube</description>
+  <name>Sonar TypeScript Plugin</name>
+  <description>Analyse TypeScript projects</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -60,7 +60,7 @@
         <version>1.3</version>
         <extensions>true</extensions>
         <configuration>
-          <pluginClass>com.mycompany.sonar.reference.ExamplePlugin</pluginClass>
+          <pluginClass>com.pablissimo.sonar.reference.ExamplePlugin</pluginClass>
         </configuration>
       </plugin>
       <plugin>
