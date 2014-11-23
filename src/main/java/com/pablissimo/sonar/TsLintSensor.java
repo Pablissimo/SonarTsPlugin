@@ -42,20 +42,22 @@ public class TsLintSensor implements Sensor {
 		for (File file : fileSystem.files(this.filePredicates.hasLanguage("ts"))) {
 			Resource resource = org.sonar.api.resources.File.fromIOFile(file, project);
 			Issuable issuable = perspectives.as(Issuable.class, resource);
-			String jsonResult = executor.execute("C:\\Users\\Pabliissimo\\AppData\\Roaming\\npm\\tslint.cmd", "C:\\temp\\tslint.json", file.getPath());
+			String jsonResult = executor.execute("C:\\Program Files (x86)\\nodejs\\node.exe", "C:\\temp\\tslint.json", file.getAbsolutePath());
 			
 			TsLintIssue[] issues = parser.parse(jsonResult);
 			
-			for (TsLintIssue issue : issues) {
-				issuable.addIssue
-				(
-					issuable
-						.newIssueBuilder()
-						.line(issue.getStartPosition().getLine())
-						.message(issue.getFailure())
-						.ruleKey(RuleKey.of("tslint", issue.getRuleName()))
-						.build()
-				);				
+			if (issues != null) {
+				for (TsLintIssue issue : issues) {
+					issuable.addIssue
+					(
+						issuable
+							.newIssueBuilder()
+							.line(issue.getStartPosition().getLine())
+							.message(issue.getFailure())
+							.ruleKey(RuleKey.of("tslint", issue.getRuleName()))
+							.build()
+					);				
+				}
 			}
 		}
 	}
