@@ -5,6 +5,7 @@ import java.io.File;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.component.ResourcePerspectives;
+import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.resources.Project;
 import org.sonar.api.resources.Resource;
@@ -15,11 +16,13 @@ import org.sonar.api.batch.fs.FileSystem;
 import com.pablissimo.sonar.model.TsLintIssue;
 
 public class TsLintSensor implements Sensor {
-  	private FileSystem fileSystem;
+  	private Settings settings;
+	private FileSystem fileSystem;
   	private FilePredicates filePredicates;
   	private ResourcePerspectives perspectives;
   
-	public TsLintSensor(FileSystem fileSystem, ResourcePerspectives perspectives) {
+	public TsLintSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives) {
+		this.settings = settings;
 		this.fileSystem = fileSystem;
 		this.filePredicates = fileSystem.predicates();
 		this.perspectives = perspectives;
@@ -42,7 +45,9 @@ public class TsLintSensor implements Sensor {
 		for (File file : fileSystem.files(this.filePredicates.hasLanguage("ts"))) {
 			Resource resource = org.sonar.api.resources.File.fromIOFile(file, project);
 			Issuable issuable = perspectives.as(Issuable.class, resource);
-			String jsonResult = executor.execute("C:\\Users\\Pabliissimo\\AppData\\Roaming\\npm\\node_modules\\tslint\\bin\\tslint", "C:\\temp\\tslint.json", file.getAbsolutePath());
+			
+			String pathToTsLint = settings.getString("sonar.ts.tslintpath");
+			String jsonResult = executor.execute(pathToTsLint, "C:\\temp\\tslint.json", file.getAbsolutePath());
 			
 			TsLintIssue[] issues = parser.parse(jsonResult);
 			
@@ -56,7 +61,7 @@ public class TsLintSensor implements Sensor {
 							.message(issue.getFailure())
 							.ruleKey(RuleKey.of("tslint", issue.getRuleName()))
 							.build()
-					);				
+					);
 				}
 			}
 		}
