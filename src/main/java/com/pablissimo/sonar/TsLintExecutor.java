@@ -13,12 +13,14 @@ public class TsLintExecutor {
 	private StringBuilder stdOut;
 	private StringBuilder stdErr;
 	
-	public String execute(String executable, String configFile, String file) {
+	public String execute(String pathToTsLint, String configFile, String file) {
 		LOG.info("TsLint executing for " + file);
-		Command command = Command.create(executable);
+		Command command = Command.create("node");
 		
 		command
-			.addArgument("\"C:\\Users\\Pabliissimo\\AppData\\Roaming\\npm\\node_modules\\tslint\\bin\\tslint\" --format json -f \"" + file.trim() + "\"");
+			.addArgument("\"" + pathToTsLint + "\" --format json -f \"" + file.trim() + "\"");
+			
+		command.setNewShell(true);
 		
 		this.stdOut = new StringBuilder();
 		this.stdErr = new StringBuilder();
