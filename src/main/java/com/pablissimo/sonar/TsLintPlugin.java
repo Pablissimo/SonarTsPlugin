@@ -18,6 +18,7 @@ import org.sonar.api.SonarPlugin;
 	  )
 	})
 public class TsLintPlugin extends SonarPlugin {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List getExtensions() {
 		return Arrays.asList
 				(

@@ -264,7 +264,7 @@ public class TsRulesDefinition implements RulesDefinition {
 			.setType(RuleParamType.BOOLEAN)
 			.setDefaultValue("true");
 
-		for (NewRule rule : repository.rules()){
+		for (NewRule rule : repository.rules()) {
 			rule.setHtmlDescription("HTML description to follow");
 			rule.setStatus(RuleStatus.READY);
 		}
