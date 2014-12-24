@@ -18,7 +18,7 @@ public class TsLintExecutor {
 		Command command = Command.create("node");
 		
 		command
-			.addArgument("\"" + pathToTsLint + "\" --format json -f \"" + file.trim() + "\"");
+			.addArgument("\"" + pathToTsLint + "\" --config \"" + configFile + "\" --format json -f \"" + file.trim() + "\"");
 			
 		command.setNewShell(true);
 		
