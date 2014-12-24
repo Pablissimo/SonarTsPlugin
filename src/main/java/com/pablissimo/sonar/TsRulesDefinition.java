@@ -38,9 +38,10 @@ public class TsRulesDefinition implements RulesDefinition {
 		
 		NewRule indentRule = repository.createRule("indent").setName("enforces consistent indentation with tabs or spaces").setSeverity(Severity.MINOR);
 		indentRule
-			.createParam("number-of-spaces")
-			.setDescription("Number of spaces or tabs to be used for indentation")
-			.setDefaultValue("4");
+			.createParam("tabs-or-spaces")
+			.setDescription("Specifies if tabs or spaces should be used for indentation")
+			.setType(RuleParamType.singleListOfValues("spaces", "tabs"))
+			.setDefaultValue("tabs");
 		
 		repository.createRule("interface-name").setName("enforces the rule that interface names must begin with a capital I").setSeverity(Severity.MAJOR);
 		repository.createRule("jsdoc-format").setName("enforces basic format rules for jsdoc comments - comments starting with /**").setSeverity(Severity.MAJOR);
