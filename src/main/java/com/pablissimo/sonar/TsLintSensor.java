@@ -68,7 +68,13 @@ public class TsLintSensor implements Sensor {
 	    	throw Throwables.propagate(e);
 	    }
 		
+		boolean skipTypeDefFiles = settings.getBoolean("sonar.ts.excludetypedefinitionfiles");
+		
 		for (File file : fileSystem.files(this.filePredicates.hasLanguage("ts"))) {
+			if (skipTypeDefFiles && file.getName().toLowerCase().endsWith(".d.ts")) {
+				continue;
+			}
+			
 			Resource resource = org.sonar.api.resources.File.fromIOFile(file, project);
 			Issuable issuable = perspectives.as(Issuable.class, resource);
 			
