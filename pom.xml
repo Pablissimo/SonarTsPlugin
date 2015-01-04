@@ -14,7 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <sonar.buildVersion>4.4</sonar.buildVersion>
-    <jdk.min.version>1.5</jdk.min.version>
+    <jdk.min.version>1.7</jdk.min.version>
   </properties>
 
   <dependencies>
@@ -24,7 +24,13 @@
       <version>${sonar.buildVersion}</version>
       <scope>provided</scope>
     </dependency>
-
+    
+    <dependency>
+	  <groupId>com.google.code.gson</groupId>
+	  <artifactId>gson</artifactId>
+	  <version>2.3</version>
+	</dependency>
+	
     <!-- unit tests -->
     <dependency>
       <groupId>org.codehaus.sonar</groupId>
@@ -50,12 +56,6 @@
       <version>2.2.1</version>
       <scope>test</scope>
     </dependency>
-    
-    <dependency>
-	  <groupId>com.google.code.gson</groupId>
-	  <artifactId>gson</artifactId>
-	  <version>2.3</version>
-	</dependency>
   </dependencies>
 
   <build>
@@ -67,7 +67,7 @@
         <extensions>true</extensions>
         <configuration>
           <pluginKey>typescript</pluginKey>
-          <pluginClass>com.pablissimo.sonar.TsLintPlugin</pluginClass>
+          <pluginClass>com.pablissimo.sonar.TypeScriptPlugin</pluginClass>
         </configuration>
       </plugin>
       <plugin>

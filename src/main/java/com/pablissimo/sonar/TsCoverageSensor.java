@@ -1,0 +1,149 @@
+/*
+ * SonarQube JavaScript Plugin
+ * Copyright (C) 2011 SonarSource and Eriks Nukis
+ * dev@sonar.codehaus.org
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02
+ */
+package com.pablissimo.sonar;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.Sensor;
+import org.sonar.api.batch.SensorContext;
+import org.sonar.api.config.Settings;
+import org.sonar.api.measures.CoreMetrics;
+import org.sonar.api.measures.CoverageMeasuresBuilder;
+import org.sonar.api.measures.Measure;
+import org.sonar.api.measures.PropertiesBuilder;
+import org.sonar.api.resources.Project;
+import org.sonar.api.scan.filesystem.FileQuery;
+import org.sonar.api.scan.filesystem.ModuleFileSystem;
+
+import java.io.File;
+import java.util.Map;
+
+public class TsCoverageSensor implements Sensor {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TsCoverageSensor.class);
+
+  private final ModuleFileSystem moduleFileSystem;
+  private final Settings settings;
+
+  public TsCoverageSensor(ModuleFileSystem moduleFileSystem, Settings settings) {
+    this.moduleFileSystem = moduleFileSystem;
+    this.settings = settings;
+  }
+
+  public boolean shouldExecuteOnProject(Project project) {
+    return !moduleFileSystem.files(FileQuery.onSource().onLanguage("ts")).isEmpty();
+  }
+
+  public void analyse(Project project, SensorContext context) {
+	  LOG.warn("HI THERE FROM THE LCOV");
+    if (isLCOVReportProvided()) {
+      saveMeasureFromLCOVFile(project, context);
+
+    } else if (isForceZeroCoverageActivated()) {
+      saveZeroValueForAllFiles(project, context);
+    }
+
+    // Else, nothing to do, there will be no coverage information for JavaScript files.
+  }
+
+  protected void saveZeroValueForAllFiles(Project project, SensorContext context) {
+    for (File file : moduleFileSystem.files(FileQuery.onSource().onLanguage("ts"))) {
+      saveZeroValueForResource(org.sonar.api.resources.File.fromIOFile(file, project), context);
+    }
+  }
+
+  protected void saveMeasureFromLCOVFile(Project project, SensorContext context) {
+    String providedPath = settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH);
+    File lcovFile = getIOFile(moduleFileSystem.baseDir(), providedPath);
+
+    if (!lcovFile.isFile()) {
+      LOG.warn("No coverage information will be saved because LCOV file cannot be analysed. Provided LCOV file path: {}", providedPath);
+      return;
+    }
+
+    LOG.info("Analysing {}", lcovFile);
+
+    LCOVParser parser = new LCOVParser(moduleFileSystem.baseDir());
+    Map<String, CoverageMeasuresBuilder> coveredFiles = parser.parseFile(lcovFile);
+
+    for (File file : moduleFileSystem.files(FileQuery.onSource().onLanguage("ts"))) {
+      try {
+        CoverageMeasuresBuilder fileCoverage = coveredFiles.get(file.getAbsolutePath());
+        org.sonar.api.resources.File resource = org.sonar.api.resources.File.fromIOFile(file, project);
+
+        if (fileCoverage != null) {
+          for (Measure measure : fileCoverage.createMeasures()) {
+            context.saveMeasure(resource, measure);
+          }
+        } else {
+          // colour all lines as not executed
+          saveZeroValueForResource(resource, context);
+        }
+      } catch (Exception e) {
+        LOG.error("Problem while calculating coverage for " + file.getAbsolutePath(), e);
+      }
+    }
+  }
+
+  private void saveZeroValueForResource(org.sonar.api.resources.File resource, SensorContext context) {
+    PropertiesBuilder<Integer, Integer> lineHitsData = new PropertiesBuilder<Integer, Integer>(CoreMetrics.COVERAGE_LINE_HITS_DATA);
+
+    for (int x = 1; x < context.getMeasure(resource, CoreMetrics.LINES).getIntValue(); x++) {
+      lineHitsData.add(x, 0);
+    }
+
+    // use non comment lines of code for coverage calculation
+    Measure ncloc = context.getMeasure(resource, CoreMetrics.NCLOC);
+    context.saveMeasure(resource, lineHitsData.build());
+    context.saveMeasure(resource, CoreMetrics.LINES_TO_COVER, ncloc.getValue());
+    context.saveMeasure(resource, CoreMetrics.UNCOVERED_LINES, ncloc.getValue());
+  }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName();
+  }
+
+  private boolean isForceZeroCoverageActivated() {
+	  // return settings.getBoolean(JavaScriptPlugin.FORCE_ZERO_COVERAGE_KEY);
+	  return false;
+  }
+
+  private boolean isLCOVReportProvided() {
+	  //return StringUtils.isNotBlank(settings.getString(JavaScriptPlugin.LCOV_REPORT_PATH));
+	  return true;
+  }
+
+  /**
+   * Returns a java.io.File for the given path.
+   * If path is not absolute, returns a File with module base directory as parent path.
+   */
+  public static File getIOFile(File baseDir, String path) {
+    File file = new File(path);
+    if (!file.isAbsolute()) {
+      file = new File(baseDir, path);
+    }
+
+
+    return file;
+  }
+
+}
