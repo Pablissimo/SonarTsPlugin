@@ -47,7 +47,7 @@ import org.sonar.api.SonarPlugin;
 public class TypeScriptPlugin extends SonarPlugin {
 	public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.forceZeroCoverage";
 	public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslintpath";
-	public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcovreportpath";
+	public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
 	
 	@SuppressWarnings({ "rawtypes" })
 	public List getExtensions() {
