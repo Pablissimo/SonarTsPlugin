@@ -19,19 +19,18 @@
  */
 package com.pablissimo.sonar;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.api.batch.fs.FilePredicates;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.config.Settings;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.CoverageMeasuresBuilder;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.measures.PropertiesBuilder;
 import org.sonar.api.resources.Project;
-import org.sonar.api.scan.filesystem.FileQuery;
-import org.sonar.api.scan.filesystem.ModuleFileSystem;
 
 import java.io.File;
 import java.util.Map;
@@ -40,16 +39,18 @@ public class TsCoverageSensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(TsCoverageSensor.class);
 
-  private final ModuleFileSystem moduleFileSystem;
+  private final FileSystem moduleFileSystem;
+  private final FilePredicates filePredicates;
   private final Settings settings;
 
-  public TsCoverageSensor(ModuleFileSystem moduleFileSystem, Settings settings) {
+  public TsCoverageSensor(FileSystem moduleFileSystem, Settings settings) {
     this.moduleFileSystem = moduleFileSystem;
+    this.filePredicates = moduleFileSystem.predicates();
     this.settings = settings;
   }
 
   public boolean shouldExecuteOnProject(Project project) {
-    return !moduleFileSystem.files(FileQuery.onSource().onLanguage("ts")).isEmpty();
+    return moduleFileSystem.files(this.filePredicates.hasLanguage("ts")).iterator().hasNext();
   }
 
   public void analyse(Project project, SensorContext context) {
@@ -65,7 +66,7 @@ public class TsCoverageSensor implements Sensor {
   }
 
   protected void saveZeroValueForAllFiles(Project project, SensorContext context) {
-    for (File file : moduleFileSystem.files(FileQuery.onSource().onLanguage("ts"))) {
+    for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage("ts"))) {
       saveZeroValueForResource(org.sonar.api.resources.File.fromIOFile(file, project), context);
     }
   }
@@ -84,7 +85,7 @@ public class TsCoverageSensor implements Sensor {
     LCOVParser parser = new LCOVParser(moduleFileSystem.baseDir());
     Map<String, CoverageMeasuresBuilder> coveredFiles = parser.parseFile(lcovFile);
 
-    for (File file : moduleFileSystem.files(FileQuery.onSource().onLanguage("ts"))) {
+    for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage("ts"))) {
       try {
         CoverageMeasuresBuilder fileCoverage = coveredFiles.get(file.getAbsolutePath());
         org.sonar.api.resources.File resource = org.sonar.api.resources.File.fromIOFile(file, project);
