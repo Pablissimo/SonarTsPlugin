@@ -33,9 +33,19 @@ import org.sonar.api.SonarPlugin;
 		description = "LCOV report path",
 		project = true,
 		global = false
+	),
+	@Property(
+		key = TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE,
+		defaultValue = "false",
+		type = PropertyType.BOOLEAN,
+		name = "Force 0 coverage",
+		description = "Force coverage to be set to 0 when no report is provided.",
+		project = true,
+		global = false
 	)
 	})
 public class TypeScriptPlugin extends SonarPlugin {
+	public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.forceZeroCoverage";
 	public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslintpath";
 	public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcovreportpath";
 	

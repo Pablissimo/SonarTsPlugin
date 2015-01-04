@@ -19,6 +19,7 @@
  */
 package com.pablissimo.sonar;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
@@ -54,7 +55,6 @@ public class TsCoverageSensor implements Sensor {
   }
 
   public void analyse(Project project, SensorContext context) {
-	  LOG.warn("HI THERE FROM THE LCOV");
     if (isLCOVReportProvided()) {
       saveMeasureFromLCOVFile(project, context);
 
@@ -106,7 +106,7 @@ public class TsCoverageSensor implements Sensor {
 
   private void saveZeroValueForResource(org.sonar.api.resources.File resource, SensorContext context) {
     PropertiesBuilder<Integer, Integer> lineHitsData = new PropertiesBuilder<Integer, Integer>(CoreMetrics.COVERAGE_LINE_HITS_DATA);
-
+    
     for (int x = 1; x < context.getMeasure(resource, CoreMetrics.LINES).getIntValue(); x++) {
       lineHitsData.add(x, 0);
     }
@@ -124,13 +124,11 @@ public class TsCoverageSensor implements Sensor {
   }
 
   private boolean isForceZeroCoverageActivated() {
-	  // return settings.getBoolean(JavaScriptPlugin.FORCE_ZERO_COVERAGE_KEY);
-	  return false;
+	  return settings.getBoolean(TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE);
   }
 
   private boolean isLCOVReportProvided() {
-	  //return StringUtils.isNotBlank(settings.getString(JavaScriptPlugin.LCOV_REPORT_PATH));
-	  return true;
+	  return StringUtils.isNotBlank(settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
   }
 
   /**
@@ -142,7 +140,6 @@ public class TsCoverageSensor implements Sensor {
     if (!file.isAbsolute()) {
       file = new File(baseDir, path);
     }
-
 
     return file;
   }
