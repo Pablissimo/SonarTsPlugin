@@ -19,7 +19,7 @@ public class TypeScriptRuleProfile extends ProfileDefinition {
 		activateRule(profile, "comment-format");
 		activateRule(profile, "quotemark");
 		activateRule(profile, "no-construct");
-		activateRule(profile, "no-debuger");
+		activateRule(profile, "no-debugger");
 		activateRule(profile, "no-duplicate-key");
 		activateRule(profile, "no-duplicate-variable");
 		activateRule(profile, "no-empty");
