@@ -49,7 +49,6 @@ public class TypeScriptPlugin extends SonarPlugin {
 	public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslintpath";
 	public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
 	
-	@SuppressWarnings({ "rawtypes" })
 	public List getExtensions() {
 		return Arrays.asList
 				(

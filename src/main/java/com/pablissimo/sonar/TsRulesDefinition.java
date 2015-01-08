@@ -1,15 +1,11 @@
 package com.pablissimo.sonar;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonar.api.rule.RuleStatus;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.server.rule.RulesDefinition;
 
-public class TsRulesDefinition implements RulesDefinition {
-	private static final Logger LOG = LoggerFactory.getLogger(TsRulesDefinition.class);
-	
+public class TsRulesDefinition implements RulesDefinition {	
 	public void define(Context context) {
 		NewRepository repository = 
 				context
