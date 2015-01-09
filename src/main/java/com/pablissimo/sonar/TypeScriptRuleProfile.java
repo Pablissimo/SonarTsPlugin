@@ -34,7 +34,7 @@ public class TypeScriptRuleProfile extends ProfileDefinition {
 		activateRule(profile, "no-switch-case-fall-through");
 		activateRule(profile, "whitespace");
 		activateRule(profile, "class-name");
-		activateRule(profile, "no-consecutive-blank-links");
+		activateRule(profile, "no-consecutive-blank-lines");
 		activateRule(profile, "one-line");
 		activateRule(profile, "no-string-literal");
 		activateRule(profile, "no-constructor-vars");
