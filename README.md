@@ -30,7 +30,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 ##Installation
 * Install Node.js
 * Install TsLint with *npm install -g tslint*
-* Find the path to TsLint and copy it - will be similar to *C:\Users\[Username]\AppData\Roaming\npm\node_modules\tslint\bin\tslint* on Windows
+* Find the path to TsLint and copy it - will be similar to *C:\Users\\[Username]\AppData\Roaming\npm\node_modules\tslint\bin\tslint* on Windows
 * Copy .jar file from target/ after build to SonarQube extensions folder
 * Restart SonarQube server
 * Browse to SonarQube web interface, login as Admin, hit up Settings
