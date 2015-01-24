@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * http://ltp.sourceforge.net/coverage/lcov/geninfo.1.php
  */
-public final class LCOVParserImpl {
+public final class LCOVParserImpl implements LCOVParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(LCOVParserImpl.class);
 

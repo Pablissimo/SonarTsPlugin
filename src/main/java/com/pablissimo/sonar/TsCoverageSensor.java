@@ -82,7 +82,7 @@ public class TsCoverageSensor implements Sensor {
 
     LOG.info("Analysing {}", lcovFile);
 
-    LCOVParserImpl parser = new LCOVParserImpl(moduleFileSystem.baseDir());
+    LCOVParser parser = getParser(moduleFileSystem.baseDir());
     Map<String, CoverageMeasuresBuilder> coveredFiles = parser.parseFile(lcovFile);
 
     for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
@@ -102,6 +102,10 @@ public class TsCoverageSensor implements Sensor {
         LOG.error("Problem while calculating coverage for " + file.getAbsolutePath(), e);
       }
     }
+  }
+  
+  protected LCOVParser getParser(File baseDirectory) {
+	  return new LCOVParserImpl(baseDirectory);
   }
 
   private void saveZeroValueForResource(org.sonar.api.resources.File resource, SensorContext context) {
