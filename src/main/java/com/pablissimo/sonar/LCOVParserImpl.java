@@ -35,9 +35,9 @@ import java.util.Map;
 /**
  * http://ltp.sourceforge.net/coverage/lcov/geninfo.1.php
  */
-public final class LCOVParser {
+public final class LCOVParserImpl {
 
-  private static final Logger LOG = LoggerFactory.getLogger(LCOVParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LCOVParserImpl.class);
 
   private static final String SF = "SF:";
   private static final String DA = "DA:";
@@ -45,7 +45,7 @@ public final class LCOVParser {
 
   private final File moduleBaseDir;
 
-  public LCOVParser(File moduleBaseDir) {
+  public LCOVParserImpl(File moduleBaseDir) {
     this.moduleBaseDir = moduleBaseDir;
   }
 

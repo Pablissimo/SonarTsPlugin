@@ -82,7 +82,7 @@ public class TsCoverageSensor implements Sensor {
 
     LOG.info("Analysing {}", lcovFile);
 
-    LCOVParser parser = new LCOVParser(moduleFileSystem.baseDir());
+    LCOVParserImpl parser = new LCOVParserImpl(moduleFileSystem.baseDir());
     Map<String, CoverageMeasuresBuilder> coveredFiles = parser.parseFile(lcovFile);
 
     for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
