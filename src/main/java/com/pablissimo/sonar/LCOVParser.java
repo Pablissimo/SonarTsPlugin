@@ -73,7 +73,7 @@ public final class LCOVParser {
           filePath = TsCoverageSensor.getIOFile(moduleBaseDir, filePath).getCanonicalPath();
         } catch (IOException e) {
           filePath = "";
-          LOG.error("Unable to retreive coverage onfo for file {}, because: {}", filePath, e);
+          LOG.error("Unable to retreive coverage info for file {}, because: {}", filePath, e);
         }
 
         fileData = files.get(filePath);

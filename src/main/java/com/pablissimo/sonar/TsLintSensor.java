@@ -68,7 +68,7 @@ public class TsLintSensor implements Sensor {
 	    	throw Throwables.propagate(e);
 	    }
 		
-		boolean skipTypeDefFiles = settings.getBoolean("sonar.ts.excludetypedefinitionfiles");
+		boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
 		
 		for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
 			if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
