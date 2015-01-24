@@ -3,6 +3,8 @@ SonarTsPlugin
 
 SonarQube plugin for TypeScript files
 
+[![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
+
 ##Overview
 
 This is a **not even alpha-level yet** SonarQube plugin for analysing projects with TypeScript content that supports:
