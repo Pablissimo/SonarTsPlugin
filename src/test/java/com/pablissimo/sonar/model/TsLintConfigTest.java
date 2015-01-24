@@ -21,12 +21,12 @@ public class TsLintConfigTest {
 	}
 
 	@Test
-	public void getRules_does_not_return_null() {
+	public void getRules_DoesNotReturnNull() {
 		assertNotNull(this.model.getRules());
 	}
 	
 	@Test
-	public void addRule_with_boolean_creates_rule() {
+	public void addRule_WithBoolean_CreatesRule() {
 		this.model.addRule("the rule", true);
 		
 		assertTrue(this.model.getRules().containsKey("the rule"));
@@ -34,7 +34,7 @@ public class TsLintConfigTest {
 	}
 	
 	@Test
-	public void addRule_with_objects_creates_rule() {
+	public void addRule_WithObjects_CreatesRule() {
 		this.model.addRule("the rule", 1, "string");
 		
 		assertTrue(this.model.getRules().containsKey("the rule"));
