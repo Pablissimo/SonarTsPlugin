@@ -30,7 +30,7 @@ public class TsLintConfigTest {
 		this.model.addRule("the rule", true);
 		
 		assertTrue(this.model.getRules().containsKey("the rule"));
-		assertEquals(this.model.getRules().get("the rule"), true);
+		assertEquals(true, this.model.getRules().get("the rule"));
 	}
 	
 	@Test
