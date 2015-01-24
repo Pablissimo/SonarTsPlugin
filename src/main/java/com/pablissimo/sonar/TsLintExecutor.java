@@ -26,7 +26,7 @@ public class TsLintExecutor {
 		
 		StreamConsumer stdOutConsumer = new StreamConsumer() {			
 			public void consumeLine(String line) {
-				LOG.info("TsLint Out: " + line);
+				LOG.trace("TsLint Out: " + line);
 				stdOut.append(line + "\n");
 			}
 		};
@@ -40,16 +40,6 @@ public class TsLintExecutor {
 		
 		CommandExecutor executor = CommandExecutor.create();
 		int exitCode = executor.execute(command, stdOutConsumer, stdErrConsumer, 5000);
-		
-		LOG.info("Exit code " + exitCode);
-		try {
-			LOG.info("CLI " + command.toCommandLine());
-		}
-		catch (Exception e) {
-			LOG.error(e.toString());
-		}
-		
-		LOG.debug("Got " + stdOut.toString());
 		
 		return stdOut.toString();
 	}

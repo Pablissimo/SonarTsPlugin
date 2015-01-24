@@ -1,5 +1,5 @@
 /*
- * SonarQube JavaScript Plugin
+ * Slightly modified version of SonarQube JavaScript Plugin
  * Copyright (C) 2011 SonarSource and Eriks Nukis
  * dev@sonar.codehaus.org
  *

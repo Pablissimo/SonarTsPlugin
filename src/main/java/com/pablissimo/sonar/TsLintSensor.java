@@ -16,14 +16,12 @@ import org.sonar.api.resources.Resource;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.rules.ActiveRule;
 import org.sonar.api.rules.ActiveRuleParam;
-import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.batch.fs.FilePredicates;
 import org.sonar.api.batch.fs.FileSystem;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pablissimo.sonar.model.TsLintConfig;
 import com.pablissimo.sonar.model.TsLintIssue;
