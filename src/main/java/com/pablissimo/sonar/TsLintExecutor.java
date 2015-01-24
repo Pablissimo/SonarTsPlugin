@@ -6,7 +6,7 @@ import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
 
-public class TsLintExecutor {
+public class TsLintExecutor {	
 	private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutor.class);
 	
 	private StringBuilder stdOut;

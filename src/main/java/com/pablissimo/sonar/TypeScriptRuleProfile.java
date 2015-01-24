@@ -6,59 +6,61 @@ import org.sonar.api.rules.Rule;
 import org.sonar.api.utils.ValidationMessages;
 
 public class TypeScriptRuleProfile extends ProfileDefinition {		
+	public static final String PROFILE_NAME = "tslint";
+	
 	@Override
 	public RulesProfile createProfile(ValidationMessages validation) {
-		RulesProfile profile = RulesProfile.create("TsLint",  "ts");
+		RulesProfile profile = RulesProfile.create("TsLint", TypeScriptLanguage.LANGUAGE_EXTENSION);
 
-		activateRule(profile, "no-any");
-		activateRule(profile, "triple-equals");
-		activateRule(profile, "radix");
-		activateRule(profile, "no-arg");
-		activateRule(profile, "no-bitwise");
-		activateRule(profile, "label-undefined");
-		activateRule(profile, "comment-format");
-		activateRule(profile, "quotemark");
-		activateRule(profile, "no-construct");
-		activateRule(profile, "no-debugger");
-		activateRule(profile, "no-duplicate-key");
-		activateRule(profile, "no-duplicate-variable");
-		activateRule(profile, "no-empty");
-		activateRule(profile, "forin");
-		activateRule(profile, "curly");
-		activateRule(profile, "jsdoc-format");
-		activateRule(profile, "indent");
-		activateRule(profile, "label-position");
-		activateRule(profile, "member-ordering");
-		activateRule(profile, "eofline");
-		activateRule(profile, "interface-name");
-		activateRule(profile, "no-switch-case-fall-through");
-		activateRule(profile, "whitespace");
-		activateRule(profile, "class-name");
-		activateRule(profile, "no-consecutive-blank-lines");
-		activateRule(profile, "one-line");
-		activateRule(profile, "no-string-literal");
-		activateRule(profile, "no-constructor-vars");
-		activateRule(profile, "no-var-requires");
-		activateRule(profile, "max-line-length");
-		activateRule(profile, "no-console");
-		activateRule(profile, "semicolon");
-		activateRule(profile, "use-strict");
-		activateRule(profile, "no-trailing-comma");
-		activateRule(profile, "no-trailing-whitespace");
-		activateRule(profile, "typedef");
-		activateRule(profile, "no-unreachable");
-		activateRule(profile, "no-unused-expression");
-		activateRule(profile, "no-unused-variable");
-		activateRule(profile, "no-eval");
-		activateRule(profile, "ban");
-		activateRule(profile, "variable-name");
-		activateRule(profile, "no-use-before-declare");
-		activateRule(profile, "typedef-whitespace");
+		activateRule(profile, TsRulesDefinition.RULE_NO_ANY);
+		activateRule(profile, TsRulesDefinition.RULE_TRIPLE_EQUALS);
+		activateRule(profile, TsRulesDefinition.RULE_RADIX);
+		activateRule(profile, TsRulesDefinition.RULE_NO_ARG);
+		activateRule(profile, TsRulesDefinition.RULE_NO_BITWISE);
+		activateRule(profile, TsRulesDefinition.RULE_LABEL_UNDEFINED);
+		activateRule(profile, TsRulesDefinition.RULE_COMMENT_FORMAT);
+		activateRule(profile, TsRulesDefinition.RULE_QUOTEMARK);
+		activateRule(profile, TsRulesDefinition.RULE_NO_CONSTRUCT);
+		activateRule(profile, TsRulesDefinition.RULE_NO_DEBUGGER);
+		activateRule(profile, TsRulesDefinition.RULE_NO_DUPLICATE_KEY);
+		activateRule(profile, TsRulesDefinition.RULE_NO_DUPLICATE_VARIABLE);
+		activateRule(profile, TsRulesDefinition.RULE_NO_EMPTY);
+		activateRule(profile, TsRulesDefinition.RULE_FORIN);
+		activateRule(profile, TsRulesDefinition.RULE_CURLY);
+		activateRule(profile, TsRulesDefinition.RULE_JSDOC_FORMAT);
+		activateRule(profile, TsRulesDefinition.RULE_INDENT);
+		activateRule(profile, TsRulesDefinition.RULE_LABEL_POSITION);
+		activateRule(profile, TsRulesDefinition.RULE_MEMBER_ORDERING);
+		activateRule(profile, TsRulesDefinition.RULE_EOFLINE);
+		activateRule(profile, TsRulesDefinition.RULE_INTERFACE_NAME);
+		activateRule(profile, TsRulesDefinition.RULE_NO_SWITCH_CASE_FALL_THROUGH);
+		activateRule(profile, TsRulesDefinition.RULE_WHITESPACE);
+		activateRule(profile, TsRulesDefinition.RULE_CLASS_NAME);
+		activateRule(profile, TsRulesDefinition.RULE_NO_CONSECUTIVE_BLANK_LINES);
+		activateRule(profile, TsRulesDefinition.RULE_ONE_LINE);
+		activateRule(profile, TsRulesDefinition.RULE_NO_STRING_LITERAL);
+		activateRule(profile, TsRulesDefinition.RULE_NO_CONSTRUCTOR_VARS);
+		activateRule(profile, TsRulesDefinition.RULE_NO_VAR_REQUIRES);
+		activateRule(profile, TsRulesDefinition.RULE_MAX_LINE_LENGTH);
+		activateRule(profile, TsRulesDefinition.RULE_NO_CONSOLE);
+		activateRule(profile, TsRulesDefinition.RULE_SEMICOLON);
+		activateRule(profile, TsRulesDefinition.RULE_USE_STRICT);
+		activateRule(profile, TsRulesDefinition.RULE_NO_TRAILING_COMMA);
+		activateRule(profile, TsRulesDefinition.RULE_NO_TRAILING_WHITESPACE);
+		activateRule(profile, TsRulesDefinition.RULE_TYPEDEF);
+		activateRule(profile, TsRulesDefinition.RULE_NO_UNREACHABLE);
+		activateRule(profile, TsRulesDefinition.RULE_NO_UNUSED_EXPRESSION);
+		activateRule(profile, TsRulesDefinition.RULE_NO_UNUSED_VARIABLE);
+		activateRule(profile, TsRulesDefinition.RULE_NO_EVAL);
+		activateRule(profile, TsRulesDefinition.RULE_BAN);
+		activateRule(profile, TsRulesDefinition.RULE_VARIABLE_NAME);
+		activateRule(profile, TsRulesDefinition.RULE_NO_USE_BEFORE_DECLARE);
+		activateRule(profile, TsRulesDefinition.RULE_TYPEDEF_WHITESPACE);
 		
 		return profile;
 	}
 	
 	private static void activateRule(RulesProfile profile, String ruleKey) {
-	    profile.activateRule(Rule.create("tslint", ruleKey), null);
+	    profile.activateRule(Rule.create(TsRulesDefinition.REPOSITORY_NAME, ruleKey), null);
 	}
 }

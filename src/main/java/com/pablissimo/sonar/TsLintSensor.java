@@ -27,7 +27,9 @@ import com.pablissimo.sonar.model.TsLintConfig;
 import com.pablissimo.sonar.model.TsLintIssue;
 
 public class TsLintSensor implements Sensor {
-  	private Settings settings;
+  	public static final String CONFIG_FILENAME = "tslint.json";
+  	
+	private Settings settings;
 	private FileSystem fileSystem;
   	private FilePredicates filePredicates;
   	private ResourcePerspectives perspectives;
@@ -48,7 +50,7 @@ public class TsLintSensor implements Sensor {
 	}
 	
 	private boolean hasFilesToAnalyze() {
-		return fileSystem.files(this.filePredicates.hasLanguage("ts")).iterator().hasNext();
+		return fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION)).iterator().hasNext();
 	}
 
 	public void analyse(Project project, SensorContext context) {
@@ -56,7 +58,7 @@ public class TsLintSensor implements Sensor {
 		TsLintParser parser = new TsLintParser();
 		
 		// Build the config file
-		File configFile = new File(this.fileSystem.workDir(), "tslint.json");
+		File configFile = new File(this.fileSystem.workDir(), CONFIG_FILENAME);
 		TsLintConfig config = getConfiguration();
 		String configSerialised = new GsonBuilder().setPrettyPrinting().create().toJson(config);
 
@@ -68,15 +70,15 @@ public class TsLintSensor implements Sensor {
 		
 		boolean skipTypeDefFiles = settings.getBoolean("sonar.ts.excludetypedefinitionfiles");
 		
-		for (File file : fileSystem.files(this.filePredicates.hasLanguage("ts"))) {
-			if (skipTypeDefFiles && file.getName().toLowerCase().endsWith(".d.ts")) {
+		for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
+			if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
 				continue;
 			}
 			
 			Resource resource = org.sonar.api.resources.File.fromIOFile(file, project);
 			Issuable issuable = perspectives.as(Issuable.class, resource);
 			
-			String pathToTsLint = settings.getString("sonar.ts.tslintpath");
+			String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
 			String jsonResult = executor.execute(pathToTsLint, configFile.getPath(), file.getAbsolutePath());
 			
 			TsLintIssue[] issues = parser.parse(jsonResult);
@@ -89,7 +91,7 @@ public class TsLintSensor implements Sensor {
 							.newIssueBuilder()
 							.line(issue.getStartPosition().getLine() + 1)
 							.message(issue.getFailure())
-							.ruleKey(RuleKey.of("tslint", issue.getRuleName()))
+							.ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
 							.build()
 					);
 				}
@@ -100,7 +102,7 @@ public class TsLintSensor implements Sensor {
 	private TsLintConfig getConfiguration() {
 		TsLintConfig toReturn = new TsLintConfig();
 		
-		for (ActiveRule rule : this.rulesProfile.getActiveRulesByRepository("tslint")) {
+		for (ActiveRule rule : this.rulesProfile.getActiveRulesByRepository(TsRulesDefinition.REPOSITORY_NAME)) {
 			List<ActiveRuleParam> params = rule.getActiveRuleParams();
 			
 			if (params == null || params.size() == 0) {

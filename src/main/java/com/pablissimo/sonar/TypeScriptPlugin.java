@@ -10,7 +10,7 @@ import org.sonar.api.SonarPlugin;
 
 @Properties({
 	@Property(
-		key = "sonar.ts.tslintpath",
+		key = TypeScriptPlugin.SETTING_TS_LINT_PATH,
 		defaultValue = "",
 		name = "Path to TSLint",
 		description = "Path to installed Node TSLint",
@@ -18,7 +18,7 @@ import org.sonar.api.SonarPlugin;
 		global = true
 	),
 	@Property(
-		key = "sonar.ts.excludetypedefinitionfiles",
+		key = TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES,
 		type = PropertyType.BOOLEAN,
 		defaultValue = "true",
 		name = "Exclude .d.ts files",
@@ -45,6 +45,7 @@ import org.sonar.api.SonarPlugin;
 	)
 	})
 public class TypeScriptPlugin extends SonarPlugin {
+	public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludetypedefinitionfiles";
 	public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.forceZeroCoverage";
 	public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslintpath";
 	public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
