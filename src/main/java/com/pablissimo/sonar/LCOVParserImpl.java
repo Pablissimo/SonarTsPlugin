@@ -70,7 +70,7 @@ public final class LCOVParserImpl implements LCOVParser {
 
         // some tools (like Istanbul, Karma) provide relative paths, so let's consider them relative to project directory
         try {
-          filePath = TsCoverageSensor.getIOFile(moduleBaseDir, filePath).getCanonicalPath();
+          filePath = this.getIOFile(moduleBaseDir, filePath).getCanonicalPath();
         } catch (IOException e) {
           filePath = "";
           LOG.error("Unable to retreive coverage info for file {}, because: {}", filePath, e);
@@ -106,6 +106,19 @@ public final class LCOVParserImpl implements LCOVParser {
       coveredFiles.put(e.getKey(), e.getValue().convert());
     }
     return coveredFiles;
+  }
+
+  /**
+   * Returns a java.io.File for the given path.
+   * If path is not absolute, returns a File with module base directory as parent path.
+   */
+  protected File getIOFile(File baseDir, String path) {
+    File file = new File(path);
+    if (!file.isAbsolute()) {
+      file = new File(baseDir, path);
+    }
+
+    return file;
   }
 
   private static class FileData {

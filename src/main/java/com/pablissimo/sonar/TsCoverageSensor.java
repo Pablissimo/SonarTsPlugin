@@ -143,7 +143,7 @@ public class TsCoverageSensor implements Sensor {
    * Returns a java.io.File for the given path.
    * If path is not absolute, returns a File with module base directory as parent path.
    */
-  public static File getIOFile(File baseDir, String path) {
+  public File getIOFile(File baseDir, String path) {
     File file = new File(path);
     if (!file.isAbsolute()) {
       file = new File(baseDir, path);
