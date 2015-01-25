@@ -67,7 +67,7 @@ public class TsCoverageSensor implements Sensor {
 
   protected void saveZeroValueForAllFiles(Project project, SensorContext context) {
     for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
-      saveZeroValueForResource(org.sonar.api.resources.File.fromIOFile(file, project), context);
+      saveZeroValueForResource(this.fileFromIoFile(file, project), context);
     }
   }
 
@@ -88,7 +88,7 @@ public class TsCoverageSensor implements Sensor {
     for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
       try {
         CoverageMeasuresBuilder fileCoverage = coveredFiles.get(file.getAbsolutePath());
-        org.sonar.api.resources.File resource = org.sonar.api.resources.File.fromIOFile(file, project);
+        org.sonar.api.resources.File resource = this.fileFromIoFile(file, project);
 
         if (fileCoverage != null) {
           for (Measure measure : fileCoverage.createMeasures()) {
@@ -102,6 +102,10 @@ public class TsCoverageSensor implements Sensor {
         LOG.error("Problem while calculating coverage for " + file.getAbsolutePath(), e);
       }
     }
+  }
+  
+  protected org.sonar.api.resources.File fileFromIoFile(java.io.File file, Project project) {
+	  return org.sonar.api.resources.File.fromIOFile(file, project);
   }
   
   protected LCOVParser getParser(File baseDirectory) {
@@ -147,5 +151,4 @@ public class TsCoverageSensor implements Sensor {
 
     return file;
   }
-
 }
