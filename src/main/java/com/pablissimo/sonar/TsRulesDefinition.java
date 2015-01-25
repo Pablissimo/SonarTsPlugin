@@ -77,7 +77,7 @@ public class TsRulesDefinition implements RulesDefinition {
 	public static final String RULE_EOFLINE = "eofline";
 	public static final String RULE_CURLY = "curly";
 	public static final String RULE_PARAM_CHECK_LOWERCASE = "check-lowercase";
-	public static final String RULE_PARAM_CHECK_SAPCE = "check-sapce";
+	public static final String RULE_PARAM_CHECK_SPACE = "check-space";
 	public static final String RULE_COMMENT_FORMAT = "comment-format";
 	public static final String RULE_CLASS_NAME = "class-name";
 	public static final String RULE_BAN = "ban";
@@ -95,7 +95,7 @@ public class TsRulesDefinition implements RulesDefinition {
 		
 		NewRule commentFormatRule = repository.createRule(RULE_COMMENT_FORMAT).setName("Comments must be correctly formatted").setSeverity(Severity.MINOR);
 		commentFormatRule
-			.createParam(RULE_PARAM_CHECK_SAPCE)
+			.createParam(RULE_PARAM_CHECK_SPACE)
 			.setDescription("enforces the rule that all single-line comments must begin with a space, as in // comment")
 			.setType(RuleParamType.BOOLEAN)
 			.setDefaultValue("true");
@@ -122,7 +122,7 @@ public class TsRulesDefinition implements RulesDefinition {
 		repository.createRule(RULE_LABEL_POSITION).setName("enforces labels only on sensible statements").setSeverity(Severity.MAJOR);
 		repository.createRule(RULE_LABEL_UNDEFINED).setName("checks that labels are defined before usage").setSeverity(Severity.CRITICAL);
 		
-		NewRule maxLineLengthRule = repository.createRule(RULE_MAX_LINE_LENGTH).setName("sets the maximum length of a line");
+		NewRule maxLineLengthRule = repository.createRule(RULE_MAX_LINE_LENGTH).setName("sets the maximum length of a line").setSeverity(Severity.MAJOR);
 		maxLineLengthRule
 			.createParam(RULE_PARAM_MAX_LINE_LENGTH)
 			.setDescription("Maximum allowed line length in characters")
@@ -163,7 +163,7 @@ public class TsRulesDefinition implements RulesDefinition {
 		repository.createRule(RULE_NO_CONSTRUCT).setName("Constructors of String, Number and Boolean must not be used").setSeverity(Severity.MAJOR);
 		repository.createRule(RULE_NO_CONSTRUCTOR_VARS).setName("Public and private modifiers must not be used on constructor arguments").setSeverity(Severity.MAJOR);
 		repository.createRule(RULE_NO_DEBUGGER).setName("Debugger statements are not allowed").setSeverity(Severity.CRITICAL);
-		repository.createRule(RULE_NO_DUPLICATE_KEY).setName("Duplicate keys must not be specified in object literals").setSeverity(Severity.CRITICAL);
+		repository.createRule(RULE_NO_DUPLICATE_KEY).setName("Duplicate keys must not be specified in object literals").setSeverity(Severity.MAJOR);
 		repository.createRule(RULE_NO_DUPLICATE_VARIABLE).setName("Duplicate variable definitions are not allowed").setSeverity(Severity.MAJOR);
 		repository.createRule(RULE_NO_EMPTY).setName("Empty blocks are not allowed").setSeverity(Severity.MAJOR);
 		repository.createRule(RULE_NO_EVAL).setName("Use of eval is not allowed").setSeverity(Severity.CRITICAL);
