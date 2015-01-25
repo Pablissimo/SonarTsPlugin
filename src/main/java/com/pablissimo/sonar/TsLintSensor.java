@@ -2,6 +2,7 @@ package com.pablissimo.sonar;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,8 +55,8 @@ public class TsLintSensor implements Sensor {
 	}
 
 	public void analyse(Project project, SensorContext context) {
-		TsLintExecutorImpl executor = new TsLintExecutorImpl();
-		TsLintParserImpl parser = new TsLintParserImpl();
+		TsLintExecutor executor = this.getTsLintExecutor();
+		TsLintParser parser = this.getTsLintParser();
 		
 		// Build the config file
 		File configFile = new File(this.fileSystem.workDir(), CONFIG_FILENAME);
@@ -63,7 +64,7 @@ public class TsLintSensor implements Sensor {
 		String configSerialised = new GsonBuilder().setPrettyPrinting().create().toJson(config);
 
 		try {
-			Files.write(configSerialised, configFile, Charsets.UTF_8);
+			writeConfiguration(configSerialised, configFile, Charsets.UTF_8);
 	    } catch (IOException e) {
 	    	throw Throwables.propagate(e);
 	    }
@@ -75,7 +76,7 @@ public class TsLintSensor implements Sensor {
 				continue;
 			}
 			
-			Resource resource = org.sonar.api.resources.File.fromIOFile(file, project);
+			Resource resource = this.getFileFromIOFile(file, project);
 			Issuable issuable = perspectives.as(Issuable.class, resource);
 			
 			String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
@@ -97,6 +98,22 @@ public class TsLintSensor implements Sensor {
 				}
 			}
 		}
+	}
+	
+	protected org.sonar.api.resources.File getFileFromIOFile(File file, Project project) {
+		return org.sonar.api.resources.File.fromIOFile(file, project);
+	}
+	
+	protected void writeConfiguration(String configSerialised, File configFile, Charset encoding) throws IOException {
+		Files.write(configSerialised, configFile, encoding);
+	}
+	
+	protected TsLintExecutor getTsLintExecutor() {
+		return new TsLintExecutorImpl();
+	}
+	
+	protected TsLintParser getTsLintParser() {
+		return new TsLintParserImpl();
 	}
 	
 	protected TsLintConfig getConfiguration() {
