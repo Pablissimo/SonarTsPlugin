@@ -99,7 +99,7 @@ public class TsLintSensor implements Sensor {
 		}
 	}
 	
-	private TsLintConfig getConfiguration() {
+	protected TsLintConfig getConfiguration() {
 		TsLintConfig toReturn = new TsLintConfig();
 		
 		for (ActiveRule rule : this.rulesProfile.getActiveRulesByRepository(TsRulesDefinition.REPOSITORY_NAME)) {
