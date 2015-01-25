@@ -54,8 +54,8 @@ public class TsLintSensor implements Sensor {
 	}
 
 	public void analyse(Project project, SensorContext context) {
-		TsLintExecutor executor = new TsLintExecutor();
-		TsLintParser parser = new TsLintParser();
+		TsLintExecutorImpl executor = new TsLintExecutorImpl();
+		TsLintParserImpl parser = new TsLintParserImpl();
 		
 		// Build the config file
 		File configFile = new File(this.fileSystem.workDir(), CONFIG_FILENAME);
