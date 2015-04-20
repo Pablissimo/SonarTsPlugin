@@ -90,7 +90,7 @@ public class TsLintSensor implements Sensor {
 					(
 						issuable
 							.newIssueBuilder()
-							.line(issue.getStartPosition().getLine() + 1)
+							.line(issue.getStartPosition().getLine())
 							.message(issue.getFailure())
 							.ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, issue.getRuleName()))
 							.build()
