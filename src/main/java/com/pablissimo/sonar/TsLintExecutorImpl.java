@@ -2,25 +2,37 @@ package com.pablissimo.sonar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.utils.command.Command;
-import org.sonar.api.utils.command.CommandExecutor;
+import org.sonar.api.utils.command.CommandException;
 import org.sonar.api.utils.command.StreamConsumer;
 
-public class TsLintExecutorImpl implements TsLintExecutor {	
+import java.util.concurrent.*;
+
+public class TsLintExecutorImpl implements TsLintExecutor {
 	private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 	
 	private StringBuilder stdOut;
 	private StringBuilder stdErr;
-	
+	private String customRuleDirectory;
+
 	public String execute(String pathToTsLint, String configFile, String file) {
 		LOG.info("TsLint executing for " + file);
-		Command command = Command.create("node");
-		
+		Command command = Command.create("tslint");
+
+		String commandToExecute =  pathToTsLint + " --config " + configFile + " --format json -f " + file.trim();
+
+		//LOG.debug("Custom rules directory " + customRuleDirectory);
+		if (customRuleDirectory != null && customRuleDirectory.length() > 0) {
+			commandToExecute += " --rules-dir \"" + customRuleDirectory + "\"";
+		}
+
+		//LOG.debug("Command to Execute: " + commandToExecute);
 		command
-			.addArgument("\"" + pathToTsLint + "\" --config \"" + configFile + "\" --format json -f \"" + file.trim() + "\"");
+			.addArguments(new String[]{"-f", file.trim(), "-c", configFile, "--format", "json"});
+
+		//command.
 			
 		command.setNewShell(true);
-		
+
 		this.stdOut = new StringBuilder();
 		this.stdErr = new StringBuilder();
 		
@@ -42,5 +54,10 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 		int exitCode = executor.execute(command, stdOutConsumer, stdErrConsumer, 5000);
 		
 		return stdOut.toString();
+	}
+
+	@Override
+	public void setCustomRulesDirectory(String customRulesDirectory) {
+		this.customRuleDirectory = customRulesDirectory;
 	}
 }

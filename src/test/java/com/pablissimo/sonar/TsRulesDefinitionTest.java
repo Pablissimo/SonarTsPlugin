@@ -374,7 +374,7 @@ public class TsRulesDefinitionTest {
 		RulesDefinition.Param checkModuleParam = getParam(rule, TsRulesDefinition.RULE_PARAM_CHECK_MODULE);
 		assertEquals(RuleParamType.BOOLEAN, checkModuleParam.type());
 		assertEquals("true", checkModuleParam.defaultValue());
-		
+
 		RulesDefinition.Param checkFunctionParam = getParam(rule, TsRulesDefinition.RULE_PARAM_CHECK_FUNCTION);
 		assertEquals(RuleParamType.BOOLEAN, checkFunctionParam.type());
 		assertEquals("true", checkFunctionParam.defaultValue());
