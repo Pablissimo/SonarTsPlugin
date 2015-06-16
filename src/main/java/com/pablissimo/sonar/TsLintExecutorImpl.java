@@ -18,19 +18,15 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 		LOG.info("TsLint executing for " + file);
 		Command command = Command.create("tslint");
 
-		String commandToExecute =  pathToTsLint + " --config " + configFile + " --format json -f " + file.trim();
-
-		//LOG.debug("Custom rules directory " + customRuleDirectory);
 		if (customRuleDirectory != null && customRuleDirectory.length() > 0) {
-			commandToExecute += " --rules-dir \"" + customRuleDirectory + "\"";
+			command
+					.addArguments(new String[]{"-f", file.trim(), "-c", configFile, "--format", "json",
+					" --rules-dir", customRuleDirectory});
+		} else {
+			command
+					.addArguments(new String[]{"-f", file.trim(), "-c", configFile, "--format", "json"});
 		}
 
-		//LOG.debug("Command to Execute: " + commandToExecute);
-		command
-			.addArguments(new String[]{"-f", file.trim(), "-c", configFile, "--format", "json"});
-
-		//command.
-			
 		command.setNewShell(true);
 
 		this.stdOut = new StringBuilder();

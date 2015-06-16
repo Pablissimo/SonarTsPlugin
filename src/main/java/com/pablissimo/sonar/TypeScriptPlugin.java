@@ -31,8 +31,8 @@ import org.sonar.api.SonarPlugin;
 			defaultValue = "",
 			name = "Custom Rules Directory",
 			description = "Path to Custom Rules Directory",
-			project = false,
-			global = true
+			project = true,
+			global = false
 	)
 	})
 public class TypeScriptPlugin extends SonarPlugin {
