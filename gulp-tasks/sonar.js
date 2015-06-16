@@ -14,18 +14,18 @@ gulp.task('sonar:analyze', ['sonar:tscoverage'], function () {
         sonar: {
             debug: true,
             host: {
-                url: cfg.task.sonar.sonarUrl
+                url: "sonar.url"
             },
             jdbc: {
-                url: cfg.task.sonar.jdbcUrl,
-                username: 'root',
-                password: 'root'
+                url: "sonar.db.url",
+                username: "db.user",
+                password: "db.password"
             },
-            projectKey: cfg.task.sonar.projectKey,
-            projectName: cfg.task.sonar.projectName,
+            projectKey: "project.key",
+            projectName: "project.name",
             projectVersion: '1.0.0',
             // comma-delimited string of source directories
-            sources: 'app',
+            sources: "ts.files.root.folder",
             language: 'ts',
             sourceEncoding: 'UTF-8'
         }
@@ -49,10 +49,10 @@ function checkIfLineCoverageExists(coverageReport) {
 }
 
 gulp.task('sonar:tscoverage', function () {
-    var jsCoverageReportName = cfg.task.sonar.projectName + "/lcov.info";
+    var jsCoverageReportName = "karmacoverage.report.folder" + "/lcov.info";
     var lineCoverageExists = checkIfLineCoverageExists(jsCoverageReportName);
 
-    var tsCoverageReportName = cfg.task.sonar.projectName + "/tslcov.info";
+    var tsCoverageReportName = "karmacoverage.report.folder" + "/tslcov.info";
     if (lineCoverageExists) {
         var rd = readline.createInterface({
             input: fs.createReadStream(jsCoverageReportName),
