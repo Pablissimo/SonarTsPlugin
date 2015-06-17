@@ -84,7 +84,7 @@ public class TsLintSensor implements Sensor {
 			
 			String pathToTsLint = "";//settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
 			String customRulesDirectory = settings.getString(TypeScriptPlugin.SETTING_CUSTOM_RULES_DIRECTORY);
-			LOG.debug("Custom Rules directory {}", customRulesDirectory);
+			//LOG.debug("Custom Rules directory {}", customRulesDirectory);
 			executor.setCustomRulesDirectory(customRulesDirectory);
 			String jsonResult = executor.execute(pathToTsLint, configFile.getPath(), file.getAbsolutePath());
 			
