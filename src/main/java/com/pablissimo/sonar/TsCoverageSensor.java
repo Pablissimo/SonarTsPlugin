@@ -34,6 +34,11 @@ import org.sonar.api.measures.PropertiesBuilder;
 import org.sonar.api.resources.Project;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 public class TsCoverageSensor implements Sensor {
@@ -87,16 +92,20 @@ public class TsCoverageSensor implements Sensor {
 
     for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
       try {
+    	 // LOG.info("File absolute path: {}", file.getAbsolutePath());
         CoverageMeasuresBuilder fileCoverage = coveredFiles.get(file.getAbsolutePath());
+        //LOG.info("File coverage: {}", fileCoverage);
         org.sonar.api.resources.File resource = this.fileFromIoFile(file, project);
-
+        //LOG.info("File Resource: {}", resource);
+        
         if (fileCoverage != null) {
           for (Measure measure : fileCoverage.createMeasures()) {
             context.saveMeasure(resource, measure);
           }
         } else {
+        	//LOG.info("Inside else {}", resource.getPath());
           // colour all lines as not executed
-          saveZeroValueForResource(resource, context);
+         // saveZeroValueForResource(resource, context);
         }
       } catch (Exception e) {
         LOG.error("Problem while calculating coverage for " + file.getAbsolutePath(), e);
@@ -111,20 +120,33 @@ public class TsCoverageSensor implements Sensor {
   protected LCOVParser getParser(File baseDirectory) {
 	  return new LCOVParserImpl(baseDirectory);
   }
-
+  
   private void saveZeroValueForResource(org.sonar.api.resources.File resource, SensorContext context) {
-    PropertiesBuilder<Integer, Integer> lineHitsData = new PropertiesBuilder<Integer, Integer>(CoreMetrics.COVERAGE_LINE_HITS_DATA);
-    
-    for (int x = 1; x < context.getMeasure(resource, CoreMetrics.LINES).getIntValue(); x++) {
-      lineHitsData.add(x, 0);
-    }
-
-    // use non comment lines of code for coverage calculation
-    Measure ncloc = context.getMeasure(resource, CoreMetrics.NCLOC);
-    context.saveMeasure(resource, lineHitsData.build());
-    context.saveMeasure(resource, CoreMetrics.LINES_TO_COVER, ncloc.getValue());
-    context.saveMeasure(resource, CoreMetrics.UNCOVERED_LINES, ncloc.getValue());
-  }
+	    PropertiesBuilder<Integer, Integer> lineHitsData = new PropertiesBuilder<Integer, Integer>(CoreMetrics.COVERAGE_LINE_HITS_DATA);
+	    
+	    //String path = resource.getPath();
+	    List<String> lines;
+		try {
+			lines = Files.readAllLines(Paths.get(resource.getPath()), Charset.defaultCharset());
+		
+	     
+		    if (lines != null && lines.size() > 0) {
+			    for (int x = 1; x < lines.size(); x++) {
+			      lineHitsData.add(x, 0);
+			    }
+			
+			    LOG.info("Number of lines: {}", lines.size());
+			    // use non comment lines of code for coverage calculation
+			    //Measure ncloc = context.getMeasure(resource, CoreMetrics.NCLOC);
+			    context.saveMeasure(resource, lineHitsData.build());
+			    //context.saveMeasure(resource, CoreMetrics.LINES_TO_COVER, ncloc.getValue());
+			    //context.saveMeasure(resource, CoreMetrics.UNCOVERED_LINES, ncloc.getValue());
+		    }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	  }
 
   @Override
   public String toString() {

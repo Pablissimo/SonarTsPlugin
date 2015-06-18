@@ -6,6 +6,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.component.ResourcePerspectives;
@@ -29,7 +31,8 @@ import com.pablissimo.sonar.model.TsLintIssue;
 
 public class TsLintSensor implements Sensor {
   	public static final String CONFIG_FILENAME = "tslint.json";
-  	
+	private static final Logger LOG = LoggerFactory.getLogger(TsLintSensor.class);
+
 	private Settings settings;
 	private FileSystem fileSystem;
   	private FilePredicates filePredicates;
@@ -79,7 +82,10 @@ public class TsLintSensor implements Sensor {
 			Resource resource = this.getFileFromIOFile(file, project);
 			Issuable issuable = perspectives.as(Issuable.class, resource);
 			
-			String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
+			String pathToTsLint = "";//settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
+			String customRulesDirectory = settings.getString(TypeScriptPlugin.SETTING_CUSTOM_RULES_DIRECTORY);
+			//LOG.debug("Custom Rules directory {}", customRulesDirectory);
+			executor.setCustomRulesDirectory(customRulesDirectory);
 			String jsonResult = executor.execute(pathToTsLint, configFile.getPath(), file.getAbsolutePath());
 			
 			TsLintIssue[] issues = parser.parse(jsonResult);
@@ -120,6 +126,7 @@ public class TsLintSensor implements Sensor {
 		TsLintConfig toReturn = new TsLintConfig();
 		
 		for (ActiveRule rule : this.rulesProfile.getActiveRulesByRepository(TsRulesDefinition.REPOSITORY_NAME)) {
+			LOG.info("Rule Name: " + rule.getRuleKey());
 			List<ActiveRuleParam> params = rule.getActiveRuleParams();
 			
 			if (params == null || params.size() == 0) {
@@ -133,7 +140,7 @@ public class TsLintSensor implements Sensor {
 				for (ActiveRuleParam param : params) {
 					switch (param.getRuleParam().getType()) {
 						case "BOOLEAN":
-							if (param.getValue() == "true") {
+							if (param.getValue().equalsIgnoreCase("true")) {
 								processedParams.add(param.getParamKey());
 							}
 							break;
@@ -145,11 +152,12 @@ public class TsLintSensor implements Sensor {
 							break;
 					}
 				}
-				
+
 				toReturn.addRule(rule.getRuleKey(), processedParams.toArray());
 			}
 		}
 		
 		return toReturn;
 	}
+
 }
