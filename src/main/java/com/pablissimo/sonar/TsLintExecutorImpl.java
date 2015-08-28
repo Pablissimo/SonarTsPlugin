@@ -17,7 +17,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 		Command command = Command.create("node");
 		
 		command
-			.addArgument("\"" + pathToTsLint + "\" --config \"" + configFile + "\" --format json -f \"" + file.trim() + "\"");
+			.addArgument("\"" + pathToTsLint + "\" --config \"" + configFile + "\" --format json \"" + file.trim() + "\"");
 			
 		command.setNewShell(true);
 		
