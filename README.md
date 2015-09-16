@@ -23,6 +23,7 @@ It's presented only for the interested, and the brave.
 ##Requirements
 * Java 1.7+
 * SonarQube 4.4+ (may or may not work with others)
+* TsLint 2.4.0+
 
 The plugin has so far *only been tested on Windows* and it'll be no surprise if it fails on Linux just now.
 
@@ -32,7 +33,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 
 ##Installation
 * Install Node.js
-* Install TsLint with *npm install -g tslint*
+* Install TsLint (2.4.0+) with *npm install -g tslint*
 * Find the path to TsLint and copy it - will be similar to *C:\Users\\[Username]\AppData\Roaming\npm\node_modules\tslint\bin\tslint* on Windows
 * Copy .jar file from target/ after build to SonarQube extensions folder
 * Restart SonarQube server
