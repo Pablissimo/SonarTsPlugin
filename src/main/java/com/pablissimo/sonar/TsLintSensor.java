@@ -6,6 +6,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.component.ResourcePerspectives;
@@ -29,6 +31,8 @@ import com.pablissimo.sonar.model.TsLintIssue;
 
 public class TsLintSensor implements Sensor {
     public static final String CONFIG_FILENAME = "tslint.json";
+
+    private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 
     private Settings settings;
     private FileSystem fileSystem;
@@ -55,6 +59,13 @@ public class TsLintSensor implements Sensor {
     }
 
     public void analyse(Project project, SensorContext context) {
+
+        String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
+        if (pathToTsLint == null) {
+            LOG.warn("Path to tslint (" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
+            return;
+        }
+
         TsLintExecutor executor = this.getTsLintExecutor();
         TsLintParser parser = this.getTsLintParser();
 
@@ -79,7 +90,6 @@ public class TsLintSensor implements Sensor {
             Resource resource = this.getFileFromIOFile(file, project);
             Issuable issuable = perspectives.as(Issuable.class, resource);
 
-            String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
             String jsonResult = executor.execute(pathToTsLint, configFile.getPath(), file.getAbsolutePath());
 
             TsLintIssue[] issues = parser.parse(jsonResult);
