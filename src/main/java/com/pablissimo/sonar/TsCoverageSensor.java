@@ -103,18 +103,18 @@ public class TsCoverageSensor implements Sensor {
       }
     }
   }
-  
+
   protected org.sonar.api.resources.File fileFromIoFile(java.io.File file, Project project) {
-	  return org.sonar.api.resources.File.fromIOFile(file, project);
+      return org.sonar.api.resources.File.fromIOFile(file, project);
   }
-  
+
   protected LCOVParser getParser(File baseDirectory) {
-	  return new LCOVParserImpl(baseDirectory);
+      return new LCOVParserImpl(baseDirectory);
   }
 
   private void saveZeroValueForResource(org.sonar.api.resources.File resource, SensorContext context) {
     PropertiesBuilder<Integer, Integer> lineHitsData = new PropertiesBuilder<Integer, Integer>(CoreMetrics.COVERAGE_LINE_HITS_DATA);
-    
+
     for (int x = 1; x < context.getMeasure(resource, CoreMetrics.LINES).getIntValue(); x++) {
       lineHitsData.add(x, 0);
     }
@@ -132,11 +132,11 @@ public class TsCoverageSensor implements Sensor {
   }
 
   private boolean isForceZeroCoverageActivated() {
-	  return settings.getBoolean(TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE);
+      return settings.getBoolean(TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE);
   }
 
   private boolean isLCOVReportProvided() {
-	  return StringUtils.isNotBlank(settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
+      return StringUtils.isNotBlank(settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
   }
 
   /**

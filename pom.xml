@@ -24,13 +24,13 @@
       <version>${sonar.buildVersion}</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
-	  <groupId>com.google.code.gson</groupId>
-	  <artifactId>gson</artifactId>
-	  <version>2.3</version>
-	</dependency>
-	
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.3</version>
+    </dependency>
+
     <!-- unit tests -->
     <dependency>
       <groupId>org.codehaus.sonar</groupId>
