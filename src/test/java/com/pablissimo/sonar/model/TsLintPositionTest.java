@@ -7,32 +7,32 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TsLintPositionTest {
-	TsLintPosition model;
-	
-	@Before
-	public void setUp() throws Exception {
-		this.model = new TsLintPosition();
-	}
+    TsLintPosition model;
 
-	@After
-	public void tearDown() throws Exception {
-	}
+    @Before
+    public void setUp() throws Exception {
+        this.model = new TsLintPosition();
+    }
 
-	@Test
-	public void getSetPosition() {
-		this.model.setPosition(123);
-		assertEquals(123, this.model.getPosition());
-	}
+    @After
+    public void tearDown() throws Exception {
+    }
 
-	@Test
-	public void getSetLine() {
-		this.model.setLine(234);
-		assertEquals(234, this.model.getLine());
-	}
-	
-	@Test
-	public void getSetCharacter() {
-		this.model.setCharacter(345);
-		assertEquals(345, this.model.getCharacter());
-	}
+    @Test
+    public void getSetPosition() {
+        this.model.setPosition(123);
+        assertEquals(123, this.model.getPosition());
+    }
+
+    @Test
+    public void getSetLine() {
+        this.model.setLine(234);
+        assertEquals(234, this.model.getLine());
+    }
+
+    @Test
+    public void getSetCharacter() {
+        this.model.setCharacter(345);
+        assertEquals(345, this.model.getCharacter());
+    }
 }
