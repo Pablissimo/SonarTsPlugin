@@ -47,5 +47,9 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 ##Licence
 MIT
 
+##Contributors
+Thanks to the following for contributions to the plugin:
+* [Alex Krauss](https://github.com/alexkrauss) for work on improving compatibility with *nix OSes
+
 ##With thanks
-The LCOV parser is directly copied from the community JavaScript SonarQube plug-in, which is LGPL'd.
+* The LCOV parser is directly copied from the community JavaScript SonarQube plug-in, which is LGPL'd.
