@@ -15,11 +15,13 @@ public class TsLintExecutorImpl implements TsLintExecutor {
     public String execute(String pathToTsLint, String configFile, String file) {
         LOG.info("TsLint executing for " + file);
         Command command = Command.create("node");
-
-        command
-            .addArgument("\"" + pathToTsLint + "\" --config \"" + configFile + "\" --format json \"" + file.trim() + "\"");
-
-        command.setNewShell(true);
+        command.addArgument(pathToTsLint);
+        command.addArgument("--format");
+        command.addArgument("json");
+        command.addArgument("--config");
+        command.addArgument(configFile);
+        command.addArgument(file.trim());
+        command.setNewShell(false);
 
         this.stdOut = new StringBuilder();
         this.stdErr = new StringBuilder();
