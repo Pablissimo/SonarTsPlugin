@@ -50,6 +50,7 @@ MIT
 ##Contributors
 Thanks to the following for contributions to the plugin:
 * [Alex Krauss](https://github.com/alexkrauss) and [Manuel Huber](https://github.com/nelo112) for work on improving compatibility with *nix OSes
+* [schnee3](https://github.com/schnee3) for giving us some NCLOC support
 
 ##With thanks
 * The LCOV parser is directly copied from the community JavaScript SonarQube plug-in, which is LGPL'd.
