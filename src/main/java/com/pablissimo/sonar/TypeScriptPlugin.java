@@ -56,6 +56,7 @@ public class TypeScriptPlugin extends SonarPlugin {
                     TypeScriptRuleProfile.class,
                     TypeScriptLanguage.class,
                     TsLintSensor.class,
+                    LOCSensor.class,
                     TsCoverageSensor.class,
                     TsRulesDefinition.class
                 );
