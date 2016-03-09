@@ -45,6 +45,7 @@ import org.sonar.api.SonarPlugin;
     ),
     @Property(
 		key = TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH,
+		defaultValue = "tslint.json",
 		type = PropertyType.STRING,
 		name = "Path to tslint.json rule configuration file",
 		description = "Path to the file that configures the rules to be included in analysis",
