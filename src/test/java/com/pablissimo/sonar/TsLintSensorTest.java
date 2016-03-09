@@ -27,6 +27,8 @@ import org.sonar.api.issue.Issuable.IssueBuilder;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
+import org.sonar.api.rules.RuleFinder;
+import org.sonar.api.rules.RuleQuery;
 
 import com.pablissimo.sonar.model.TsLintIssue;
 import com.pablissimo.sonar.model.TsLintPosition;
@@ -37,7 +39,7 @@ public class TsLintSensorTest {
     Settings settings;
     FileSystem fileSystem;
     ResourcePerspectives perspectives;
-    RulesProfile rulesProfile;
+    RuleFinder ruleFinder;
     FilePredicates filePredicates;
     FilePredicate predicate;
     Issuable issuable;
@@ -55,6 +57,7 @@ public class TsLintSensorTest {
     public void setUp() throws Exception {
         this.settings = mock(Settings.class);
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn("/path/to/tslint");
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH)).thenReturn("/path/to/tslint.json");
 
         this.fileSystem = mock(FileSystem.class);
         this.perspectives = mock(ResourcePerspectives.class);
@@ -62,7 +65,7 @@ public class TsLintSensorTest {
         this.issueBuilder = mock(IssueBuilder.class, RETURNS_DEEP_STUBS);
         when(this.issuable.newIssueBuilder()).thenReturn(this.issueBuilder);
         doReturn(this.issuable).when(this.perspectives).as(eq(Issuable.class), any(org.sonar.api.resources.File.class));
-        this.rulesProfile = mock(RulesProfile.class);
+        this.ruleFinder = mock(RuleFinder.class);
 
         this.file = mock(File.class);
         doReturn(true).when(this.file).isFile();
@@ -83,8 +86,7 @@ public class TsLintSensorTest {
 
         this.executor = mock(TsLintExecutor.class);
         this.parser = mock(TsLintParser.class);
-        this.sensor = spy(new TsLintSensor(settings, fileSystem, perspectives, rulesProfile));
-        doNothing().when(this.sensor).writeConfiguration(any(String.class), any(File.class), any(Charset.class));
+        this.sensor = spy(new TsLintSensor(settings, fileSystem, perspectives, ruleFinder));
         doReturn(this.sonarFile).when(this.sensor).getFileFromIOFile(eq(this.file), any(Project.class));
         doReturn(this.executor).when(this.sensor).getTsLintExecutor();
         doReturn(this.parser).when(this.sensor).getTsLintParser();
@@ -104,18 +106,7 @@ public class TsLintSensorTest {
         when(fileSystem.files(this.predicate)).thenReturn(new ArrayList<File>());
         assertFalse(this.sensor.shouldExecuteOnProject(null));
     }
-
-    @Test
-    public void analyse_WritesConfigurationFile() throws IOException {
-        when(this.fileSystem.files(any(FilePredicate.class))).thenReturn(new ArrayList<File>());
-        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
-
-        ArgumentCaptor<File> fileCaptor = ArgumentCaptor.forClass(File.class);
-        verify(this.sensor).writeConfiguration(eq("{\n  \"rules\": {}\n}"), fileCaptor.capture(), eq(Charsets.UTF_8));
-
-        assertEquals("tslint.json", fileCaptor.getValue().getName());
-    }
-
+    
     @Test
     public void analyse_addsIssues() {
         TsLintIssue issue = new TsLintIssue();
@@ -154,7 +145,6 @@ public class TsLintSensorTest {
         when(this.fileSystem.files(any(FilePredicate.class))).thenReturn(new ArrayList<File>());
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
 
-        verify(this.sensor, never()).writeConfiguration(anyString(), any(File.class), any(Charset.class));
         verify(this.issuable, never()).addIssue(any(Issue.class));
     }
 }

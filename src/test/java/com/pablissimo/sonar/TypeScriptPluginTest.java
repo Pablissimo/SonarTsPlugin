@@ -53,13 +53,14 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(4, propertiesAnnotation.value().length);
+        assertEquals(5, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES));
         assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE));
         assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
         assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_TS_LINT_PATH));
+        assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH));
     }
 
     @Test
