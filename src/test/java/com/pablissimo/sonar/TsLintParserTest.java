@@ -27,7 +27,7 @@ public class TsLintParserTest {
         assertEquals(658, issue.getEndPosition().getPosition());
 
         assertEquals("for statements must be braced", issue.getFailure());
-        assertEquals("Tools.ts", issue.getFileName());
+        assertEquals("Tools.ts", issue.getName());
         assertEquals("curly", issue.getRuleName());
 
         assertEquals(6, issue.getStartPosition().getCharacter());
