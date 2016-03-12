@@ -71,7 +71,7 @@ public class TsLintSensorTest {
         doReturn(true).when(this.file).isFile();
 
         this.files = new ArrayList<File>(Arrays.asList(new File[] {
-            this.file
+                this.file
         }));
 
         this.fileSystem = mock(FileSystem.class);
@@ -106,7 +106,7 @@ public class TsLintSensorTest {
         when(fileSystem.files(this.predicate)).thenReturn(new ArrayList<File>());
         assertFalse(this.sensor.shouldExecuteOnProject(null));
     }
-    
+
     @Test
     public void analyse_addsIssues() {
         TsLintIssue issue = new TsLintIssue();
@@ -119,7 +119,7 @@ public class TsLintSensorTest {
         issue.setStartPosition(startPosition);
 
         TsLintIssue[] issues = new TsLintIssue[] {
-            issue
+                issue
         };
 
         final List<Issue> capturedIssues = new ArrayList<Issue>();
@@ -142,6 +142,15 @@ public class TsLintSensorTest {
     public void analyse_doesNothingWhenNotConfigured() throws IOException {
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn(null);
 
+        when(this.fileSystem.files(any(FilePredicate.class))).thenReturn(new ArrayList<File>());
+        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
+
+        verify(this.issuable, never()).addIssue(any(Issue.class));
+    }
+
+    @Test
+    public void analyse_doesNothingWhenNoConfigPathset() throws IOException {
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH)).thenReturn(null);
         when(this.fileSystem.files(any(FilePredicate.class))).thenReturn(new ArrayList<File>());
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
 
