@@ -8,39 +8,33 @@ import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.config.Settings;
 import org.sonar.api.measures.CoreMetrics;
-import org.sonar.api.measures.FileLinesContextFactory;
 import org.sonar.api.measures.Measure;
 import org.sonar.api.resources.Project;
 
 public class LOCSensor implements Sensor {
-
-    private Settings settings;
-    private FileSystem fs;
+    private FileSystem fileSystem;
 
     /**
      * Use of IoC to get Settings and FileSystem
      */
-    public LOCSensor(FileLinesContextFactory _fileLinesContextFactory,
-            Settings settings, FileSystem fs) {
-        this.settings = settings;
-        this.fs = fs;
+    public LOCSensor(FileSystem fs) {
+        this.fileSystem = fs;
     }
 
     public boolean shouldExecuteOnProject(Project project) {
         // This sensor is executed only when there are TypeScript files
-        return fs.hasFiles(fs.predicates().hasLanguage("ts"));
+        return fileSystem.hasFiles(fileSystem.predicates().hasLanguage("ts"));
     }
 
     public void analyse(Project project, SensorContext sensorContext) {
         // This sensor count the Line of source code in every .ts file
 
-        for (InputFile inputFile : fs.inputFiles(fs.predicates().hasLanguage(
+        for (InputFile inputFile : fileSystem.inputFiles(fileSystem.predicates().hasLanguage(
                 "ts"))) {
-            double value = this.getNumberCodeLine(inputFile);
+            int value = this.getNonCommentLineCount(inputFile);
             sensorContext.saveMeasure(inputFile, new Measure<Integer>(
-                    CoreMetrics.NCLOC, value));
+                    CoreMetrics.NCLOC, (double) value));
         }
     }
 
@@ -48,12 +42,16 @@ public class LOCSensor implements Sensor {
     public String toString() {
         return getClass().getSimpleName();
     }
+    
+    protected BufferedReader getReaderFromFile(InputFile inputFile) throws FileNotFoundException {
+        return new BufferedReader(new FileReader(inputFile.file()));
+    }
 
-    private double getNumberCodeLine(InputFile inputFile) {
-        double value = 0;
+    private int getNonCommentLineCount(InputFile inputFile) {
+        int value = 0;
         BufferedReader br;
         try {
-            br = new BufferedReader(new FileReader(inputFile.file()));
+            br = this.getReaderFromFile(inputFile);
 
             boolean isEOF = false;
             boolean isCommentOpen = false;
@@ -62,7 +60,7 @@ public class LOCSensor implements Sensor {
 
                 String line = br.readLine();
                 if (line != null) {
-                    isACommentLine = false;
+                    isACommentLine = isCommentOpen;
                     line = line.trim();
 
                     if (isCommentOpen) {

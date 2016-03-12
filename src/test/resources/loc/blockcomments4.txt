@@ -1,0 +1,2 @@
+/* We don't expect a one-line block comment to confuse things either */
+var x = 1;

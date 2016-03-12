@@ -1,0 +1,2 @@
+var x = 1; /* Single-line block comments with actual code should be OK */
+var y = 2;

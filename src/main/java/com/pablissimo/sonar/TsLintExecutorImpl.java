@@ -40,9 +40,12 @@ public class TsLintExecutorImpl implements TsLintExecutor {
             }
         };
 
-        CommandExecutor executor = CommandExecutor.create();
-        int exitCode = executor.execute(command, stdOutConsumer, stdErrConsumer, 5000);
+        this.createExecutor().execute(command, stdOutConsumer, stdErrConsumer, 5000);
 
         return stdOut.toString();
+    }
+    
+    protected CommandExecutor createExecutor() {
+        return CommandExecutor.create();
     }
 }

@@ -1,0 +1,8 @@
+// This line shouldn't be counted
+   // Nor should this one
+	// Nor this
+var x = "this one should, though."; // but not get confused by this
+
+// Whitespace above shouldn't count
+x += "but this should";
+

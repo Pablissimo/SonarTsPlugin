@@ -1,0 +1,9 @@
+/*
+    Block comments tracking shouldn't get confused by
+    other comment lines embedded in the block
+    // like this
+    nor by unexpected extra comment block openings
+    /* like this
+ */
+ module Whatever {
+ }
