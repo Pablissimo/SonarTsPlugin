@@ -5,15 +5,15 @@ import org.sonar.api.rule.Severity;
 import org.sonar.api.server.rule.RulesDefinition;
 
 public class TsRulesDefinition implements RulesDefinition {
-	public static final String REPOSITORY_NAME = "tslint";
-	
-	public static final String RULE_TSLINT_ISSUE = "tslint-issue";
-	
-	public static final String RULE_ALIGN = "align";
-	public static final String RULE_BAN = "ban";
-	public static final String RULE_CLASS_NAME = "class-name";
-	public static final String RULE_COMMENT_FORMAT = "comment-format";
-	public static final String RULE_CURLY = "curly";
+    public static final String REPOSITORY_NAME = "tslint";
+
+    public static final String RULE_TSLINT_ISSUE = "tslint-issue";
+
+    public static final String RULE_ALIGN = "align";
+    public static final String RULE_BAN = "ban";
+    public static final String RULE_CLASS_NAME = "class-name";
+    public static final String RULE_COMMENT_FORMAT = "comment-format";
+    public static final String RULE_CURLY = "curly";
     public static final String RULE_EOFLINE = "eofline";
     public static final String RULE_FORIN = "forin";
     public static final String RULE_INDENT = "indent";
@@ -72,7 +72,7 @@ public class TsRulesDefinition implements RulesDefinition {
                 .setName("TsLint Analyser");
 
         repository.createRule(RULE_TSLINT_ISSUE).setName("tslint issues that are not yet known to the plugin").setSeverity(Severity.MAJOR);
-        
+
         repository.createRule(RULE_ALIGN).setName("enforces vertical alignment of parameters, arguments and statements").setSeverity(Severity.MINOR);
         repository.createRule(RULE_BAN).setName("Use of this method is banned by current configuration").setSeverity(Severity.CRITICAL);
         repository.createRule(RULE_CLASS_NAME).setName("Name must use PascalCase").setSeverity(Severity.MAJOR);
@@ -128,7 +128,7 @@ public class TsRulesDefinition implements RulesDefinition {
         repository.createRule(RULE_USE_STRICT).setName("Strict mode must be used").setSeverity(Severity.CRITICAL);
         repository.createRule(RULE_VARIABLE_NAME).setName("Variable names must be either camelCased or UPPER_CASED").setSeverity(Severity.MAJOR);
         repository.createRule(RULE_WHITESPACE).setName("Inappropriate whitespace between tokens").setSeverity(Severity.MINOR);
-        
+
         for (NewRule rule : repository.rules()) {
             rule.setHtmlDescription("HTML description to follow");
             rule.setStatus(RuleStatus.READY);

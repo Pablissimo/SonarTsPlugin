@@ -66,16 +66,16 @@ public class TsLintSensor implements Sensor {
     public void analyse(Project project, SensorContext context) {
         String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
         String pathToTsLintConfig = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH);
-        
+
         if (pathToTsLint == null) {
             LOG.warn("Path to tslint (" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
             return;
         }
         else if (pathToTsLintConfig == null) {
-        	LOG.warn("Path to tslint.json configuration file (" + TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH + ") is not defined. Skipping tslint analysis.");
-        	return;
+            LOG.warn("Path to tslint.json configuration file (" + TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH + ") is not defined. Skipping tslint analysis.");
+            return;
         }
-        
+
         TsLintExecutor executor = this.getTsLintExecutor();
         TsLintParser parser = this.getTsLintParser();
 
@@ -85,9 +85,9 @@ public class TsLintSensor implements Sensor {
         Collection<Rule> allRules = this.ruleFinder.findAll(ruleQuery);
         HashSet<String> ruleNames = new HashSet<String>();
         for (Rule rule : allRules) {
-        	ruleNames.add(rule.getKey());
+            ruleNames.add(rule.getKey());
         }
-        
+
         for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
             if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
                 continue;
@@ -99,25 +99,25 @@ public class TsLintSensor implements Sensor {
             String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, file.getAbsolutePath());
 
             TsLintIssue[] issues = parser.parse(jsonResult);
-                        
+
             if (issues != null) {
                 for (TsLintIssue issue : issues) {
-                	// Make sure the rule we're violating is one we recognise - if not, we'll
-                	// fall back to the generic 'tslint-issue' rule
-                	String ruleName = issue.getRuleName();
-                	if (!ruleNames.contains(ruleName)) {
-                		ruleName = TsRulesDefinition.RULE_TSLINT_ISSUE;
-                	}
+                    // Make sure the rule we're violating is one we recognise - if not, we'll
+                    // fall back to the generic 'tslint-issue' rule
+                    String ruleName = issue.getRuleName();
+                    if (!ruleNames.contains(ruleName)) {
+                        ruleName = TsRulesDefinition.RULE_TSLINT_ISSUE;
+                    }
 
                     issuable.addIssue
                     (
-                        issuable
+                            issuable
                             .newIssueBuilder()
                             .line(issue.getStartPosition().getLine() + 1)
                             .message(issue.getFailure())
                             .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, ruleName))
                             .build()
-                    );
+                            );
                 }
             }
         }

@@ -49,7 +49,7 @@ public class TsCoverageSensorTest {
         doReturn(true).when(this.file).isFile();
 
         this.files = new ArrayList<File>(Arrays.asList(new File[] {
-            this.file
+                this.file
         }));
 
         this.fileSystem = mock(FileSystem.class);

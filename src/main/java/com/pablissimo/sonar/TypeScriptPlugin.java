@@ -44,15 +44,15 @@ import org.sonar.api.SonarPlugin;
         global = false
     ),
     @Property(
-		key = TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH,
-		defaultValue = "tslint.json",
-		type = PropertyType.STRING,
-		name = "Path to tslint.json rule configuration file",
-		description = "Path to the file that configures the rules to be included in analysis",
-		project = true,
-		global = false
-	)
-    })
+        key = TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH,
+        defaultValue = "tslint.json",
+        type = PropertyType.STRING,
+        name = "Path to tslint.json rule configuration file",
+        description = "Path to the file that configures the rules to be included in analysis",
+        project = true,
+        global = false
+    )
+})
 public class TypeScriptPlugin extends SonarPlugin {
     public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludetypedefinitionfiles";
     public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.forceZeroCoverage";
@@ -63,12 +63,12 @@ public class TypeScriptPlugin extends SonarPlugin {
     public List getExtensions() {
         return Arrays.asList
                 (
-                    TypeScriptRuleProfile.class,
-                    TypeScriptLanguage.class,
-                    TsLintSensor.class,
-                    LOCSensor.class,
-                    TsCoverageSensor.class,
-                    TsRulesDefinition.class
-                );
+                        TypeScriptRuleProfile.class,
+                        TypeScriptLanguage.class,
+                        TsLintSensor.class,
+                        LOCSensor.class,
+                        TsCoverageSensor.class,
+                        TsRulesDefinition.class
+                        );
     }
 }

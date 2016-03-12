@@ -37,133 +37,133 @@ import java.util.Map;
  */
 public final class LCOVParserImpl implements LCOVParser {
 
-  private static final Logger LOG = LoggerFactory.getLogger(LCOVParserImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LCOVParserImpl.class);
 
-  private static final String SF = "SF:";
-  private static final String DA = "DA:";
-  private static final String BRDA = "BRDA:";
+    private static final String SF = "SF:";
+    private static final String DA = "DA:";
+    private static final String BRDA = "BRDA:";
 
-  private final File moduleBaseDir;
+    private final File moduleBaseDir;
 
-  public LCOVParserImpl(File moduleBaseDir) {
-    this.moduleBaseDir = moduleBaseDir;
-  }
-
-  public Map<String, CoverageMeasuresBuilder> parseFile(File file) {
-    final List<String> lines;
-    try {
-      lines = FileUtils.readLines(file);
-    } catch (IOException e) {
-      throw new SonarException("Could not read content from file: " + file, e);
+    public LCOVParserImpl(File moduleBaseDir) {
+        this.moduleBaseDir = moduleBaseDir;
     }
-    return parse(lines);
-  }
 
-  public Map<String, CoverageMeasuresBuilder> parse(List<String> lines) {
-    final Map<String, FileData> files = Maps.newHashMap();
-    FileData fileData = new FileData();
-
-    for (String line : lines) {
-      if (line.startsWith(SF)) {
-        // SF:<absolute path to the source file>
-        String filePath = line.substring(SF.length());
-
-        // some tools (like Istanbul, Karma) provide relative paths, so let's consider them relative to project directory
+    public Map<String, CoverageMeasuresBuilder> parseFile(File file) {
+        final List<String> lines;
         try {
-          filePath = this.getIOFile(moduleBaseDir, filePath).getCanonicalPath();
+            lines = FileUtils.readLines(file);
         } catch (IOException e) {
-          filePath = "";
-          LOG.error("Unable to retreive coverage info for file {}, because: {}", filePath, e);
+            throw new SonarException("Could not read content from file: " + file, e);
+        }
+        return parse(lines);
+    }
+
+    public Map<String, CoverageMeasuresBuilder> parse(List<String> lines) {
+        final Map<String, FileData> files = Maps.newHashMap();
+        FileData fileData = new FileData();
+
+        for (String line : lines) {
+            if (line.startsWith(SF)) {
+                // SF:<absolute path to the source file>
+                String filePath = line.substring(SF.length());
+
+                // some tools (like Istanbul, Karma) provide relative paths, so let's consider them relative to project directory
+                try {
+                    filePath = this.getIOFile(moduleBaseDir, filePath).getCanonicalPath();
+                } catch (IOException e) {
+                    filePath = "";
+                    LOG.error("Unable to retreive coverage info for file {}, because: {}", filePath, e);
+                }
+
+                fileData = files.get(filePath);
+                if (fileData == null) {
+                    fileData = new FileData();
+                    files.put(filePath, fileData);
+                }
+
+            } else if (line.startsWith(DA)) {
+                // DA:<line number>,<execution count>[,<checksum>]
+                String execution = line.substring(DA.length());
+                String executionCount = execution.substring(execution.indexOf(',') + 1);
+                String lineNumber = execution.substring(0, execution.indexOf(','));
+
+                fileData.addLine(Integer.valueOf(lineNumber), Integer.valueOf(executionCount));
+
+            } else if (line.startsWith(BRDA)) {
+                // BRDA:<line number>,<block number>,<branch number>,<taken>
+                String[] tokens = line.substring(BRDA.length()).trim().split(",");
+                String lineNumber = tokens[0];
+                String branchNumber = tokens[1] + tokens[2];
+                String taken = tokens[3];
+
+                fileData.addBranch(Integer.valueOf(lineNumber), branchNumber, "-".equals(taken) ? 0 : Integer.valueOf(taken));
+            }
         }
 
-        fileData = files.get(filePath);
-        if (fileData == null) {
-          fileData = new FileData();
-          files.put(filePath, fileData);
+        Map<String, CoverageMeasuresBuilder> coveredFiles = Maps.newHashMap();
+        for (Map.Entry<String, FileData> e : files.entrySet()) {
+            coveredFiles.put(e.getKey(), e.getValue().convert());
         }
-
-      } else if (line.startsWith(DA)) {
-        // DA:<line number>,<execution count>[,<checksum>]
-        String execution = line.substring(DA.length());
-        String executionCount = execution.substring(execution.indexOf(',') + 1);
-        String lineNumber = execution.substring(0, execution.indexOf(','));
-
-        fileData.addLine(Integer.valueOf(lineNumber), Integer.valueOf(executionCount));
-
-      } else if (line.startsWith(BRDA)) {
-        // BRDA:<line number>,<block number>,<branch number>,<taken>
-        String[] tokens = line.substring(BRDA.length()).trim().split(",");
-        String lineNumber = tokens[0];
-        String branchNumber = tokens[1] + tokens[2];
-        String taken = tokens[3];
-
-        fileData.addBranch(Integer.valueOf(lineNumber), branchNumber, "-".equals(taken) ? 0 : Integer.valueOf(taken));
-      }
+        return coveredFiles;
     }
 
-    Map<String, CoverageMeasuresBuilder> coveredFiles = Maps.newHashMap();
-    for (Map.Entry<String, FileData> e : files.entrySet()) {
-      coveredFiles.put(e.getKey(), e.getValue().convert());
-    }
-    return coveredFiles;
-  }
-
-  /**
-   * Returns a java.io.File for the given path.
-   * If path is not absolute, returns a File with module base directory as parent path.
-   */
-  protected File getIOFile(File baseDir, String path) {
-    File file = new File(path);
-    if (!file.isAbsolute()) {
-      file = new File(baseDir, path);
-    }
-
-    return file;
-  }
-
-  private static class FileData {
     /**
-     * line number -> branch number -> taken
+     * Returns a java.io.File for the given path.
+     * If path is not absolute, returns a File with module base directory as parent path.
      */
-    private Map<Integer, Map<String, Integer>> branches = Maps.newHashMap();
-
-    /**
-     * line number -> execution count
-     */
-    private Map<Integer, Integer> hits = Maps.newHashMap();
-
-    public void addBranch(Integer lineNumber, String branchNumber, Integer taken) {
-      Map<String, Integer> branchesForLine = branches.get(lineNumber);
-      if (branchesForLine == null) {
-        branchesForLine = Maps.newHashMap();
-        branches.put(lineNumber, branchesForLine);
-      }
-      Integer currentValue = branchesForLine.get(branchNumber);
-      branchesForLine.put(branchNumber, Objects.firstNonNull(currentValue, 0) + taken);
-    }
-
-    public void addLine(Integer lineNumber, Integer executionCount) {
-      Integer currentValue = hits.get(lineNumber);
-      hits.put(lineNumber, Objects.firstNonNull(currentValue, 0) + executionCount);
-    }
-
-    public CoverageMeasuresBuilder convert() {
-      CoverageMeasuresBuilder result = CoverageMeasuresBuilder.create();
-      for (Map.Entry<Integer, Integer> e : hits.entrySet()) {
-        result.setHits(e.getKey(), e.getValue());
-      }
-      for (Map.Entry<Integer, Map<String, Integer>> e : branches.entrySet()) {
-        int conditions = e.getValue().size();
-        int covered = 0;
-        for (Integer taken : e.getValue().values()) {
-          if (taken > 0) {
-            covered++;
-          }
+    protected File getIOFile(File baseDir, String path) {
+        File file = new File(path);
+        if (!file.isAbsolute()) {
+            file = new File(baseDir, path);
         }
-        result.setConditions(e.getKey(), conditions, covered);
-      }
-      return result;
+
+        return file;
     }
-  }
+
+    private static class FileData {
+        /**
+         * line number -> branch number -> taken
+         */
+        private Map<Integer, Map<String, Integer>> branches = Maps.newHashMap();
+
+        /**
+         * line number -> execution count
+         */
+        private Map<Integer, Integer> hits = Maps.newHashMap();
+
+        public void addBranch(Integer lineNumber, String branchNumber, Integer taken) {
+            Map<String, Integer> branchesForLine = branches.get(lineNumber);
+            if (branchesForLine == null) {
+                branchesForLine = Maps.newHashMap();
+                branches.put(lineNumber, branchesForLine);
+            }
+            Integer currentValue = branchesForLine.get(branchNumber);
+            branchesForLine.put(branchNumber, Objects.firstNonNull(currentValue, 0) + taken);
+        }
+
+        public void addLine(Integer lineNumber, Integer executionCount) {
+            Integer currentValue = hits.get(lineNumber);
+            hits.put(lineNumber, Objects.firstNonNull(currentValue, 0) + executionCount);
+        }
+
+        public CoverageMeasuresBuilder convert() {
+            CoverageMeasuresBuilder result = CoverageMeasuresBuilder.create();
+            for (Map.Entry<Integer, Integer> e : hits.entrySet()) {
+                result.setHits(e.getKey(), e.getValue());
+            }
+            for (Map.Entry<Integer, Map<String, Integer>> e : branches.entrySet()) {
+                int conditions = e.getValue().size();
+                int covered = 0;
+                for (Integer taken : e.getValue().values()) {
+                    if (taken > 0) {
+                        covered++;
+                    }
+                }
+                result.setConditions(e.getKey(), conditions, covered);
+            }
+            return result;
+        }
+    }
 
 }

@@ -23,7 +23,7 @@ public class TypeScriptRuleProfileTest {
         this.validationMessages = ValidationMessages.create();
         this.ruleProfile = new TypeScriptRuleProfile();
         this.expectedRuleNames = new ArrayList<String>(Arrays.asList(
-        		TsRulesDefinition.RULE_TSLINT_ISSUE,
+                TsRulesDefinition.RULE_TSLINT_ISSUE,
                 TsRulesDefinition.RULE_ALIGN,
                 TsRulesDefinition.RULE_BAN,
                 TsRulesDefinition.RULE_CLASS_NAME,
@@ -79,7 +79,7 @@ public class TypeScriptRuleProfileTest {
                 TsRulesDefinition.RULE_USE_STRICT,
                 TsRulesDefinition.RULE_VARIABLE_NAME,
                 TsRulesDefinition.RULE_WHITESPACE
-        ));
+                ));
     }
 
     @After
