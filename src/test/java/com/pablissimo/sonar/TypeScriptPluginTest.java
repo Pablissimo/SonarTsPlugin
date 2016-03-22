@@ -33,11 +33,11 @@ public class TypeScriptPluginTest {
         List extensions = this.plugin.getExtensions();
 
         assertEquals(6, extensions.size());
-		assertTrue(extensions.contains(TypeScriptRuleProfile.class));
-		assertTrue(extensions.contains(TypeScriptLanguage.class));
-		assertTrue(extensions.contains(TsLintSensor.class));
-		assertTrue(extensions.contains(TsCoverageSensor.class));
-		assertTrue(extensions.contains(TsRulesDefinition.class));
+        assertTrue(extensions.contains(TypeScriptRuleProfile.class));
+        assertTrue(extensions.contains(TypeScriptLanguage.class));
+        assertTrue(extensions.contains(TsLintSensor.class));
+        assertTrue(extensions.contains(TsCoverageSensor.class));
+        assertTrue(extensions.contains(TsRulesDefinition.class));
     }
 
     @Test
@@ -53,13 +53,19 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(4, propertiesAnnotation.value().length);
+        assertEquals(5, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
-        assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES));
-        assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE));
-        assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
-        assertNotNull(findPropertyByName(properties, TypeScriptPlugin.SETTING_TS_LINT_PATH));
+        assertNotNull(findPropertyByName(properties,
+                TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES));
+        assertNotNull(findPropertyByName(properties,
+                TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE));
+        assertNotNull(findPropertyByName(properties,
+                TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
+        assertNotNull(findPropertyByName(properties,
+                TypeScriptPlugin.SETTING_TS_LINT_PATH));
+        assertNotNull(findPropertyByName(properties,
+                TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH));
     }
 
     @Test
@@ -103,15 +109,18 @@ public class TypeScriptPluginTest {
     }
 
     private Property findPropertyByName(String property) {
-        return findPropertyByName(((Properties) plugin.getClass().getAnnotations()[0]).value(), property);
+        return findPropertyByName(((Properties) plugin.getClass()
+                .getAnnotations()[0]).value(), property);
     }
 
-    private static Property findPropertyByName(Property[] properties, final String name) {
-        return (Property) CollectionUtils.find(Arrays.asList(properties), new Predicate() {
-            @Override
-            public boolean evaluate(Object arg0) {
-                return ((Property) arg0).key().equals(name);
-            }
-        });
+    private static Property findPropertyByName(Property[] properties,
+            final String name) {
+        return (Property) CollectionUtils.find(Arrays.asList(properties),
+                new Predicate() {
+                    @Override
+                    public boolean evaluate(Object arg0) {
+                        return ((Property) arg0).key().equals(name);
+                    }
+                });
     }
 }

@@ -5,7 +5,7 @@
   <groupId>com.pablissimo.sonar</groupId>
   <artifactId>sonar-typescript-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
 
   <name>TypeScript</name>
   <description>Analyse TypeScript projects</description>
@@ -14,7 +14,7 @@
     <connection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</connection>
     <developerConnection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</developerConnection>
     <url>https://github.com/Pablissimo/SonarTsPlugin</url>
-    <tag>0.1</tag>
+    <tag>0.2</tag>
   </scm>
   
   <properties>
@@ -115,7 +115,10 @@
         <artifactId>cobertura-maven-plugin</artifactId>
         <version>2.6</version>
         <configuration>
-            <format>xml</format>
+            <formats>
+                <format>xml</format>
+                <format>html</format>
+            </formats>
             <maxmem>256m</maxmem>
             <!-- aggregated reports for multi-module projects -->
             <aggregate>true</aggregate>

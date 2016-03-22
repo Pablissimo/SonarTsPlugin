@@ -1,18 +1,18 @@
 package com.pablissimo.sonar.model;
 
 public class TsLintIssue {
-    private String fileName;
+    private String name;
     private TsLintPosition startPosition;
     private TsLintPosition endPosition;
     private String failure;
     private String ruleName;
 
-    public String getFileName() {
-        return fileName;
+    public String getName() {
+        return name;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public TsLintPosition getStartPosition() {

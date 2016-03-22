@@ -1,0 +1,5 @@
+/*
+    Block comments shouldn't count towards line count - expected 2 lines
+*/
+module Whatever {
+}

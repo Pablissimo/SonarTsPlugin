@@ -11,14 +11,17 @@ SonarQube plugin for TypeScript files
 This is a **not even alpha-level yet** SonarQube plugin for analysing projects with TypeScript content that supports:
 * TsLint for code quality information
 * Importing LCOV files for unit test coverage information
+* NCLOC metric generation
 
 It's unfinished in the following respects:
 * Plug-in code quality needs improved
-* No unit test coverage of the plugin
+* Incomplete unit test coverage of the plugin
 * Exceptionally little error handling
-* No overall code metrics like LOC, NCLOC
 
 It's presented only for the interested, and the brave.
+
+###Breaking change in 0.2###
+To more easily support changes to the rules TsLint understands, the plugin no longer generates a TsLint configuration file for you but instead you must now specify your own using the sonar.ts.tslintconfigpath configuration property (either in the web interface, or in your sonar-project.properties file).
 
 ##Requirements
 * Java 1.7+
@@ -29,7 +32,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 
 ##Building
 * Download the source
-* Build with maven, *mvn install*
+* Build with maven, *mvn clean && mvn install*
 
 ##Installation
 * Install Node.js
@@ -39,7 +42,8 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 * Restart SonarQube server
 * Browse to SonarQube web interface, login as Admin, hit up Settings
 * Find the TypeScript tab, paste in the TsLint path
-* Hit the Rules tab, then the TsLint rule set, then apply it to your project - configure rules as required
+* Hit the Rules tab, then the TsLint rule set, then apply it to your project - alter rule activation as required
+* Add *sonar.ts.tslintconfigpath=tslint.json* to your sonar-project.properties file - change the path as required, relative to your properties file
 * If LCOV data available, add *sonar.ts.lcov.reportpath=lcov.dat* to your sonar-project.properties file (replace lcov.dat with your lcov output, will be sought relative to the sonar-project.properties file)
 * Run sonar-runner
 * TsLint rule breaches should be shown in the web view

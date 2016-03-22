@@ -1,0 +1,4 @@
+var x = 1; /*
+this block comment started somewhere unusual but shouldn't
+confuse things any - expecting one line
+*/

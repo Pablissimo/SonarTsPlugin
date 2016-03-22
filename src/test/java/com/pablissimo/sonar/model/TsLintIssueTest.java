@@ -19,9 +19,9 @@ public class TsLintIssueTest {
     }
 
     @Test
-    public void getSetFilename() {
-        this.model.setFileName("the file");
-        assertEquals("the file", this.model.getFileName());
+    public void getSetName() {
+        this.model.setName("the file");
+        assertEquals("the file", this.model.getName());
     }
 
     @Test
