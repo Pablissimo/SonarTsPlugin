@@ -51,6 +51,7 @@ public class TsLintSensorTest {
         this.settings = mock(Settings.class);
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn("/path/to/tslint");
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH)).thenReturn("/path/to/tslint.json");
+        when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(45000);
 
         this.fileSystem = mock(FileSystem.class);
         this.perspectives = mock(ResourcePerspectives.class);
@@ -148,5 +149,21 @@ public class TsLintSensorTest {
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
 
         verify(this.issuable, never()).addIssue(any(Issue.class));
+    }
+    
+    @Test
+    public void analyse_callsExecutorWithSuppliedTimeout() throws IOException {
+        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
+     
+        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), eq(45000));
+    }
+    
+    @Test
+    public void analyze_callsExecutorWithAtLeast5000msTimeout() throws IOException {
+        when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(-500);
+        
+        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
+        
+        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), eq(5000));
     }
 }
