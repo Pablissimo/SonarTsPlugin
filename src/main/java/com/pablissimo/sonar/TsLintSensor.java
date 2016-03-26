@@ -66,6 +66,7 @@ public class TsLintSensor implements Sensor {
     public void analyse(Project project, SensorContext context) {
         String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
         String pathToTsLintConfig = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH);
+        String rulesDir = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR);
         Integer tsLintTimeoutMs = Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
 
         if (pathToTsLint == null) {
@@ -97,7 +98,7 @@ public class TsLintSensor implements Sensor {
             Resource resource = this.getFileFromIOFile(file, project);
             Issuable issuable = perspectives.as(Issuable.class, resource);
 
-            String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, file.getAbsolutePath(), tsLintTimeoutMs);
+            String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, rulesDir, file.getAbsolutePath(), tsLintTimeoutMs);
 
             TsLintIssue[] issues = parser.parse(jsonResult);
 

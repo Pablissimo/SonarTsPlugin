@@ -12,12 +12,18 @@ public class TsLintExecutorImpl implements TsLintExecutor {
     private StringBuilder stdOut;
     private StringBuilder stdErr;
 
-    public String execute(String pathToTsLint, String configFile, String file, Integer timeoutMs) {
+    public String execute(String pathToTsLint, String configFile, String rulesDir, String file, Integer timeoutMs) {
         LOG.info("TsLint executing for " + file);
         Command command = Command.create("node");
         command.addArgument(pathToTsLint);
         command.addArgument("--format");
         command.addArgument("json");
+        
+        if (rulesDir != null && rulesDir.length() > 0) {
+            command.addArgument("--rules-dir");
+            command.addArgument(rulesDir);
+        }
+        
         command.addArgument("--config");
         command.addArgument(configFile);
         command.addArgument(file.trim());

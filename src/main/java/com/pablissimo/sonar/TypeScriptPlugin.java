@@ -53,6 +53,15 @@ import org.sonar.api.SonarPlugin;
         global = false
     ),
     @Property(
+        key = TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR,
+        defaultValue = "",
+        type = PropertyType.STRING,
+        name = "Custom rules dir",
+        description = "Path to any custom rules directory to be supplied to TsLint",
+        project = true,
+        global = false
+    ),
+    @Property(
         key = TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT,
         defaultValue = "60000",
         type = PropertyType.INTEGER,
@@ -68,6 +77,7 @@ public class TypeScriptPlugin extends SonarPlugin {
     public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslintpath";
     public static final String SETTING_TS_LINT_CONFIG_PATH = "sonar.ts.tslintconfigpath";
     public static final String SETTING_TS_LINT_TIMEOUT = "sonar.ts.tslinttimeout";
+    public static final String SETTING_TS_LINT_RULES_DIR = "sonar.ts.tslintrulesdir";
     public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
 
     public List getExtensions() {
