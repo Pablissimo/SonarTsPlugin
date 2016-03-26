@@ -38,14 +38,14 @@ public class TsLintExecutorImplTest {
         };
         
         when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute("path/to/tslint", "path/to/config", "path/to/file", 40000);
+        this.executorImpl.execute("path/to/tslint", "path/to/config", "path/to/rules", "path/to/file", 40000);
         
         assertEquals(1, capturedCommands.size());
         
         Command theCommand = capturedCommands.get(0);
         long theTimeout = capturedTimeouts.get(0);
         
-        assertEquals("node path/to/tslint --format json --config path/to/config path/to/file", theCommand.toCommandLine());
+        assertEquals("node path/to/tslint --format json --rules-dir path/to/rules --config path/to/config path/to/file", theCommand.toCommandLine());
         assertEquals(40000, theTimeout);        
     }
 }

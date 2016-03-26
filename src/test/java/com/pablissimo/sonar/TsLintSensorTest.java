@@ -155,7 +155,7 @@ public class TsLintSensorTest {
     public void analyse_callsExecutorWithSuppliedTimeout() throws IOException {
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
      
-        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), eq(45000));
+        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(String.class), eq(45000));
     }
     
     @Test
@@ -164,6 +164,6 @@ public class TsLintSensorTest {
         
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
         
-        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), eq(5000));
+        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(String.class), eq(5000));
     }
 }
