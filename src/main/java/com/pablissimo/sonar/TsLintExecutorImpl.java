@@ -12,7 +12,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
     private StringBuilder stdOut;
     private StringBuilder stdErr;
 
-    public String execute(String pathToTsLint, String configFile, String file) {
+    public String execute(String pathToTsLint, String configFile, String file, Integer timeoutMs) {
         LOG.info("TsLint executing for " + file);
         Command command = Command.create("node");
         command.addArgument(pathToTsLint);
@@ -40,7 +40,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
             }
         };
 
-        this.createExecutor().execute(command, stdOutConsumer, stdErrConsumer, 5000);
+        this.createExecutor().execute(command, stdOutConsumer, stdErrConsumer, timeoutMs);
 
         return stdOut.toString();
     }
