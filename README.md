@@ -6,6 +6,17 @@ SonarQube plugin for TypeScript files
 [![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
 [![Coverage Status](https://coveralls.io/repos/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/r/Pablissimo/SonarTsPlugin?branch=master)
 
+##Demos
+
+A live deployed demo hitting a few large open-source TypeScript projects can be found here:
+http://sonar.pablissimo.com
+
+Suggestions for more projects (or ones with easy-to-gather code coverage info) appreciated!
+
+* [Microsoft TypeScript Compiler](http://sonar.pablissimo.com/overview?id=18739)
+* [Microsoft Visual Studio Code](http://sonar.pablissimo.com/overview?id=18739)
+* [Angular Framework](http://sonar.pablissimo.com/overview?id=18822)
+
 ##Overview
 
 This is a **not even alpha-level yet** SonarQube plugin for analysing projects with TypeScript content that supports:
