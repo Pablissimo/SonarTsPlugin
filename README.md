@@ -14,6 +14,7 @@ http://sonar.pablissimo.com
 Suggestions for more projects (or ones with easy-to-gather code coverage info) appreciated!
 
 * [Microsoft TypeScript Compiler](http://sonar.pablissimo.com/overview?id=18739)
+* [Turbulenz Engine](http://sonar.pablissimo.com/overview?id=20352)
 * [Microsoft Visual Studio Code](http://sonar.pablissimo.com/overview?id=19179)
 * [Angular Framework](http://sonar.pablissimo.com/overview?id=18822)
 
