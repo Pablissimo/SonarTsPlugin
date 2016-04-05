@@ -74,7 +74,7 @@ public class TsLintSensorTest {
 
         this.filePredicates = mock(FilePredicates.class);
         when(this.fileSystem.predicates()).thenReturn(this.filePredicates);
-        when(filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION)).thenReturn(this.predicate);
+        when(filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY)).thenReturn(this.predicate);
 
         this.sonarFile = mock(org.sonar.api.resources.File.class);
 

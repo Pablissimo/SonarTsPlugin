@@ -68,7 +68,7 @@ public class TsRulesDefinition implements RulesDefinition {
     public void define(Context context) {
         NewRepository repository =
                 context
-                .createRepository(REPOSITORY_NAME, TypeScriptLanguage.LANGUAGE_EXTENSION)
+                .createRepository(REPOSITORY_NAME, TypeScriptLanguage.LANGUAGE_KEY)
                 .setName("TsLint Analyser");
 
         repository.createRule(RULE_TSLINT_ISSUE).setName("tslint issues that are not yet known to the plugin").setSeverity(Severity.MAJOR);

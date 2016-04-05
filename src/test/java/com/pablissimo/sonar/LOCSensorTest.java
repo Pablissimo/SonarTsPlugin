@@ -59,7 +59,7 @@ public class LOCSensorTest {
                 
         this.filePredicates = mock(FilePredicates.class);
         when(this.fileSystem.predicates()).thenReturn(this.filePredicates);
-        when(filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION)).thenReturn(this.predicate);
+        when(filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY)).thenReturn(this.predicate);
         when(fileSystem.hasFiles(this.predicate)).thenReturn(true);
                 
         this.sensor = spy(new LOCSensor(this.fileSystem));

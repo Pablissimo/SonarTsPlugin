@@ -25,10 +25,11 @@ public class TypeScriptLanguageTest {
     }
 
     @Test
-    public void definesCorrectExtension() {
+    public void definesCorrectExtensions() {
         String[] suffices = this.language.getFileSuffixes();
 
-        assertEquals(1, suffices.length);
+        assertEquals(2, suffices.length);
         assertEquals("ts", suffices[0]);
+		assertEquals("tsx", suffices[1]);
     }
 }

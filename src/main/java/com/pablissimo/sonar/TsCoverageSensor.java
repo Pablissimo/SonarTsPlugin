@@ -51,7 +51,7 @@ public class TsCoverageSensor implements Sensor {
     }
 
     public boolean shouldExecuteOnProject(Project project) {
-        return moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION)).iterator().hasNext();
+        return moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY)).iterator().hasNext();
     }
 
     public void analyse(Project project, SensorContext context) {
@@ -66,7 +66,7 @@ public class TsCoverageSensor implements Sensor {
     }
 
     protected void saveZeroValueForAllFiles(Project project, SensorContext context) {
-        for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
+        for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             saveZeroValueForResource(this.fileFromIoFile(file, project), context);
         }
     }
@@ -85,7 +85,7 @@ public class TsCoverageSensor implements Sensor {
         LCOVParser parser = getParser(moduleFileSystem.baseDir());
         Map<String, CoverageMeasuresBuilder> coveredFiles = parser.parseFile(lcovFile);
 
-        for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
+        for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             try {
                 CoverageMeasuresBuilder fileCoverage = coveredFiles.get(file.getAbsolutePath());
                 org.sonar.api.resources.File resource = this.fileFromIoFile(file, project);
