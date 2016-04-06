@@ -60,7 +60,7 @@ public class TsLintSensor implements Sensor {
     }
 
     private boolean hasFilesToAnalyze() {
-        return fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION)).iterator().hasNext();
+        return fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY)).iterator().hasNext();
     }
 
     public void analyse(Project project, SensorContext context) {
@@ -90,7 +90,7 @@ public class TsLintSensor implements Sensor {
             ruleNames.add(rule.getKey());
         }
 
-        for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_EXTENSION))) {
+        for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
                 continue;
             }

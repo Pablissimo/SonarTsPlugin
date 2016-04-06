@@ -31,7 +31,7 @@ public class TsRulesDefinitionTest {
         Context context = mock(Context.class, RETURNS_DEEP_STUBS);
         this.definition.define(context);
 
-        verify(context).createRepository(eq(TsRulesDefinition.REPOSITORY_NAME), eq(TypeScriptLanguage.LANGUAGE_EXTENSION));
+        verify(context).createRepository(eq(TsRulesDefinition.REPOSITORY_NAME), eq(TypeScriptLanguage.LANGUAGE_KEY));
     }
 
     @Test

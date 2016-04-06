@@ -10,7 +10,7 @@ public class TypeScriptRuleProfile extends ProfileDefinition {
 
     @Override
     public RulesProfile createProfile(ValidationMessages validation) {
-        RulesProfile profile = RulesProfile.create("TsLint", TypeScriptLanguage.LANGUAGE_EXTENSION);
+        RulesProfile profile = RulesProfile.create("TsLint", TypeScriptLanguage.LANGUAGE_KEY);
 
         activateRule(profile, TsRulesDefinition.RULE_TSLINT_ISSUE);
         activateRule(profile, TsRulesDefinition.RULE_ALIGN);
