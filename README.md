@@ -9,14 +9,14 @@ SonarQube plugin for TypeScript files
 ##Demos
 
 A live deployed demo hitting a few large open-source TypeScript projects can be found here:
-http://sonar.pablissimo.com
+https://sonar.pablissimo.com
 
 Suggestions for more projects (or ones with easy-to-gather code coverage info) appreciated!
 
-* [Microsoft TypeScript Compiler](http://sonar.pablissimo.com/overview?id=18739)
-* [Turbulenz Engine](http://sonar.pablissimo.com/overview?id=20352)
-* [Microsoft Visual Studio Code](http://sonar.pablissimo.com/overview?id=19179)
-* [Angular Framework](http://sonar.pablissimo.com/overview?id=18822)
+* [Microsoft TypeScript Compiler](https://sonar.pablissimo.com/overview?id=18739)
+* [Turbulenz Engine](https://sonar.pablissimo.com/overview?id=20352)
+* [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
+* [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
 
 ##Overview
 
