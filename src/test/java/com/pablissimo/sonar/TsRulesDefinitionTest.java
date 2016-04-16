@@ -35,244 +35,394 @@ public class TsRulesDefinitionTest {
     }
 
     @Test
+    public void ConfiguresAlignRule() {
+        Rule rule = getRule("align");
+        assertNotNull(rule);
+        assertEquals(Severity.MINOR, rule.severity());
+    }
+
+    @Test
     public void ConfiguresBanRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_BAN);
+        Rule rule = getRule("ban");
+        assertNotNull(rule);
         assertEquals(Severity.CRITICAL, rule.severity());
     }
 
     @Test
     public void ConfiguresClassNameRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_CLASS_NAME);
+        Rule rule = getRule("class-name");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresCommentFormatRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_COMMENT_FORMAT);
-        assertEquals(Severity.MINOR, rule.severity());    }
+        Rule rule = getRule("comment-format");
+        assertNotNull(rule);
+        assertEquals(Severity.MINOR, rule.severity());
+    }
 
     @Test
     public void ConfiguresCurlyRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_CURLY);
+        Rule rule = getRule("curly");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresEofLineRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_EOFLINE);
+        Rule rule = getRule("eofline");
+        assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
     }
 
     @Test
     public void ConfiguresForInRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_FORIN);
+        Rule rule = getRule("forin");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresIndentRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_INDENT);
-        assertEquals(Severity.MINOR, rule.severity());    }
+        Rule rule = getRule("indent");
+        assertNotNull(rule);
+        assertEquals(Severity.MINOR, rule.severity());
+    }
 
     @Test
     public void ConfiguresInterfaceNameRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_INTERFACE_NAME);
+        Rule rule = getRule("interface-name");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresJsDocFormat() {
-        Rule rule = getRule(TsRulesDefinition.RULE_JSDOC_FORMAT);
+        Rule rule = getRule("jsdoc-format");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresLabelPositionRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_LABEL_POSITION);
+        Rule rule = getRule("label-position");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresLabelUndefinedRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_LABEL_UNDEFINED);
+        Rule rule = getRule("label-undefined");
+        assertNotNull(rule);
         assertEquals(Severity.CRITICAL, rule.severity());
     }
 
     @Test
     public void ConfiguresMaxLineLengthRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_MAX_LINE_LENGTH);
-        assertEquals(Severity.MAJOR, rule.severity());    }
+        Rule rule = getRule("max-line-length");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresMemberAccessRule() {
+        Rule rule = getRule("member-access");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
 
     @Test
     public void ConfiguresMemberOrderingRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_MEMBER_ORDERING);
-        assertEquals(Severity.MAJOR, rule.severity());    }
+        Rule rule = getRule("member-ordering");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoAngleBracketTypeAssertionRule() {
+        Rule rule = getRule("no-angle-bracket-type-assertion");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
 
     @Test
     public void ConfiguresNoAnyRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_ANY);
+        Rule rule = getRule("no-any");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoArgRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_ARG);
+        Rule rule = getRule("no-arg");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoBitwiseRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_BITWISE);
+        Rule rule = getRule("no-bitwise");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
-    public void ConfiguresNoConsoleRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_CONSOLE);
+    public void ConfiguresNoConditionalAssignmentRule() {
+        Rule rule = getRule("no-conditional-assignment");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoConsecutiveBlankLinesRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_CONSECUTIVE_BLANK_LINES);
+        Rule rule = getRule("no-consecutive-blank-lines");
+        assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
     }
 
     @Test
+    public void ConfiguresNoConsoleRule() {
+        Rule rule = getRule("no-console");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
     public void ConfiguresNoConstructRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_CONSTRUCT);
+        Rule rule = getRule("no-construct");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoConstructorVarsRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_CONSTRUCTOR_VARS);
+        Rule rule = getRule("no-constructor-vars");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoDebuggerRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_DEBUGGER);
+        Rule rule = getRule("no-debugger");
+        assertNotNull(rule);
         assertEquals(Severity.CRITICAL, rule.severity());
     }
 
     @Test
     public void ConfiguresNoDuplicateKeyRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_DUPLICATE_KEY);
+        Rule rule = getRule("no-duplicate-key");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoDuplicateVariableRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_DUPLICATE_VARIABLE);
+        Rule rule = getRule("no-duplicate-variable");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoEmptyRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_EMPTY);
+        Rule rule = getRule("no-empty");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoEvalRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_EVAL);
+        Rule rule = getRule("no-eval");
+        assertNotNull(rule);
         assertEquals(Severity.CRITICAL, rule.severity());
     }
 
     @Test
+    public void ConfiguresNoInferrableTypesRule() {
+        Rule rule = getRule("no-inferrable-types");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoInternalModuleRule() {
+        Rule rule = getRule("no-internal-module");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoNullKeywordRule() {
+        Rule rule = getRule("no-null-keyword");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoRequireImportsRule() {
+        Rule rule = getRule("no-require-imports");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoShadowedVariableRule() {
+        Rule rule = getRule("no-shadowed-variable");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
     public void ConfiguresNoStringLiteralRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_STRING_LITERAL);
+        Rule rule = getRule("no-string-literal");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
-    public void ConfiguresNoSwitchFallThroughRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_SWITCH_CASE_FALL_THROUGH);
+    public void ConfiguresNoSwitchCaseFallThroughRule() {
+        Rule rule = getRule("no-switch-case-fall-through");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
-    }
-
-    @Test
-    public void ConfiguresNoTrailingCommaRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_TRAILING_COMMA);
-        assertEquals(Severity.MINOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoTrailingWhitespaceRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_TRAILING_WHITESPACE);
+        Rule rule = getRule("no-trailing-whitespace");
+        assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoUnreachableRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_UNREACHABLE);
+        Rule rule = getRule("no-unreachable");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoUnusedExpressionRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_UNUSED_EXPRESSION);
+        Rule rule = getRule("no-unused-expression");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresNoUnusedVariableRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_NO_UNUSED_VARIABLE);
+        Rule rule = getRule("no-unused-variable");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
+    public void ConfiguresNoUseBeforeDeclareRule() {
+        Rule rule = getRule("no-use-before-declare");
+        assertNotNull(rule);
+        assertEquals(Severity.CRITICAL, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoVarKeywordRule() {
+        Rule rule = getRule("no-var-keyword");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresNoVarRequiresRule() {
+        Rule rule = getRule("no-var-requires");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresObjectLiteralSortKeysRule() {
+        Rule rule = getRule("object-literal-sort-keys");
+        assertNotNull(rule);
+        assertEquals(Severity.MINOR, rule.severity());
+    }
+
+    @Test
     public void ConfiguresOneLineRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_ONE_LINE);
+        Rule rule = getRule("one-line");
+        assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
     }
 
     @Test
     public void ConfiguresQuoteMarkRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_QUOTEMARK);
+        Rule rule = getRule("quotemark");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresRadixRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_RADIX);
+        Rule rule = getRule("radix");
+        assertNotNull(rule);
         assertEquals(Severity.CRITICAL, rule.severity());
     }
 
     @Test
     public void ConfiguresSemicolonRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_SEMICOLON);
+        Rule rule = getRule("semicolon");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresSwitchDefaultRule() {
+        Rule rule = getRule("switch-default");
+        assertNotNull(rule);
+        assertEquals(Severity.MAJOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresTrailingCommaRule() {
+        Rule rule = getRule("trailing-comma");
+        assertNotNull(rule);
+        assertEquals(Severity.MINOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresTripleEqualsCommaRule() {
+        Rule rule = getRule("triple-equals");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresTypedefRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_TYPEDEF);
+        Rule rule = getRule("typedef");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresTypedefWhitespaceRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_TYPEDEF_WHITESPACE);
+        Rule rule = getRule("typedef-whitespace");
+        assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
     }
 
     @Test
     public void ConfiguresUseStrictRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_USE_STRICT);
+        Rule rule = getRule("use-strict");
+        assertNotNull(rule);
         assertEquals(Severity.CRITICAL, rule.severity());
     }
 
     @Test
     public void ConfiguresVariableNameRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_VARIABLE_NAME);
+        Rule rule = getRule("variable-name");
+        assertNotNull(rule);
         assertEquals(Severity.MAJOR, rule.severity());
     }
 
     @Test
     public void ConfiguresWhitespaceRule() {
-        Rule rule = getRule(TsRulesDefinition.RULE_WHITESPACE);
+        Rule rule = getRule("whitespace");
+        assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
     }
 

@@ -108,7 +108,7 @@ public class TsLintSensor implements Sensor {
                     // fall back to the generic 'tslint-issue' rule
                     String ruleName = issue.getRuleName();
                     if (!ruleNames.contains(ruleName)) {
-                        ruleName = TsRulesDefinition.RULE_TSLINT_ISSUE;
+                        ruleName = TsRulesDefinition.TSLINT_UNKNOWN_RULE.key;
                     }
 
                     issuable.addIssue
