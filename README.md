@@ -94,9 +94,11 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 
 To present custom TSLint rules in SonarQube analysis, you can provide a configuration that maps the TSLint rules from your `sonar.ts.tslintrulesdir` 
 directory to dedicated Sonar rules for analysis.
-The configuration for a TSLint Sonar rule consists of a line declaring the TSLint rule id, and some attached properties that are used by Sonar for analysis and reporting.
+The configuration for a TSLint Sonar rule consists of a line declaring the TSLint rule id, a boolean switch to enable or disable the rule if needed 
+and some attached properties that are used by Sonar for analysis and reporting.
 
-For example taking the `no-constant-condition` rule from the [tslint-eslint-rules](https://github.com/buzinas/tslint-eslint-rules) package, a configuration in Sonar could look as follows:
+For example taking the `no-constant-condition` rule from the [tslint-eslint-rules](https://github.com/buzinas/tslint-eslint-rules) package, 
+a configuration in Sonar could look as follows:
 
 	no-constant-condition=true
 	no-constant-condition.name=disallow use of constant expressions in conditions
