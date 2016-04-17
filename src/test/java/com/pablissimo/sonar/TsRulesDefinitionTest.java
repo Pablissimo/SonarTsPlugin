@@ -3,6 +3,7 @@ package com.pablissimo.sonar;
 import com.pablissimo.sonar.model.TsLintRule;
 import org.junit.Before;
 import org.junit.Test;
+import org.sonar.api.config.Settings;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinition.Context;
@@ -18,12 +19,29 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class TsRulesDefinitionTest {
+
+    Settings settings;
     TsRulesDefinition definition;
     Context context;
 
     @Before
     public void setUp() throws Exception {
-        this.definition = new TsRulesDefinition();
+
+        this.settings = mock(Settings.class);
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG))
+            .thenReturn(
+                "custom-rule-1=false\n" +
+                "custom-rule-1.name=test rule #1\n" +
+                "custom-rule-1.severity=MAJOR\n" +
+                "custom-rule-1.description=#1 description\n" +
+                "\n" +
+                "custom-rule-2=true\n" +
+                "custom-rule-2.name=test rule #2\n" +
+                "custom-rule-2.severity=MINOR\n" +
+                "custom-rule-2.description=#2 description\n" +
+                "\n");
+
+        this.definition = new TsRulesDefinition(this.settings);
         this.context = new Context();
     }
 
@@ -423,6 +441,13 @@ public class TsRulesDefinitionTest {
     @Test
     public void ConfiguresWhitespaceRule() {
         Rule rule = getRule("whitespace");
+        assertNotNull(rule);
+        assertEquals(Severity.MINOR, rule.severity());
+    }
+
+    @Test
+    public void ConfiguresCustomRule() {
+        Rule rule = getRule("custom-rule-2");
         assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
     }
