@@ -17,10 +17,12 @@ public class TypeScriptRuleProfile extends ProfileDefinition {
     public RulesProfile createProfile(ValidationMessages validation) {
         RulesProfile profile = RulesProfile.create("TsLint", TypeScriptLanguage.LANGUAGE_KEY);
 
-        for (TsLintRule core_rule : TsRulesDefinition.TSLINT_CORE_RULES)
-            activateRule(profile, core_rule.key);
+        TsRulesDefinition rules = new TsRulesDefinition();
 
         activateRule(profile, TsRulesDefinition.TSLINT_UNKNOWN_RULE.key);
+
+        for (TsLintRule core_rule : rules.getCoreRules())
+            activateRule(profile, core_rule.key);
 
         return profile;
     }

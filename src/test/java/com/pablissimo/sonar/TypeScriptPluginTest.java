@@ -53,7 +53,7 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(7, propertiesAnnotation.value().length);
+        assertEquals(8, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties,
@@ -68,6 +68,8 @@ public class TypeScriptPluginTest {
                 TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
+        assertNotNull(findPropertyByName(properties,
+            TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR));
     }
@@ -115,13 +117,13 @@ public class TypeScriptPluginTest {
     @Test
     public void tsLintTimeoutSettings_definedAppropriately() {
         Property property = findPropertyByName(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT);
-        
+
         assertEquals(PropertyType.INTEGER, property.type());
         assertEquals("60000", property.defaultValue());
         assertEquals(true, property.project());
         assertEquals(false, property.global());
     }
-    
+
     @Test
     public void rulesDirSetting_definedAppropriately() {
         Property property = findPropertyByName(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR);
@@ -131,7 +133,7 @@ public class TypeScriptPluginTest {
         assertEquals(true, property.project());
         assertEquals(false, property.global());
     }
-    
+
     private Property findPropertyByName(String property) {
         return findPropertyByName(((Properties) plugin.getClass()
                 .getAnnotations()[0]).value(), property);

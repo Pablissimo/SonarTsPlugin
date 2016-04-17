@@ -80,6 +80,7 @@ public class TsLintSensor implements Sensor {
 
         TsLintExecutor executor = this.getTsLintExecutor();
         TsLintParser parser = this.getTsLintParser();
+        TsRulesDefinition rules = this.getTsRulesDefinition();
 
         boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
 
@@ -135,5 +136,9 @@ public class TsLintSensor implements Sensor {
 
     protected TsLintParser getTsLintParser() {
         return new TsLintParserImpl();
+    }
+
+    protected TsRulesDefinition getTsRulesDefinition() {
+        return new TsRulesDefinition(this.settings);
     }
 }
