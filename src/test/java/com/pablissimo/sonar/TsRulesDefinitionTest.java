@@ -1,20 +1,21 @@
 package com.pablissimo.sonar;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import org.junit.After;
+import com.pablissimo.sonar.model.TsLintRule;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonar.api.batch.rule.RuleParam;
 import org.sonar.api.rule.Severity;
-import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinition.Context;
-import org.sonar.api.server.rule.RulesDefinition.NewRepository;
-import org.sonar.api.server.rule.RulesDefinition.NewRule;
 import org.sonar.api.server.rule.RulesDefinition.Rule;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.*;
 
 public class TsRulesDefinitionTest {
     TsRulesDefinition definition;
@@ -424,6 +425,18 @@ public class TsRulesDefinitionTest {
         Rule rule = getRule("whitespace");
         assertNotNull(rule);
         assertEquals(Severity.MINOR, rule.severity());
+    }
+
+    @Test
+    public void LoadRulesFromInvalidStream() throws IOException {
+        List<TsLintRule> rules = new ArrayList<>();
+        InputStream test_stream = new InputStream() {
+            @Override
+            public int read() throws IOException {
+                throw new IOException("Test exception");
+            }
+        };
+        TsRulesDefinition.loadRules(test_stream, rules);
     }
 
     private Rule getRule(String name) {

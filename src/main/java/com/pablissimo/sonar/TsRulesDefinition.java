@@ -60,7 +60,7 @@ public class TsRulesDefinition implements RulesDefinition {
         }
     }
 
-    private static void loadRules(InputStream stream, List<TsLintRule> rules_collection) {
+    public static void loadRules(InputStream stream, List<TsLintRule> rules_collection) {
         Properties properties = new Properties();
 
         try {
