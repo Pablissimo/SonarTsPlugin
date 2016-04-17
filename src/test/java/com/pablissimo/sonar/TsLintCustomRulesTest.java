@@ -66,6 +66,39 @@ public class TsLintCustomRulesTest {
     }
 
     @Test
+    public void disabledCustomRule() throws IOException {
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG))
+            .thenReturn(
+                "custom-rule-1=false\n" +
+                "custom-rule-1.name=test rule #1\n" +
+                "custom-rule-1.severity=MAJOR\n" +
+                "custom-rule-1.description=#1 description\n" +
+                "\n" +
+                "custom-rule-2=true\n" +
+                "custom-rule-2.name=test rule #2\n" +
+                "custom-rule-2.severity=MINOR\n" +
+                "custom-rule-2.description=#2 description\n" +
+                "\n");
+
+        this.rules_def = new TsRulesDefinition(this.settings);
+
+        final int num_custom_rules = 1;
+
+        assertEquals(this.rules_def.getCustomRules().size(), num_custom_rules);
+
+        List<TsLintRule> custom_rules = this.rules_def.getCustomRules();
+
+        if (custom_rules.size() == num_custom_rules) {
+            TsLintRule rule_no_2 = custom_rules.get(0);
+
+            assertEquals(rule_no_2.key, "custom-rule-2");
+            assertEquals(rule_no_2.name, "test rule #2");
+            assertEquals(rule_no_2.severity, "MINOR");
+            assertEquals(rule_no_2.html_description, "#2 description");
+        }
+    }
+
+    @Test
     public void parsesEmptyCustomRules() throws IOException {
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG))
             .thenReturn("#empty config\n");
