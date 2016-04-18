@@ -54,9 +54,7 @@ public class TsLintSensor implements Sensor {
     }
 
     public boolean shouldExecuteOnProject(Project project) {
-        boolean toReturn = hasFilesToAnalyze();
-
-        return toReturn;
+        return hasFilesToAnalyze();
     }
 
     private boolean hasFilesToAnalyze() {
@@ -85,7 +83,7 @@ public class TsLintSensor implements Sensor {
 
         RuleQuery ruleQuery = RuleQuery.create().withRepositoryKey(TsRulesDefinition.REPOSITORY_NAME);
         Collection<Rule> allRules = this.ruleFinder.findAll(ruleQuery);
-        HashSet<String> ruleNames = new HashSet<String>();
+        HashSet<String> ruleNames = new HashSet<>();
         for (Rule rule : allRules) {
             ruleNames.add(rule.getKey());
         }

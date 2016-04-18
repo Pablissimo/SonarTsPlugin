@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FileSystem;
@@ -13,6 +16,8 @@ import org.sonar.api.measures.Measure;
 import org.sonar.api.resources.Project;
 
 public class LOCSensor implements Sensor {
+    private static final Logger LOG = LoggerFactory.getLogger(LOCSensor.class);
+
     private FileSystem fileSystem;
 
     /**
@@ -42,7 +47,7 @@ public class LOCSensor implements Sensor {
     public String toString() {
         return getClass().getSimpleName();
     }
-    
+
     protected BufferedReader getReaderFromFile(InputFile inputFile) throws FileNotFoundException {
         return new BufferedReader(new FileReader(inputFile.file()));
     }
@@ -53,9 +58,9 @@ public class LOCSensor implements Sensor {
         try {
             br = this.getReaderFromFile(inputFile);
 
-            boolean isEOF = false;
+            boolean isEOF;
             boolean isCommentOpen = false;
-            boolean isACommentLine = false;
+            boolean isACommentLine;
             do {
 
                 String line = br.readLine();
@@ -102,11 +107,9 @@ public class LOCSensor implements Sensor {
             br.close();
 
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error("File not found", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error("Error while reading BufferedReader", e);
         }
         return value;
     }
