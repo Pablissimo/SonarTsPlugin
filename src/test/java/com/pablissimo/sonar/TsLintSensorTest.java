@@ -63,6 +63,7 @@ public class TsLintSensorTest {
 
         this.file = mock(File.class);
         doReturn(true).when(this.file).isFile();
+        doReturn("/path/to/file").when(this.file).getAbsolutePath();
 
         this.files = new ArrayList<File>(Arrays.asList(new File[] {
                 this.file
@@ -106,14 +107,15 @@ public class TsLintSensorTest {
         TsLintIssue issue = new TsLintIssue();
         issue.setFailure("failure");
         issue.setRuleName("rule name");
+        issue.setName("/path/to/file");
 
         TsLintPosition startPosition = new TsLintPosition();
         startPosition.setLine(1);
 
         issue.setStartPosition(startPosition);
 
-        TsLintIssue[] issues = new TsLintIssue[] {
-                issue
+        TsLintIssue[][] issues = new TsLintIssue[][] {
+                new TsLintIssue[] { issue }
         };
 
         final List<Issue> capturedIssues = new ArrayList<Issue>();
@@ -155,7 +157,7 @@ public class TsLintSensorTest {
     public void analyse_callsExecutorWithSuppliedTimeout() throws IOException {
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
      
-        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(String.class), eq(45000));
+        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(List.class), eq(45000));
     }
     
     @Test
@@ -164,6 +166,6 @@ public class TsLintSensorTest {
         
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
         
-        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(String.class), eq(5000));
+        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(List.class), eq(5000));
     }
 }
