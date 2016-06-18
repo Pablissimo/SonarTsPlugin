@@ -9,14 +9,14 @@ SonarQube plugin for TypeScript files
 ##Demos
 
 A live deployed demo hitting a few large open-source TypeScript projects can be found here:
-http://sonar.pablissimo.com
+https://sonar.pablissimo.com
 
 Suggestions for more projects (or ones with easy-to-gather code coverage info) appreciated!
 
-* [Microsoft TypeScript Compiler](http://sonar.pablissimo.com/overview?id=18739)
-* [Turbulenz Engine](http://sonar.pablissimo.com/overview?id=20352)
-* [Microsoft Visual Studio Code](http://sonar.pablissimo.com/overview?id=19179)
-* [Angular Framework](http://sonar.pablissimo.com/overview?id=18822)
+* [Microsoft TypeScript Compiler](https://sonar.pablissimo.com/overview?id=18739)
+* [Turbulenz Engine](https://sonar.pablissimo.com/overview?id=20352)
+* [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
+* [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
 
 ##Overview
 
@@ -80,8 +80,8 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 </thead>
 <tbody>
 <tr><td>sonar.ts.tslintconfigpath</td><td><b>Mandatory</b></td><td>Path to the tslint.json file that configures the rules to be used in linting</td></tr>
-<tr><td>sonar.ts.excludetypedefinitionfiles</td><td><b>Optional</b></td><td>Excludes .d.ts files from analysis</td></tr>
-<tr><td>sonar.ts.forceZeroCoverage</td><td><b>Optional</b></td><td>Forces code coverage percentage to zero when no report is supplied</td></tr>
+<tr><td>sonar.ts.excludetypedefinitionfiles</td><td><b>Optional</b></td><td>Excludes .d.ts files from analysis, defaults to true</td></tr>
+<tr><td>sonar.ts.forceZeroCoverage</td><td><b>Optional</b></td><td>Forces code coverage percentage to zero when no report is supplied, defaults to false</td></tr>
 <tr><td>sonar.ts.tslinttimeout</td><td><b>Optional</b></td><td>Max time to wait for TsLint to finish processing a single file (in milliseconds), defaults to 60 seconds</td></tr>
 <tr><td>sonar.ts.tslintrulesdir</td><td><b>Optional</b></td><td>Path to a folder containing custom TsLint rules referenced in tslint.json</td></tr>
 <tr><td>sonar.ts.lcov.reportpath</td><td><b>Optional</b></td><td>Path to an LCOV code-coverage report to be included in analysis</td></tr>

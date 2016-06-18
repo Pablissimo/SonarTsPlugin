@@ -7,7 +7,7 @@ public class TsLintConfig {
     private Map<String, Object> rules;
 
     public TsLintConfig() {
-        this.rules = new HashMap<String, Object>();
+        this.rules = new HashMap<>();
     }
 
     public Map<String, Object> getRules() {
