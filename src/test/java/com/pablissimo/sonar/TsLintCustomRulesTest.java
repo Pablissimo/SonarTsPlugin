@@ -15,7 +15,7 @@ import static org.mockito.Mockito.when;
 
 public class TsLintCustomRulesTest {
     private Settings settings;
-    private TsRulesDefinition rules_def;
+    private TsRulesDefinition rulesDef;
 
     @Before
     public void setUp() throws Exception {
@@ -41,27 +41,27 @@ public class TsLintCustomRulesTest {
                 "custom-rule-2.description=#2 description\n" +
                 "\n");
 
-        this.rules_def = new TsRulesDefinition(this.settings);
+        this.rulesDef = new TsRulesDefinition(this.settings);
 
-        final int num_custom_rules = 2;
+        final int numCustomRules = 2;
 
-        assertEquals(this.rules_def.getCustomRules().size(), num_custom_rules);
+        assertEquals(this.rulesDef.getCustomRules().size(), numCustomRules);
 
-        List<TsLintRule> custom_rules = this.rules_def.getCustomRules();
+        List<TsLintRule> customRules = this.rulesDef.getCustomRules();
 
-        if (custom_rules.size() == num_custom_rules) {
-            TsLintRule rule_no_1 = custom_rules.get(0);
-            TsLintRule rule_no_2 = custom_rules.get(1);
+        if (customRules.size() == numCustomRules) {
+            TsLintRule ruleNo1 = customRules.get(0);
+            TsLintRule ruleNo2 = customRules.get(1);
 
-            assertEquals(rule_no_1.key, "custom-rule-1");
-            assertEquals(rule_no_1.name, "test rule #1");
-            assertEquals(rule_no_1.severity, "MAJOR");
-            assertEquals(rule_no_1.html_description, "#1 description");
+            assertEquals(ruleNo1.key, "custom-rule-1");
+            assertEquals(ruleNo1.name, "test rule #1");
+            assertEquals(ruleNo1.severity, "MAJOR");
+            assertEquals(ruleNo1.htmlDescription, "#1 description");
 
-            assertEquals(rule_no_2.key, "custom-rule-2");
-            assertEquals(rule_no_2.name, "test rule #2");
-            assertEquals(rule_no_2.severity, "MINOR");
-            assertEquals(rule_no_2.html_description, "#2 description");
+            assertEquals(ruleNo2.key, "custom-rule-2");
+            assertEquals(ruleNo2.name, "test rule #2");
+            assertEquals(ruleNo2.severity, "MINOR");
+            assertEquals(ruleNo2.htmlDescription, "#2 description");
         }
     }
 
@@ -80,21 +80,21 @@ public class TsLintCustomRulesTest {
                 "custom-rule-2.description=#2 description\n" +
                 "\n");
 
-        this.rules_def = new TsRulesDefinition(this.settings);
+        this.rulesDef = new TsRulesDefinition(this.settings);
 
-        final int num_custom_rules = 1;
+        final int numCustomRules = 1;
 
-        assertEquals(this.rules_def.getCustomRules().size(), num_custom_rules);
+        assertEquals(this.rulesDef.getCustomRules().size(), numCustomRules);
 
-        List<TsLintRule> custom_rules = this.rules_def.getCustomRules();
+        List<TsLintRule> customRules = this.rulesDef.getCustomRules();
 
-        if (custom_rules.size() == num_custom_rules) {
-            TsLintRule rule_no_2 = custom_rules.get(0);
+        if (customRules.size() == numCustomRules) {
+            TsLintRule ruleNo2 = customRules.get(0);
 
-            assertEquals(rule_no_2.key, "custom-rule-2");
-            assertEquals(rule_no_2.name, "test rule #2");
-            assertEquals(rule_no_2.severity, "MINOR");
-            assertEquals(rule_no_2.html_description, "#2 description");
+            assertEquals(ruleNo2.key, "custom-rule-2");
+            assertEquals(ruleNo2.name, "test rule #2");
+            assertEquals(ruleNo2.severity, "MINOR");
+            assertEquals(ruleNo2.htmlDescription, "#2 description");
         }
     }
 
@@ -103,10 +103,10 @@ public class TsLintCustomRulesTest {
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG))
             .thenReturn("#empty config\n");
 
-        this.rules_def = new TsRulesDefinition(this.settings);
+        this.rulesDef = new TsRulesDefinition(this.settings);
 
-        final int num_custom_rules = 0;
+        final int numCustomRules = 0;
 
-        assertEquals(this.rules_def.getCustomRules().size(), num_custom_rules);
+        assertEquals(this.rulesDef.getCustomRules().size(), numCustomRules);
     }
 }

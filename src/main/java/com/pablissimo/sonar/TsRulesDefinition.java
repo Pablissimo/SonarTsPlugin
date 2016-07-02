@@ -26,8 +26,8 @@ public class TsRulesDefinition implements RulesDefinition {
         "tslint issues that are not yet known to the plugin",
         "No description for TsLint rule");
 
-    private List<TsLintRule> tslint_core_rules = new ArrayList<>();
-    private List<TsLintRule> tslint_custom_rules = new ArrayList<>();
+    private List<TsLintRule> tslintCoreRules = new ArrayList<>();
+    private List<TsLintRule> tslintCustomRules = new ArrayList<>();
 
     private final Settings settings;
 
@@ -44,23 +44,23 @@ public class TsRulesDefinition implements RulesDefinition {
     }
 
     private void loadCoreRules() {
-        InputStream core_rules_stream = TsRulesDefinition.class.getResourceAsStream(CORE_RULES_CONFIG_RESOURCE_PATH);
-        loadRules(core_rules_stream, tslint_core_rules);
+        InputStream coreRulesStream = TsRulesDefinition.class.getResourceAsStream(CORE_RULES_CONFIG_RESOURCE_PATH);
+        loadRules(coreRulesStream, tslintCoreRules);
     }
 
     private void loadCustomRules() {
         if (this.settings == null)
             return;
 
-        String custom_rules_cfg = this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG);
+        String customRulesCfg = this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG);
 
-        if (custom_rules_cfg != null) {
-            InputStream custom_rules_stream = new ByteArrayInputStream(custom_rules_cfg.getBytes(Charset.defaultCharset()));
-            loadRules(custom_rules_stream, tslint_custom_rules);
+        if (customRulesCfg != null) {
+            InputStream customRulesStream = new ByteArrayInputStream(customRulesCfg.getBytes(Charset.defaultCharset()));
+            loadRules(customRulesStream, tslintCustomRules);
         }
     }
 
-    public static void loadRules(InputStream stream, List<TsLintRule> rules_collection) {
+    public static void loadRules(InputStream stream, List<TsLintRule> rulesCollection) {
         Properties properties = new Properties();
 
         try {
@@ -69,30 +69,30 @@ public class TsRulesDefinition implements RulesDefinition {
             LOG.error("Error while loading TsLint rules: " + e.getMessage());
         }
 
-        for(String prop_key : properties.stringPropertyNames()) {
+        for(String propKey : properties.stringPropertyNames()) {
 
-            if (prop_key.contains("."))
+            if (propKey.contains("."))
                 continue;
 
-            String rule_enabled = properties.getProperty(prop_key);
+            String ruleEnabled = properties.getProperty(propKey);
 
-            if (!rule_enabled.equals("true"))
+            if (!ruleEnabled.equals("true"))
                 continue;
 
-            String rule_id = prop_key;
-            String rule_severity = properties.getProperty(prop_key + ".severity", Severity.defaultSeverity());
-            String rule_name = properties.getProperty(prop_key + ".name", "Unnamed TsLint rule");
-            String rule_description = properties.getProperty(prop_key + ".description", "No description for TsLint rule");
+            String ruleId = propKey;
+            String ruleSeverity = properties.getProperty(propKey + ".severity", Severity.defaultSeverity());
+            String ruleName = properties.getProperty(propKey + ".name", "Unnamed TsLint rule");
+            String ruleDescription = properties.getProperty(propKey + ".description", "No description for TsLint rule");
 
-            rules_collection.add(new TsLintRule(
-                rule_id,
-                rule_severity,
-                rule_name,
-                rule_description
+            rulesCollection.add(new TsLintRule(
+                ruleId,
+                ruleSeverity,
+                ruleName,
+                ruleDescription
             ));
         }
 
-        Collections.sort(rules_collection, new Comparator<TsLintRule>() {
+        Collections.sort(rulesCollection, new Comparator<TsLintRule>() {
             @Override
             public int compare(TsLintRule r1, TsLintRule r2) {
                 return r1.key.compareTo(r2.key);
@@ -105,7 +105,7 @@ public class TsRulesDefinition implements RulesDefinition {
             .createRule(rule.key)
             .setName(rule.name)
             .setSeverity(rule.severity)
-            .setHtmlDescription(rule.html_description)
+            .setHtmlDescription(rule.htmlDescription)
             .setStatus(RuleStatus.READY);
     }
 
@@ -118,23 +118,23 @@ public class TsRulesDefinition implements RulesDefinition {
         createRule(repository, TSLINT_UNKNOWN_RULE);
 
         // add the TsLint builtin core rules
-        for (TsLintRule core_rule : tslint_core_rules) {
-            createRule(repository, core_rule);
+        for (TsLintRule coreRule : tslintCoreRules) {
+            createRule(repository, coreRule);
         }
 
         // add additional custom TsLint rules
-        for (TsLintRule custom_rule : tslint_custom_rules) {
-            createRule(repository, custom_rule);
+        for (TsLintRule customRule : tslintCustomRules) {
+            createRule(repository, customRule);
         }
 
         repository.done();
     }
 
     public List<TsLintRule> getCoreRules() {
-        return tslint_core_rules;
+        return tslintCoreRules;
     }
 
     public List<TsLintRule> getCustomRules() {
-        return tslint_custom_rules;
+        return tslintCustomRules;
     }
 }

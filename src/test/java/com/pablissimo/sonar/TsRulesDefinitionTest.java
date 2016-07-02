@@ -455,13 +455,13 @@ public class TsRulesDefinitionTest {
     @Test
     public void LoadRulesFromInvalidStream() throws IOException {
         List<TsLintRule> rules = new ArrayList<>();
-        InputStream test_stream = new InputStream() {
+        InputStream testStream = new InputStream() {
             @Override
             public int read() throws IOException {
                 throw new IOException("Test exception");
             }
         };
-        TsRulesDefinition.loadRules(test_stream, rules);
+        TsRulesDefinition.loadRules(testStream, rules);
     }
 
     private Rule getRule(String name) {

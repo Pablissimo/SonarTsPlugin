@@ -92,51 +92,51 @@ public class TsLintSensor implements Sensor {
 
         List<String> paths = new ArrayList<String>();
         HashMap<String, File> fileMap = new HashMap<String, File>();
-        
+
         for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
                 continue;
             }
-            
+
             String pathAdjusted = file.getAbsolutePath().replace('\\', '/');
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
-        
+
         String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, rulesDir, paths, tsLintTimeoutMs);
-                
+
         TsLintIssue[][] issues = parser.parse(jsonResult);
-        
+
         if (issues == null) {
             LOG.warn("TsLint returned no result at all");
             return;
         }
-        
+
         // Each issue bucket will contain info about a single file
         for (TsLintIssue[] batchIssues : issues) {
             if (batchIssues == null || batchIssues.length == 0) {
                 continue;
             }
-            
+
             String filePath = batchIssues[0].getName();
-            
+
             if (!fileMap.containsKey(filePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;
             }
-            
+
             File file = fileMap.get(filePath);
             Resource resource = this.getFileFromIOFile(file, project);
             Issuable issuable = perspectives.as(Issuable.class, resource);
-            
+
             for (TsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll
                 // fall back to the generic 'tslint-issue' rule
                 String ruleName = issue.getRuleName();
                 if (!ruleNames.contains(ruleName)) {
-                    ruleName = TsRulesDefinition.RULE_TSLINT_ISSUE;
+                    ruleName = TsRulesDefinition.TSLINT_UNKNOWN_RULE.name;
                 }
-    
+
                 issuable.addIssue
                 (
                         issuable

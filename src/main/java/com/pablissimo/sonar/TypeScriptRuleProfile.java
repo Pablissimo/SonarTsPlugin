@@ -21,8 +21,8 @@ public class TypeScriptRuleProfile extends ProfileDefinition {
 
         activateRule(profile, TsRulesDefinition.TSLINT_UNKNOWN_RULE.key);
 
-        for (TsLintRule core_rule : rules.getCoreRules())
-            activateRule(profile, core_rule.key);
+        for (TsLintRule coreRule : rules.getCoreRules())
+            activateRule(profile, coreRule.key);
 
         return profile;
     }
