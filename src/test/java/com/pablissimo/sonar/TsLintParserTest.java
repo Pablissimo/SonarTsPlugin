@@ -16,12 +16,16 @@ public class TsLintParserTest {
 
     @Test
     public void parsesValidTsLintRecordIntoObject() {
-        String toParse = "[{\"endPosition\":{\"character\":44,\"line\":23,\"position\":658},\"failure\":\"for statements must be braced\",\"name\":\"Tools.ts\",\"ruleName\":\"curly\",\"startPosition\":{\"character\":6,\"line\":22,\"position\":587}}]";
-        TsLintIssue[] issues = new TsLintParserImpl().parse(toParse);
+        String toParse = "[[{\"endPosition\":{\"character\":44,\"line\":23,\"position\":658},\"failure\":\"for statements must be braced\",\"name\":\"Tools.ts\",\"ruleName\":\"curly\",\"startPosition\":{\"character\":6,\"line\":22,\"position\":587}}]]";
+        TsLintIssue[][] issues = new TsLintParserImpl().parse(toParse);
 
         assertEquals(1,  issues.length);
 
-        TsLintIssue issue = issues[0];
+        TsLintIssue[] fileIssues = issues[0];
+        
+        assertEquals(1, fileIssues.length);
+        
+        TsLintIssue issue = fileIssues[0];
         assertEquals(44, issue.getEndPosition().getCharacter());
         assertEquals(23, issue.getEndPosition().getLine());
         assertEquals(658, issue.getEndPosition().getPosition());
