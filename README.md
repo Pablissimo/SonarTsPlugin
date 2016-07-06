@@ -17,8 +17,8 @@ Suggestions for more projects (or ones with easy-to-gather code coverage info) a
 * [Turbulenz Engine](https://sonar.pablissimo.com/overview?id=20352)
 * [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
 * [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
-* 
-### Integrations
+ 
+###Integrations
 
 * [Running TSLint within SonarQube on a TFS build](http://blogs.blackmarble.co.uk/blogs/rfennell/post/2016/07/05/Running-TSLint-within-SonarQube-on-a-TFS-build) - [Richard Fennell](https://github.com/rfennell)
 
