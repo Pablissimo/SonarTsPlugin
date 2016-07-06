@@ -6,7 +6,7 @@ SonarQube plugin for TypeScript files
 [![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
 [![Coverage Status](https://coveralls.io/repos/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/r/Pablissimo/SonarTsPlugin?branch=master)
 
-##Demos
+##Demos & Useful Resources
 
 A live deployed demo hitting a few large open-source TypeScript projects can be found here:
 https://sonar.pablissimo.com
@@ -17,6 +17,10 @@ Suggestions for more projects (or ones with easy-to-gather code coverage info) a
 * [Turbulenz Engine](https://sonar.pablissimo.com/overview?id=20352)
 * [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
 * [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
+* 
+### Integrations
+
+* [Running TSLint within SonarQube on a TFS build](http://blogs.blackmarble.co.uk/blogs/rfennell/post/2016/07/05/Running-TSLint-within-SonarQube-on-a-TFS-build) - [Richard Fennell](https://github.com/rfennell)
 
 ##Overview
 
