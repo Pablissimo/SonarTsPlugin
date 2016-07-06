@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleStatus;
 import org.sonar.api.rule.Severity;
+import org.sonar.api.server.debt.DebtRemediationFunction;
 import org.sonar.api.server.rule.RulesDefinition;
 
 import java.io.*;
@@ -17,6 +18,13 @@ public class TsRulesDefinition implements RulesDefinition {
 
     public static final String REPOSITORY_NAME = "tslint";
 
+    public static final String DEFAULT_RULE_NAME = "Unnamed TsLint rule";
+    public static final String DEFAULT_RULE_SEVERITY = Severity.defaultSeverity();
+    public static final String DEFAULT_RULE_DESCRIPTION = "No description provided for this TsLint rule";
+    public static final String DEFAULT_RULE_DEBT_SCALAR = "0min";
+    public static final String DEFAULT_RULE_DEBT_OFFSET = "0min";
+    public static final String DEFAULT_RULE_DEBT_TYPE = SubCharacteristics.ARCHITECTURE_RELIABILITY;
+
     private static final String CORE_RULES_CONFIG_RESOURCE_PATH = "/tslint/tslint-rules.properties";
 
     /** The SonarQube rule that will contain all unknown TsLint issues. */
@@ -27,7 +35,7 @@ public class TsRulesDefinition implements RulesDefinition {
         "No description for TsLint rule");
 
     private List<TsLintRule> tslintCoreRules = new ArrayList<>();
-    private List<TsLintRule> tslintCustomRules = new ArrayList<>();
+    private List<TsLintRule> tslintRules = new ArrayList<>();
 
     private final Settings settings;
 
@@ -52,11 +60,15 @@ public class TsRulesDefinition implements RulesDefinition {
         if (this.settings == null)
             return;
 
-        String customRulesCfg = this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG);
+        List<String> configKeys = settings.getKeysStartingWith(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS);
 
-        if (customRulesCfg != null) {
-            InputStream customRulesStream = new ByteArrayInputStream(customRulesCfg.getBytes(Charset.defaultCharset()));
-            loadRules(customRulesStream, tslintCustomRules);
+        for (String cfgKey : configKeys) {
+            if (!cfgKey.endsWith("config"))
+                continue;
+
+            String rulesConfig = settings.getString(cfgKey);
+            InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
+            loadRules(rulesConfigStream, tslintRules);
         }
     }
 
@@ -80,16 +92,44 @@ public class TsRulesDefinition implements RulesDefinition {
                 continue;
 
             String ruleId = propKey;
-            String ruleSeverity = properties.getProperty(propKey + ".severity", Severity.defaultSeverity());
-            String ruleName = properties.getProperty(propKey + ".name", "Unnamed TsLint rule");
-            String ruleDescription = properties.getProperty(propKey + ".description", "No description for TsLint rule");
+            String ruleName = properties.getProperty(propKey + ".name", DEFAULT_RULE_NAME);
+            String ruleSeverity = properties.getProperty(propKey + ".severity", DEFAULT_RULE_SEVERITY);
+            String ruleDescription = properties.getProperty(propKey + ".description", DEFAULT_RULE_DESCRIPTION);
 
-            rulesCollection.add(new TsLintRule(
-                ruleId,
-                ruleSeverity,
-                ruleName,
-                ruleDescription
-            ));
+            String debtRemediationFunction = properties.getProperty(propKey + ".debtFunc", null);
+            String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", DEFAULT_RULE_DEBT_SCALAR);
+            String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", DEFAULT_RULE_DEBT_OFFSET);
+            String debtCharacteristic = properties.getProperty(propKey + ".debtType", DEFAULT_RULE_DEBT_TYPE);
+
+            TsLintRule tsRule = null;
+
+            // try to apply the specified debt remediation function
+            if (debtRemediationFunction != null) {
+                DebtRemediationFunction.Type debtRemediationFunctionEnum = DebtRemediationFunction.Type.valueOf(debtRemediationFunction);
+
+                tsRule = new TsLintRule(
+                    ruleId,
+                    ruleSeverity,
+                    ruleName,
+                    ruleDescription,
+                    debtRemediationFunctionEnum,
+                    debtRemediationScalar,
+                    debtRemediationOffset,
+                    debtCharacteristic
+                );
+            }
+
+            // no debt remediation function specified
+            if (tsRule == null) {
+                tsRule = new TsLintRule(
+                    ruleId,
+                    ruleSeverity,
+                    ruleName,
+                    ruleDescription
+                );
+            }
+
+            rulesCollection.add(tsRule);
         }
 
         Collections.sort(rulesCollection, new Comparator<TsLintRule>() {
@@ -100,13 +140,36 @@ public class TsRulesDefinition implements RulesDefinition {
         });
     }
 
-    private void createRule(NewRepository repository, TsLintRule rule) {
-        repository
-            .createRule(rule.key)
-            .setName(rule.name)
-            .setSeverity(rule.severity)
-            .setHtmlDescription(rule.htmlDescription)
+    private void createRule(NewRepository repository, TsLintRule tsRule) {
+        NewRule sonarRule = repository
+            .createRule(tsRule.key)
+            .setName(tsRule.name)
+            .setSeverity(tsRule.severity)
+            .setHtmlDescription(tsRule.htmlDescription)
             .setStatus(RuleStatus.READY);
+
+        if (tsRule.hasDebtRemediation) {
+            DebtRemediationFunction debtRemediationFn = null;
+            DebtRemediationFunctions funcs = sonarRule.debtRemediationFunctions();
+
+            switch (tsRule.debtRemediationFunction)
+            {
+                case LINEAR:
+                    debtRemediationFn = funcs.linear(tsRule.debtRemediationScalar);
+                    break;
+
+                case LINEAR_OFFSET:
+                    debtRemediationFn = funcs.linearWithOffset(tsRule.debtRemediationScalar, tsRule.debtRemediationOffset);
+                    break;
+
+                case CONSTANT_ISSUE:
+                    debtRemediationFn = funcs.constantPerIssue(tsRule.debtRemediationScalar);
+                    break;
+            }
+
+            sonarRule.setDebtRemediationFunction(debtRemediationFn);
+            sonarRule.setDebtSubCharacteristic(tsRule.debtCharacteristic);
+        }
     }
 
     public void define(Context context) {
@@ -123,7 +186,7 @@ public class TsRulesDefinition implements RulesDefinition {
         }
 
         // add additional custom TsLint rules
-        for (TsLintRule customRule : tslintCustomRules) {
+        for (TsLintRule customRule : tslintRules) {
             createRule(repository, customRule);
         }
 
@@ -134,7 +197,7 @@ public class TsRulesDefinition implements RulesDefinition {
         return tslintCoreRules;
     }
 
-    public List<TsLintRule> getCustomRules() {
-        return tslintCustomRules;
+    public List<TsLintRule> getRules() {
+        return tslintRules;
     }
 }

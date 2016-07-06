@@ -1,39 +1,24 @@
 package com.pablissimo.sonar;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
+import com.pablissimo.sonar.model.TsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.api.batch.fs.FilePredicates;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
-import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.resources.Resource;
 import org.sonar.api.rule.RuleKey;
-import org.sonar.api.rules.ActiveRule;
-import org.sonar.api.rules.ActiveRuleParam;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.rules.RuleQuery;
-import org.sonar.api.batch.fs.FilePredicates;
-import org.sonar.api.batch.fs.FileSystem;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
-import com.google.gson.GsonBuilder;
-import com.pablissimo.sonar.model.TsLintConfig;
-import com.pablissimo.sonar.model.TsLintIssue;
+import java.io.File;
+import java.util.*;
 
 public class TsLintSensor implements Sensor {
     public static final String CONFIG_FILENAME = "tslint.json";
@@ -79,7 +64,6 @@ public class TsLintSensor implements Sensor {
 
         TsLintExecutor executor = this.getTsLintExecutor();
         TsLintParser parser = this.getTsLintParser();
-        TsRulesDefinition rules = this.getTsRulesDefinition();
 
         boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
 
@@ -134,7 +118,7 @@ public class TsLintSensor implements Sensor {
                 // fall back to the generic 'tslint-issue' rule
                 String ruleName = issue.getRuleName();
                 if (!ruleNames.contains(ruleName)) {
-                    ruleName = TsRulesDefinition.TSLINT_UNKNOWN_RULE.name;
+                    ruleName = TsRulesDefinition.TSLINT_UNKNOWN_RULE.key;
                 }
 
                 issuable.addIssue

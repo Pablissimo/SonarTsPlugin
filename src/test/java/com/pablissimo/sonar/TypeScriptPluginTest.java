@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,9 +68,9 @@ public class TypeScriptPluginTest {
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
         assertNotNull(findPropertyByName(properties,
-            TypeScriptPlugin.SETTING_TS_LINT_CUSTOM_RULES_CONFIG));
-        assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR));
+        assertNotNull(findPropertyByName(properties,
+                TypeScriptPlugin.SETTING_TS_RULE_CONFIGS));
     }
 
     @Test
@@ -132,6 +131,26 @@ public class TypeScriptPluginTest {
         assertEquals("", property.defaultValue());
         assertEquals(true, property.project());
         assertEquals(false, property.global());
+    }
+
+    @Test
+    public void ruleConfigsSetting_definedAppropriately() {
+        Property property = findPropertyByName(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS);
+
+        assertEquals(PropertyType.STRING, property.type());
+        assertEquals("", property.defaultValue());
+        assertEquals(false, property.project());
+        assertEquals(true, property.global());
+        assertEquals(2, property.fields().length);
+
+        // name
+        assertEquals("name", property.fields()[0].key());
+        assertEquals(PropertyType.STRING, property.fields()[0].type());
+
+        // config
+        assertEquals("config", property.fields()[1].key());
+        assertEquals(PropertyType.TEXT, property.fields()[1].type());
+        assertEquals(120, property.fields()[1].indicativeSize());
     }
 
     private Property findPropertyByName(String property) {
