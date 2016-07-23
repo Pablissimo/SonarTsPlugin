@@ -108,7 +108,7 @@ a configuration for that rule in SonarTsPlugin could look as follows:
 	export-name.debtOffset=1h
 	export-name.debtType=HARDWARE_RELATED_PORTABILITY
 
-**You will need to restart the SonarQube server after configuring custom rules this way before subsequent analyses will pick them up.**
+**You will need to restart the SonarQube server after configuring custom rules this way before subsequent analyses will pick them up. You will also need to activate the new rules after restart for any quality profile you want them to participate in - by default they will be disabled.**
 
 * for documentation about the `technical debt` parameters look [here](http://docs.sonarqube.org/display/PLUG/Rule+Remediation+Costs) and [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/debt/DebtRemediationFunction.html)
 * for possible values for `debtType` go [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/rule/RulesDefinition.SubCharacteristics.html)
