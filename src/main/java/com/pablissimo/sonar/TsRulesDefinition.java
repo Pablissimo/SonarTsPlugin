@@ -18,7 +18,6 @@ public class TsRulesDefinition implements RulesDefinition {
 
     public static final String REPOSITORY_NAME = "tslint";
 
-    public static final String DEFAULT_RULE_NAME = "Unnamed TsLint rule";
     public static final String DEFAULT_RULE_SEVERITY = Severity.defaultSeverity();
     public static final String DEFAULT_RULE_DESCRIPTION = "No description provided for this TsLint rule";
     public static final String DEFAULT_RULE_DEBT_SCALAR = "0min";
@@ -92,7 +91,7 @@ public class TsRulesDefinition implements RulesDefinition {
                 continue;
 
             String ruleId = propKey;
-            String ruleName = properties.getProperty(propKey + ".name", DEFAULT_RULE_NAME);
+            String ruleName = properties.getProperty(propKey + ".name", ruleId.replace("-", " "));            
             String ruleSeverity = properties.getProperty(propKey + ".severity", DEFAULT_RULE_SEVERITY);
             String ruleDescription = properties.getProperty(propKey + ".description", DEFAULT_RULE_DESCRIPTION);
 
