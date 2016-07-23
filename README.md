@@ -6,7 +6,7 @@ SonarQube plugin for TypeScript files
 [![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
 [![Coverage Status](https://coveralls.io/repos/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/r/Pablissimo/SonarTsPlugin?branch=master)
 
-##Demos & Useful Resources
+##Demos
 
 A live deployed demo hitting a few large open-source TypeScript projects can be found here:
 https://sonar.pablissimo.com
@@ -17,10 +17,6 @@ Suggestions for more projects (or ones with easy-to-gather code coverage info) a
 * [Turbulenz Engine](https://sonar.pablissimo.com/overview?id=20352)
 * [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
 * [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
- 
-###Integrations
-
-* [Running TSLint within SonarQube on a TFS build](http://blogs.blackmarble.co.uk/blogs/rfennell/post/2016/07/05/Running-TSLint-within-SonarQube-on-a-TFS-build) - [Richard Fennell](https://github.com/rfennell)
 
 ##Overview
 
@@ -73,8 +69,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 <tr><th>Key</th><th></th><th>Description</th></thead>
 <tbody>
 <tr><td>sonar.ts.tslintpath</td><td><b>Mandatory</b></td><td>Path to the installed copy of TsLint to use</td></tr>
-<tr><td>sonar.ts.tslint.customrules</td><td><b>Optional</b></td><td>Configuration to map custom TSLint rules to SonarQube rules & settings</td></tr>
-<tr><td>sonar.ts.ruleconfigs</td><td><b>Optional</b></td><td>A list of configurations to map custom TSLint rules to dedicated SonarQube rules & settings - see TsLint Custom Rules section below</td></tr>
+<tr><td>sonar.ts.ruleconfigs</td><td><b>Optional</b></td><td>A list of configurations to map custom TsLint rules to dedicated SonarQube rules &amp; settings - see TsLint Custom Rules section below</td></tr>
 </tbody>
 </table>
 
@@ -96,7 +91,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 
 ## TsLint Custom Rules
 
-To present custom TSLint rules in SonarQube analysis, you can provide a configuration that maps the TsLint rules from your `sonar.ts.tslintrulesdir`
+To present custom TsLint rules in SonarQube analysis, you can provide a configuration that maps the TsLint rules from your `sonar.ts.tslintrulesdir`
 directory to dedicated Sonar rules for analysis.
 The configuration for a TSLint Sonar rule consists of a line declaring the TSLint rule id, a boolean switch to enable or disable the rule if needed
 and some attached properties that are used by Sonar for analysis and reporting.
@@ -112,6 +107,8 @@ a configuration for that rule in SonarTsPlugin could look as follows:
 	export-name.debtScalar=15min
 	export-name.debtOffset=1h
 	export-name.debtType=HARDWARE_RELATED_PORTABILITY
+
+**You will need to restart the SonarQube server after configuring custom rules this way before subsequent analyses will pick them up.**
 
 * for documentation about the `technical debt` parameters look [here](http://docs.sonarqube.org/display/PLUG/Rule+Remediation+Costs) and [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/debt/DebtRemediationFunction.html)
 * for possible values for `debtType` go [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/rule/RulesDefinition.SubCharacteristics.html)
