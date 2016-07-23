@@ -70,6 +70,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 <tbody>
 <tr><td>sonar.ts.tslintpath</td><td><b>Mandatory</b></td><td>Path to the installed copy of TsLint to use</td></tr>
 <tr><td>sonar.ts.tslint.customrules</td><td><b>Optional</b></td><td>Configuration to map custom TSLint rules to SonarQube rules & settings</td></tr>
+<tr><td>sonar.ts.ruleconfigs</td><td><b>Optional</b></td><td>A list of configurations to map custom TSLint rules to dedicated SonarQube rules & settings - see TsLint Custom Rules section below</td></tr>
 </tbody>
 </table>
 
@@ -86,13 +87,12 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 <tr><td>sonar.ts.tslinttimeout</td><td><b>Optional</b></td><td>Max time to wait for TsLint to finish processing a single file (in milliseconds), defaults to 60 seconds</td></tr>
 <tr><td>sonar.ts.tslintrulesdir</td><td><b>Optional</b></td><td>Path to a folder containing custom TsLint rules referenced in tslint.json</td></tr>
 <tr><td>sonar.ts.lcov.reportpath</td><td><b>Optional</b></td><td>Path to an LCOV code-coverage report to be included in analysis</td></tr>
-<tr><td>sonar.ts.ruleconfigs</td><td><b>Optional</b></td><td>A list of configurations to map custom TSLint rules to dedicated SonarQube rules & settings</td></tr>
 </tbody>
 </table>
 
-## TSLint Custom Rules
+## TsLint Custom Rules
 
-To present custom TSLint rules in SonarQube analysis, you can provide a configuration that maps the TSLint rules from your `sonar.ts.tslintrulesdir`
+To present custom TSLint rules in SonarQube analysis, you can provide a configuration that maps the TsLint rules from your `sonar.ts.tslintrulesdir`
 directory to dedicated Sonar rules for analysis.
 The configuration for a TSLint Sonar rule consists of a line declaring the TSLint rule id, a boolean switch to enable or disable the rule if needed
 and some attached properties that are used by Sonar for analysis and reporting.
@@ -119,7 +119,7 @@ MIT
 Thanks to the following for contributions to the plugin:
 * [Alex Krauss](https://github.com/alexkrauss) and [Manuel Huber](https://github.com/nelo112) for work on improving compatibility with *nix OSes
 * [schnee3](https://github.com/schnee3) for giving us some NCLOC support
-* [drywolf](https://github.com/drywolf) for TSX support
+* [drywolf](https://github.com/drywolf) for TSX file and better custom rule mapping
 
 ##With thanks
 * The LCOV parser is directly copied from the community JavaScript SonarQube plug-in, which is LGPL'd.
