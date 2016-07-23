@@ -73,6 +73,8 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 <tr><th>Key</th><th></th><th>Description</th></thead>
 <tbody>
 <tr><td>sonar.ts.tslintpath</td><td><b>Mandatory</b></td><td>Path to the installed copy of TsLint to use</td></tr>
+<tr><td>sonar.ts.tslint.customrules</td><td><b>Optional</b></td><td>Configuration to map custom TSLint rules to SonarQube rules & settings</td></tr>
+<tr><td>sonar.ts.ruleconfigs</td><td><b>Optional</b></td><td>A list of configurations to map custom TSLint rules to dedicated SonarQube rules & settings - see TsLint Custom Rules section below</td></tr>
 </tbody>
 </table>
 
@@ -92,6 +94,28 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 </tbody>
 </table>
 
+## TsLint Custom Rules
+
+To present custom TSLint rules in SonarQube analysis, you can provide a configuration that maps the TsLint rules from your `sonar.ts.tslintrulesdir`
+directory to dedicated Sonar rules for analysis.
+The configuration for a TSLint Sonar rule consists of a line declaring the TSLint rule id, a boolean switch to enable or disable the rule if needed
+and some attached properties that are used by Sonar for analysis and reporting.
+
+For example taking the `export-name` rule from the [tslint-microsoft-contrib](https://github.com/Microsoft/tslint-microsoft-contrib) package,
+a configuration for that rule in SonarTsPlugin could look as follows:
+
+	export-name=true
+	export-name.name=The name of the exported module must match the filename of the source file.
+	export-name.severity=MAJOR
+	export-name.description=This is case-sensitive but ignores file extension. Since version 1.0, this rule takes a list of regular expressions as a parameter. Any export name matching that regular expression will be ignored.
+	export-name.debtFunc=LINEAR_OFFSET
+	export-name.debtScalar=15min
+	export-name.debtOffset=1h
+	export-name.debtType=HARDWARE_RELATED_PORTABILITY
+
+* for documentation about the `technical debt` parameters look [here](http://docs.sonarqube.org/display/PLUG/Rule+Remediation+Costs) and [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/debt/DebtRemediationFunction.html)
+* for possible values for `debtType` go [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/rule/RulesDefinition.SubCharacteristics.html)
+
 ##Licence
 MIT
 
@@ -99,7 +123,7 @@ MIT
 Thanks to the following for contributions to the plugin:
 * [Alex Krauss](https://github.com/alexkrauss) and [Manuel Huber](https://github.com/nelo112) for work on improving compatibility with *nix OSes
 * [schnee3](https://github.com/schnee3) for giving us some NCLOC support
-* [drywolf](https://github.com/drywolf) for TSX support
+* [drywolf](https://github.com/drywolf) for TSX file and better custom rule mapping
 
 ##With thanks
 * The LCOV parser is directly copied from the community JavaScript SonarQube plug-in, which is LGPL'd.

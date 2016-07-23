@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.apache.commons.lang.ArrayUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,7 +52,7 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(7, propertiesAnnotation.value().length);
+        assertEquals(8, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties,
@@ -70,6 +69,8 @@ public class TypeScriptPluginTest {
                 TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR));
+        assertNotNull(findPropertyByName(properties,
+                TypeScriptPlugin.SETTING_TS_RULE_CONFIGS));
     }
 
     @Test
@@ -115,13 +116,13 @@ public class TypeScriptPluginTest {
     @Test
     public void tsLintTimeoutSettings_definedAppropriately() {
         Property property = findPropertyByName(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT);
-        
+
         assertEquals(PropertyType.INTEGER, property.type());
         assertEquals("60000", property.defaultValue());
         assertEquals(true, property.project());
         assertEquals(false, property.global());
     }
-    
+
     @Test
     public void rulesDirSetting_definedAppropriately() {
         Property property = findPropertyByName(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR);
@@ -131,7 +132,27 @@ public class TypeScriptPluginTest {
         assertEquals(true, property.project());
         assertEquals(false, property.global());
     }
-    
+
+    @Test
+    public void ruleConfigsSetting_definedAppropriately() {
+        Property property = findPropertyByName(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS);
+
+        assertEquals(PropertyType.STRING, property.type());
+        assertEquals("", property.defaultValue());
+        assertEquals(false, property.project());
+        assertEquals(true, property.global());
+        assertEquals(2, property.fields().length);
+
+        // name
+        assertEquals("name", property.fields()[0].key());
+        assertEquals(PropertyType.STRING, property.fields()[0].type());
+
+        // config
+        assertEquals("config", property.fields()[1].key());
+        assertEquals(PropertyType.TEXT, property.fields()[1].type());
+        assertEquals(120, property.fields()[1].indicativeSize());
+    }
+
     private Property findPropertyByName(String property) {
         return findPropertyByName(((Properties) plugin.getClass()
                 .getAnnotations()[0]).value(), property);

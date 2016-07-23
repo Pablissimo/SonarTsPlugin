@@ -27,6 +27,8 @@ import org.sonar.api.resources.Project;
 import org.sonar.api.rules.RuleFinder;
 import com.pablissimo.sonar.model.TsLintIssue;
 import com.pablissimo.sonar.model.TsLintPosition;
+import org.sonar.api.server.debt.DebtRemediationFunction;
+import org.sonar.api.server.rule.RulesDefinition;
 
 public class TsLintSensorTest {
     Settings settings;
@@ -52,6 +54,66 @@ public class TsLintSensorTest {
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn("/path/to/tslint");
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH)).thenReturn("/path/to/tslint.json");
         when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(45000);
+        when(this.settings.getKeysStartingWith(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS))
+            .thenReturn(new ArrayList<String>() {{
+                add(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg1.name");
+                add(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg1.config");
+                add(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg2.name");
+                add(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg2.config");
+                add(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg3.name");
+                add(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg3.config");
+            }});
+
+        // config with one disabled rule
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg1.config"))
+            .thenReturn(
+                "custom-rule-1=false\n" +
+                "custom-rule-1.name=test rule #1\n" +
+                "custom-rule-1.severity=MAJOR\n" +
+                "custom-rule-1.description=#1 description\n" +
+                "\n"
+            );
+
+        // config with a basic rule (no debt settings)
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg2.config"))
+            .thenReturn(
+                "custom-rule-2=true\n" +
+                "custom-rule-2.name=test rule #2\n" +
+                "custom-rule-2.severity=MINOR\n" +
+                "custom-rule-2.description=#2 description\n" +
+                "\n"
+            );
+
+        // config with a advanced rules (including debt settings)
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS + ".cfg3.config"))
+            .thenReturn(
+                "custom-rule-3=true\n" +
+                "custom-rule-3.name=test rule #3\n" +
+                "custom-rule-3.severity=INFO\n" +
+                "custom-rule-3.description=#3 description\n" +
+                "custom-rule-3.debtFunc=" + DebtRemediationFunction.Type.CONSTANT_ISSUE + "\n" +
+                "custom-rule-3.debtScalar=15min\n" +
+                "custom-rule-3.debtOffset=1min\n" +
+                "\n" +
+                "custom-rule-4=true\n" +
+                "custom-rule-4.name=test rule #4\n" +
+                "custom-rule-4.severity=MINOR\n" +
+                "custom-rule-4.description=#4 description\n" +
+                "custom-rule-4.debtFunc=" + DebtRemediationFunction.Type.LINEAR + "\n" +
+                "custom-rule-4.debtScalar=5min\n" +
+                "custom-rule-4.debtOffset=2h\n" +
+                "custom-rule-4.debtType=" + RulesDefinition.SubCharacteristics.EXCEPTION_HANDLING + "\n" +
+                "\n" +
+                "custom-rule-5=true\n" +
+                "custom-rule-5.name=test rule #5\n" +
+                "custom-rule-5.severity=MAJOR\n" +
+                "custom-rule-5.description=#5 description\n" +
+                "custom-rule-5.debtFunc=" + DebtRemediationFunction.Type.LINEAR_OFFSET + "\n" +
+                "custom-rule-5.debtScalar=30min\n" +
+                "custom-rule-5.debtOffset=15min\n" +
+                "custom-rule-5.debtType=" + RulesDefinition.SubCharacteristics.HARDWARE_RELATED_PORTABILITY + "\n" +
+                "\n"
+            );
 
         this.fileSystem = mock(FileSystem.class);
         this.perspectives = mock(ResourcePerspectives.class);
@@ -152,20 +214,44 @@ public class TsLintSensorTest {
 
         verify(this.issuable, never()).addIssue(any(Issue.class));
     }
-    
+
     @Test
     public void analyse_callsExecutorWithSuppliedTimeout() throws IOException {
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
-     
+
         verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(List.class), eq(45000));
     }
-    
+
     @Test
     public void analyze_callsExecutorWithAtLeast5000msTimeout() throws IOException {
         when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(-500);
-        
+
         this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
-        
+
         verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(List.class), eq(5000));
+    }
+
+    @Test
+    public void check_getExecutor()
+    {
+        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder);
+        TsLintExecutor executor = sensor.getTsLintExecutor();
+        assertNotNull(executor);
+    }
+
+    @Test
+    public void check_getParser()
+    {
+        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder);
+        TsLintParser parser = sensor.getTsLintParser();
+        assertNotNull(parser);
+    }
+
+    @Test
+    public void check_getTsRulesDefinition()
+    {
+        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder);
+        TsRulesDefinition rulesDef = sensor.getTsRulesDefinition();
+        assertNotNull(rulesDef);
     }
 }

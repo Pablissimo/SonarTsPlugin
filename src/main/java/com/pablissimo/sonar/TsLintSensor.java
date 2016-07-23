@@ -1,39 +1,24 @@
 package com.pablissimo.sonar;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
+import com.pablissimo.sonar.model.TsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
+import org.sonar.api.batch.fs.FilePredicates;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.config.Settings;
 import org.sonar.api.issue.Issuable;
-import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.resources.Project;
 import org.sonar.api.resources.Resource;
 import org.sonar.api.rule.RuleKey;
-import org.sonar.api.rules.ActiveRule;
-import org.sonar.api.rules.ActiveRuleParam;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.rules.RuleQuery;
-import org.sonar.api.batch.fs.FilePredicates;
-import org.sonar.api.batch.fs.FileSystem;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.io.Files;
-import com.google.gson.GsonBuilder;
-import com.pablissimo.sonar.model.TsLintConfig;
-import com.pablissimo.sonar.model.TsLintIssue;
+import java.io.File;
+import java.util.*;
 
 public class TsLintSensor implements Sensor {
     public static final String CONFIG_FILENAME = "tslint.json";
@@ -91,51 +76,51 @@ public class TsLintSensor implements Sensor {
 
         List<String> paths = new ArrayList<String>();
         HashMap<String, File> fileMap = new HashMap<String, File>();
-        
+
         for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
                 continue;
             }
-            
+
             String pathAdjusted = file.getAbsolutePath().replace('\\', '/');
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
-        
+
         String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, rulesDir, paths, tsLintTimeoutMs);
-                
+
         TsLintIssue[][] issues = parser.parse(jsonResult);
-        
+
         if (issues == null) {
             LOG.warn("TsLint returned no result at all");
             return;
         }
-        
+
         // Each issue bucket will contain info about a single file
         for (TsLintIssue[] batchIssues : issues) {
             if (batchIssues == null || batchIssues.length == 0) {
                 continue;
             }
-            
+
             String filePath = batchIssues[0].getName();
-            
+
             if (!fileMap.containsKey(filePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;
             }
-            
+
             File file = fileMap.get(filePath);
             Resource resource = this.getFileFromIOFile(file, project);
             Issuable issuable = perspectives.as(Issuable.class, resource);
-            
+
             for (TsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll
                 // fall back to the generic 'tslint-issue' rule
                 String ruleName = issue.getRuleName();
                 if (!ruleNames.contains(ruleName)) {
-                    ruleName = TsRulesDefinition.RULE_TSLINT_ISSUE;
+                    ruleName = TsRulesDefinition.TSLINT_UNKNOWN_RULE.key;
                 }
-    
+
                 issuable.addIssue
                 (
                         issuable
@@ -159,5 +144,9 @@ public class TsLintSensor implements Sensor {
 
     protected TsLintParser getTsLintParser() {
         return new TsLintParserImpl();
+    }
+
+    protected TsRulesDefinition getTsRulesDefinition() {
+        return new TsRulesDefinition(this.settings);
     }
 }
