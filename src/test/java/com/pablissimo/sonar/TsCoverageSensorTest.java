@@ -133,6 +133,24 @@ public class TsCoverageSensorTest {
     }
 
     @Test
+    public void savesNoCoverage_IfNotFoundFilesAreIgnored() {        
+        when(this.settings.getBoolean(TypeScriptPlugin.SETTING_IGNORE_NOT_FOUND)).thenReturn(true);
+        
+        Measure linesMeasure = mock(Measure.class);
+        when(this.context.getMeasure(eq(this.sonarFile), eq(CoreMetrics.LINES))).thenReturn(linesMeasure);
+
+        Measure nclocLines = mock(Measure.class);
+        when(nclocLines.getIntValue()).thenReturn(5);
+        when(nclocLines.getValue()).thenReturn(5.0);
+        when(this.context.getMeasure(eq(this.sonarFile), eq(CoreMetrics.NCLOC))).thenReturn(nclocLines);
+
+        this.sensor.analyse(mock(Project.class), this.context);
+        verify(context, never()).saveMeasure(eq(this.sonarFile), any(Measure.class));
+        verify(context, never()).saveMeasure(eq(this.sonarFile), eq(CoreMetrics.LINES_TO_COVER), any(Double.class));
+        verify(context, never()).saveMeasure(eq(this.sonarFile), eq(CoreMetrics.UNCOVERED_LINES), any(Double.class));
+    }
+
+    @Test
     public void savesCoverage_IfParserOutputHasDetailsForFile() {
         when(this.file.getAbsolutePath()).thenReturn("path");
 

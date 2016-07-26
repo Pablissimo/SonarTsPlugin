@@ -84,6 +84,8 @@ public class TsCoverageSensor implements Sensor {
 
         LCOVParser parser = getParser(moduleFileSystem.baseDir());
         Map<String, CoverageMeasuresBuilder> coveredFiles = parser.parseFile(lcovFile);
+        
+        final boolean ignoreNotFound = isIgnoreNotFoundActivated();
 
         for (File file : moduleFileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             try {
@@ -94,7 +96,7 @@ public class TsCoverageSensor implements Sensor {
                     for (Measure measure : fileCoverage.createMeasures()) {
                         context.saveMeasure(resource, measure);
                     }
-                } else {
+                } else if (!ignoreNotFound) {
                     // colour all lines as not executed
                     saveZeroValueForResource(resource, context);
                 }
@@ -133,6 +135,10 @@ public class TsCoverageSensor implements Sensor {
 
     private boolean isForceZeroCoverageActivated() {
         return settings.getBoolean(TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE);
+    }
+
+    private boolean isIgnoreNotFoundActivated() {
+        return settings.getBoolean(TypeScriptPlugin.SETTING_IGNORE_NOT_FOUND);
     }
 
     private boolean isLCOVReportProvided() {

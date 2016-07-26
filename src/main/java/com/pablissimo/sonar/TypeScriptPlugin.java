@@ -91,6 +91,7 @@ import org.sonar.api.*;
 public class TypeScriptPlugin extends SonarPlugin {
     public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludetypedefinitionfiles";
     public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.forceZeroCoverage";
+    public static final String SETTING_IGNORE_NOT_FOUND = "sonar.ts.ignoreNotFound";
     public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslintpath";
     public static final String SETTING_TS_LINT_CONFIG_PATH = "sonar.ts.tslintconfigpath";
     public static final String SETTING_TS_LINT_TIMEOUT = "sonar.ts.tslinttimeout";
