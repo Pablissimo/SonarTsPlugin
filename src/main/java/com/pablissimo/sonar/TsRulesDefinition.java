@@ -91,7 +91,7 @@ public class TsRulesDefinition implements RulesDefinition {
                 continue;
 
             String ruleId = propKey;
-            String ruleName = properties.getProperty(propKey + ".name", ruleId.replace("-", " "));            
+            String ruleName = properties.getProperty(propKey + ".name", ruleId.replace("-", " "));
             String ruleSeverity = properties.getProperty(propKey + ".severity", DEFAULT_RULE_SEVERITY);
             String ruleDescription = properties.getProperty(propKey + ".description", DEFAULT_RULE_DESCRIPTION);
 
