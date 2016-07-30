@@ -115,7 +115,14 @@ public class TsCoverageSensor implements Sensor {
     private void saveZeroValueForResource(org.sonar.api.resources.File resource, SensorContext context) {
         PropertiesBuilder<Integer, Integer> lineHitsData = new PropertiesBuilder<>(CoreMetrics.COVERAGE_LINE_HITS_DATA);
 
-        for (int x = 1; x < context.getMeasure(resource, CoreMetrics.LINES).getIntValue(); x++) {
+        Measure<Integer> measure = context.getMeasure(resource, CoreMetrics.LINES);
+
+        if(measure == null){
+            LOG.info("measure == null for {}", resource.getPath());
+            return;
+        }
+
+        for (int x = 1; x < measure.getIntValue(); x++) {
             lineHitsData.add(x, 0);
         }
 
