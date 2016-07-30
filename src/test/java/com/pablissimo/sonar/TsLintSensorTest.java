@@ -131,9 +131,9 @@ public class TsLintSensorTest {
                 this.file
         }));
 
-        this.fileSystem = mock(FileSystem.class);
         this.predicate = mock(FilePredicate.class);
         when(fileSystem.files(this.predicate)).thenReturn(this.files);
+        when(fileSystem.baseDir()).thenReturn(new File("/path/to/base/of/project/"));
 
         this.filePredicates = mock(FilePredicates.class);
         when(this.fileSystem.predicates()).thenReturn(this.filePredicates);
@@ -147,6 +147,7 @@ public class TsLintSensorTest {
         doReturn(this.sonarFile).when(this.sensor).getFileFromIOFile(eq(this.file), any(Project.class));
         doReturn(this.executor).when(this.sensor).getTsLintExecutor();
         doReturn(this.parser).when(this.sensor).getTsLintParser();
+        doReturn(true).when(this.sensor).doesFileExist(any(File.class));
     }
 
     @After
@@ -253,5 +254,29 @@ public class TsLintSensorTest {
         TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder);
         TsRulesDefinition rulesDef = sensor.getTsRulesDefinition();
         assertNotNull(rulesDef);
+    }
+    
+    @Test
+    public void analyse_usesServerConfiguredTsLintPath_whenSet() {
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn("/path/to/tslint");
+        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
+        
+        verify(this.executor).execute(eq("/path/to/tslint"), any(String.class), any(String.class), any(List.class), any(Integer.class));
+    }
+    
+    @Test
+    public void analyse_fallsBackToDefaultTsLintPath_whenNoServerConfiguration() {
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn(null);
+        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
+        
+        verify(this.executor).execute(eq(TsLintSensor.TSLINT_FALLBACK_PATH), any(String.class), any(String.class), any(List.class), any(Integer.class));
+    }
+    
+    @Test
+    public void analyse_fallsBackToDefaultTsLintPath_whenServerConfigurationNonNullButEmpty() {
+        when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn("");
+        this.sensor.analyse(mock(Project.class), mock(SensorContext.class));
+        
+        verify(this.executor).execute(eq(TsLintSensor.TSLINT_FALLBACK_PATH), any(String.class), any(String.class), any(List.class), any(Integer.class));
     }
 }

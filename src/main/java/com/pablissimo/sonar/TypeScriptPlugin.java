@@ -11,7 +11,7 @@ import org.sonar.api.*;
         defaultValue = "",
         name = "Path to TSLint",
         description = "Path to installed Node TSLint",
-        project = false,
+        project = true,
         global = true
     ),
     @Property(

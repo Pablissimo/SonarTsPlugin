@@ -79,7 +79,7 @@ public class TypeScriptPluginTest {
 
         assertEquals(PropertyType.STRING, property.type());
         assertEquals("", property.defaultValue());
-        assertEquals(false, property.project());
+        assertEquals(true, property.project());
         assertEquals(true, property.global());
     }
 
