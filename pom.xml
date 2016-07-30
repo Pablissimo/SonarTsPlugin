@@ -5,17 +5,40 @@
   <groupId>com.pablissimo.sonar</groupId>
   <artifactId>sonar-typescript-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.7-SNAPSHOT</version>
+  <version>0.8-SNAPSHOT</version>
 
   <name>TypeScript</name>
   <description>Analyse TypeScript projects</description>
+  <inceptionYear>2013</inceptionYear>
+  <url>http://github.com/pablissimo/SonarTsPlugin</url>
+  
+  <organisation>
+    <name>Paul O'Neill (pablissimo) and contributors</name>
+    <url>https://github.com/pablissimo/SonarTsPlugin</url>
+  </organisation>
+  
+  <developers>
+    <developer>
+      <id>pablissimo</id>
+      <name>Paul O'Neill</name>
+      <url>http://pablissimo.com</url>
+    </developer>
+  </developers>
 
   <scm>
     <connection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</connection>
     <developerConnection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</developerConnection>
     <url>https://github.com/Pablissimo/SonarTsPlugin</url>
-    <tag>0.7</tag>
+    <tag>0.8</tag>
   </scm>
+  <issueManagement>
+    <system>Github</system>
+    <url>https://github.com/Pablissimo/SonarTsPlugin/issues</url>
+  </issueManagement>
+  <ciManagement>
+    <system>Travis</system>
+    <url>https://travis-ci.org/pablissimo/SonarTsPlugin</url>
+  </ciManagement>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
