@@ -10,7 +10,7 @@
   <name>TypeScript</name>
   <description>Analyse TypeScript projects</description>
   <inceptionYear>2013</inceptionYear>
-  <url>http://github.com/pablissimo/SonarTsPlugin</url>
+  <url>https://github.com/pablissimo/SonarTsPlugin</url>
   
   <organisation>
     <name>Paul O'Neill (pablissimo) and contributors</name>
