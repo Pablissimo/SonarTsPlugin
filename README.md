@@ -83,6 +83,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 <tr><td>sonar.ts.tslintconfigpath</td><td><b>Mandatory</b></td><td>Path to the tslint.json file that configures the rules to be used in linting</td></tr>
 <tr><td>sonar.ts.excludetypedefinitionfiles</td><td><b>Optional</b></td><td>Excludes .d.ts files from analysis, defaults to true</td></tr>
 <tr><td>sonar.ts.forceZeroCoverage</td><td><b>Optional</b></td><td>Forces code coverage percentage to zero when no report is supplied, defaults to false</td></tr>
+<tr><td>sonar.ts.ignoreNotFound</td><td><b>Optional</b></td><td>Don't set code coverage percentage to zero when file is not found in report, defaults to false</td></tr>
 <tr><td>sonar.ts.tslinttimeout</td><td><b>Optional</b></td><td>Max time to wait for TsLint to finish processing a single file (in milliseconds), defaults to 60 seconds</td></tr>
 <tr><td>sonar.ts.tslintrulesdir</td><td><b>Optional</b></td><td>Path to a folder containing custom TsLint rules referenced in tslint.json</td></tr>
 <tr><td>sonar.ts.lcov.reportpath</td><td><b>Optional</b></td><td>Path to an LCOV code-coverage report to be included in analysis</td></tr>
