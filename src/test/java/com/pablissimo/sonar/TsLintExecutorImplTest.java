@@ -49,7 +49,7 @@ public class TsLintExecutorImplTest {
         Command theCommand = capturedCommands.get(0);
         long theTimeout = capturedTimeouts.get(0);
         
-        assertEquals("node path/to/tslint --format json --rules-dir path/to/rules --config path/to/config path/to/file path/to/another", theCommand.toCommandLine());
+        assertEquals("node \"path/to/tslint\" --format json --rules-dir \"path/to/rules\" --config \"path/to/config\" \"path/to/file\" \"path/to/another\"", theCommand.toCommandLine());
         // Expect one timeout period per file processed
         assertEquals(2 * 40000, theTimeout);        
     }
@@ -105,7 +105,7 @@ public class TsLintExecutorImplTest {
         String firstBatch = "first batch";
         while (currentLength + 12 < TsLintExecutorImpl.MAX_COMMAND_LENGTH - standardCmdLength) {
             filenames.add(firstBatch);
-            currentLength += firstBatch.length() + 1;
+            currentLength += firstBatch.length() + 3; // 1 for the space, 2 for the quotes
         }
         filenames.add("second batch");
         

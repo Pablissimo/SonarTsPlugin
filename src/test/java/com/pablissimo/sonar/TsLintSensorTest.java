@@ -148,6 +148,14 @@ public class TsLintSensorTest {
         doReturn(this.executor).when(this.sensor).getTsLintExecutor();
         doReturn(this.parser).when(this.sensor).getTsLintParser();
         doReturn(true).when(this.sensor).doesFileExist(any(File.class));
+        
+        // For now, pretend all paths are absolute
+        when(this.sensor.getAbsolutePath(any(String.class))).thenAnswer(new Answer<String>() {
+           @Override
+           public String answer(InvocationOnMock invocation) throws Throwable {
+               return (String) invocation.getArguments()[0];
+           }
+        });
     }
 
     @After

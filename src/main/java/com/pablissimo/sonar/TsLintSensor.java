@@ -48,30 +48,37 @@ public class TsLintSensor implements Sensor {
         return fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY)).iterator().hasNext();
     }
     
-    protected String getTsLintPath() {
+    private String getPath(String settingKey, String defaultValue) {
         // Prefer the specified path
-        String toReturn = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
-                
+        String toReturn = settings.getString(settingKey);
+
         // Fall back to a file system search if null or doesn't exist
         if (toReturn == null || toReturn.isEmpty()) {
-            LOG.debug("Path to TsLint not specified, falling back to node_modules");
-            toReturn = TSLINT_FALLBACK_PATH;
+            LOG.debug("Path " + settingKey + " not specified, falling back to " + defaultValue);
+            toReturn = defaultValue;
         }
         else {
-            LOG.debug("Found TsLint path to be '" + toReturn + "'");
+            LOG.debug("Found " + settingKey + " Lint path to be '" + toReturn + "'");
         }
         
-        File candidateFile = new java.io.File(toReturn);
-        if (!candidateFile.isAbsolute()) {
-            candidateFile = new java.io.File(this.fileSystem.baseDir().getAbsolutePath(), toReturn);
+        return getAbsolutePath(toReturn);
+    }
+    
+    protected String getAbsolutePath(String toReturn) {
+        if (toReturn != null) {
+            File candidateFile = new java.io.File(toReturn);
+            if (!candidateFile.isAbsolute()) {
+                candidateFile = new java.io.File(this.fileSystem.baseDir().getAbsolutePath(), toReturn);
+            }
+            
+            if (!doesFileExist(candidateFile)) {
+                return null;
+            }
+
+            return candidateFile.getAbsolutePath();
         }
         
-        if (!doesFileExist(candidateFile)) {
-            LOG.warn("Could not find tslint at path '" + toReturn + "' - skipping tslint analysis");
-            toReturn = null;
-        }
-        
-        return toReturn;
+        return null;
     }
     
     protected boolean doesFileExist(File f) {
@@ -79,16 +86,18 @@ public class TsLintSensor implements Sensor {
     }
 
     public void analyse(Project project, SensorContext context) {
-        String pathToTsLint = getTsLintPath();
-        String pathToTsLintConfig = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH);
-        String rulesDir = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR);
+        String pathToTsLint = this.getPath(TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH);
+        String pathToTsLintConfig = this.getPath(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME);
+        String rulesDir = this.getPath(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null);
+        
         Integer tsLintTimeoutMs = Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
 
         if (pathToTsLint == null) {
+            LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
             return;
         }
         else if (pathToTsLintConfig == null) {
-            LOG.warn("Path to tslint.json configuration file (" + TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH + ") is not defined. Skipping tslint analysis.");
+            LOG.warn("Path to tslint.json configuration file not defined or not found. Skipping tslint analysis.");
             return;
         }
 
@@ -133,7 +142,7 @@ public class TsLintSensor implements Sensor {
             }
 
             String filePath = batchIssues[0].getName();
-
+            
             if (!fileMap.containsKey(filePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;

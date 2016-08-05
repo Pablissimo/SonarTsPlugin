@@ -5,7 +5,7 @@
   <groupId>com.pablissimo.sonar</groupId>
   <artifactId>sonar-typescript-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.8-SNAPSHOT</version>
+  <version>0.9-SNAPSHOT</version>
 
   <name>TypeScript</name>
   <description>Analyse TypeScript projects</description>
@@ -29,7 +29,7 @@
     <connection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</connection>
     <developerConnection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</developerConnection>
     <url>https://github.com/Pablissimo/SonarTsPlugin</url>
-    <tag>0.8</tag>
+    <tag>0.9</tag>
   </scm>
   <issueManagement>
     <system>Github</system>

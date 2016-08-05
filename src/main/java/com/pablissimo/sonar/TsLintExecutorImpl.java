@@ -20,19 +20,19 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         Command command =
                 Command
                 .create("node")
-                .addArgument(pathToTsLint)
+                .addArgument('"' + pathToTsLint + '"')
                 .addArgument("--format")
                 .addArgument("json");
 
         if (rulesDir != null && rulesDir.length() > 0) {
             command
                 .addArgument("--rules-dir")
-                .addArgument(rulesDir);
+                .addArgument('"' + rulesDir + '"');
         }
 
         command
             .addArgument("--config")
-            .addArgument(configFile)
+            .addArgument('"' + configFile + '"')
             .setNewShell(false);
 
         return command;
@@ -50,7 +50,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
         int currentBatchLength = 0;
         for (int i = 0; i < files.size(); i++) {
-            String nextPath = files.get(i).trim();
+            String nextPath = '"' + files.get(i).trim() + '"';
 
             // +1 for the space we'll be adding between filenames
             if (currentBatchLength + nextPath.length() + 1 > availableForBatching) {
@@ -71,7 +71,6 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
         StreamConsumer stdOutConsumer = new StreamConsumer() {
             public void consumeLine(String line) {
-                LOG.trace("TsLint Out: " + line);
                 stdOut.append(line);
             }
         };
@@ -99,7 +98,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         }
 
         String rawOutput = stdOut.toString();
-
+        
         // TsLint returns nonsense for its JSON output when faced with multiple files
         // so we need to fix it up before we do anything else
         return "[" + rawOutput.replaceAll("\\]\\[", "],[") + "]";
