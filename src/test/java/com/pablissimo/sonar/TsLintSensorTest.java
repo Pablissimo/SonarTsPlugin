@@ -29,6 +29,7 @@ import com.pablissimo.sonar.model.TsLintIssue;
 import com.pablissimo.sonar.model.TsLintPosition;
 import org.sonar.api.server.debt.DebtRemediationFunction;
 import org.sonar.api.server.rule.RulesDefinition;
+import org.sonar.api.utils.System2;
 
 public class TsLintSensorTest {
     Settings settings;
@@ -39,6 +40,7 @@ public class TsLintSensorTest {
     FilePredicate predicate;
     Issuable issuable;
     IssueBuilder issueBuilder;
+    System2 system;
 
     List<File> files;
     File file;
@@ -51,6 +53,7 @@ public class TsLintSensorTest {
     @Before
     public void setUp() throws Exception {
         this.settings = mock(Settings.class);
+        this.system = mock(System2.class);
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH)).thenReturn("/path/to/tslint");
         when(this.settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH)).thenReturn("/path/to/tslint.json");
         when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(45000);
@@ -143,7 +146,7 @@ public class TsLintSensorTest {
 
         this.executor = mock(TsLintExecutor.class);
         this.parser = mock(TsLintParser.class);
-        this.sensor = spy(new TsLintSensor(settings, fileSystem, perspectives, ruleFinder));
+        this.sensor = spy(new TsLintSensor(settings, fileSystem, perspectives, ruleFinder, system));
         doReturn(this.sonarFile).when(this.sensor).getFileFromIOFile(eq(this.file), any(Project.class));
         doReturn(this.executor).when(this.sensor).getTsLintExecutor();
         doReturn(this.parser).when(this.sensor).getTsLintParser();
@@ -243,7 +246,7 @@ public class TsLintSensorTest {
     @Test
     public void check_getExecutor()
     {
-        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder);
+        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder, system);
         TsLintExecutor executor = sensor.getTsLintExecutor();
         assertNotNull(executor);
     }
@@ -251,7 +254,7 @@ public class TsLintSensorTest {
     @Test
     public void check_getParser()
     {
-        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder);
+        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder, system);
         TsLintParser parser = sensor.getTsLintParser();
         assertNotNull(parser);
     }
@@ -259,7 +262,7 @@ public class TsLintSensorTest {
     @Test
     public void check_getTsRulesDefinition()
     {
-        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder);
+        TsLintSensor sensor = new TsLintSensor(settings, fileSystem, perspectives, ruleFinder, system);
         TsRulesDefinition rulesDef = sensor.getTsRulesDefinition();
         assertNotNull(rulesDef);
     }

@@ -84,6 +84,11 @@ public class TsCoverageSensor implements Sensor {
 
         LCOVParser parser = getParser(moduleFileSystem.baseDir());
         Map<String, CoverageMeasuresBuilder> coveredFiles = parser.parseFile(lcovFile);
+       
+        LOG.debug("Found coverage information for " + coveredFiles.size() + " files:");
+        for (String key : coveredFiles.keySet()) {
+            LOG.debug("  " + key);
+        }
         
         final boolean ignoreNotFound = isIgnoreNotFoundActivated();
 
@@ -92,6 +97,9 @@ public class TsCoverageSensor implements Sensor {
                 CoverageMeasuresBuilder fileCoverage = coveredFiles.get(file.getAbsolutePath());
                 org.sonar.api.resources.File resource = this.fileFromIoFile(file, project);
 
+                if (fileCoverage == null) {
+                    LOG.debug("No coverage found for '" + file.getAbsolutePath() + "'");
+                }                
                 if (fileCoverage != null) {
                     for (Measure measure : fileCoverage.createMeasures()) {
                         context.saveMeasure(resource, measure);

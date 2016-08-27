@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sonar.api.utils.System2;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
@@ -19,11 +20,13 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 public class TsLintExecutorImplTest {
     TsLintExecutorImpl executorImpl;
     CommandExecutor commandExecutor;
+    System2 system;
     
     @Before
     public void setUp() throws Exception {
+        this.system = mock(System2.class);
         this.commandExecutor = mock(CommandExecutor.class);
-        this.executorImpl = spy(new TsLintExecutorImpl());
+        this.executorImpl = spy(new TsLintExecutorImpl(this.system));
         when(this.executorImpl.createExecutor()).thenReturn(this.commandExecutor);
     }
     
@@ -49,7 +52,7 @@ public class TsLintExecutorImplTest {
         Command theCommand = capturedCommands.get(0);
         long theTimeout = capturedTimeouts.get(0);
         
-        assertEquals("node \"path/to/tslint\" --format json --rules-dir \"path/to/rules\" --config \"path/to/config\" \"path/to/file\" \"path/to/another\"", theCommand.toCommandLine());
+        assertEquals("node path/to/tslint --format json --rules-dir path/to/rules --config path/to/config path/to/file path/to/another", theCommand.toCommandLine());
         // Expect one timeout period per file processed
         assertEquals(2 * 40000, theTimeout);        
     }
@@ -105,7 +108,7 @@ public class TsLintExecutorImplTest {
         String firstBatch = "first batch";
         while (currentLength + 12 < TsLintExecutorImpl.MAX_COMMAND_LENGTH - standardCmdLength) {
             filenames.add(firstBatch);
-            currentLength += firstBatch.length() + 3; // 1 for the space, 2 for the quotes
+            currentLength += firstBatch.length() + 1; // 1 for the space
         }
         filenames.add("second batch");
         
