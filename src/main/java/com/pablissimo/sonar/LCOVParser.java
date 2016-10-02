@@ -4,9 +4,10 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.sonar.api.measures.CoverageMeasuresBuilder;
+import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.sensor.coverage.NewCoverage;
 
 public interface LCOVParser {
-    Map<String, CoverageMeasuresBuilder> parseFile(File file);
-    Map<String, CoverageMeasuresBuilder> parse(List<String> lines);
+    Map<InputFile, NewCoverage> parseFile(File file);
+    Map<InputFile, NewCoverage> parse(List<String> lines);
 }

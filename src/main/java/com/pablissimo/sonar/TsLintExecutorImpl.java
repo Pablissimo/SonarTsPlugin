@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.utils.System2;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
@@ -16,23 +17,41 @@ public class TsLintExecutorImpl implements TsLintExecutor {
     private StringBuilder stdOut;
     private StringBuilder stdErr;
 
-    private static Command getBaseCommand(String pathToTsLint, String configFile, String rulesDir) {
+    private boolean mustQuoteSpaceContainingPaths = false;
+    
+    public TsLintExecutorImpl(System2 system) {
+        this.mustQuoteSpaceContainingPaths = system.isOsWindows();
+    }
+    
+    public String preparePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        else if (path.contains(" ") && this.mustQuoteSpaceContainingPaths) {
+            return '"' + path + '"';
+        }
+        else {
+            return path;
+        }
+    }
+    
+    private Command getBaseCommand(String pathToTsLint, String configFile, String rulesDir) {
         Command command =
                 Command
                 .create("node")
-                .addArgument('"' + pathToTsLint + '"')
+                .addArgument(this.preparePath(pathToTsLint))
                 .addArgument("--format")
                 .addArgument("json");
 
         if (rulesDir != null && rulesDir.length() > 0) {
             command
                 .addArgument("--rules-dir")
-                .addArgument('"' + rulesDir + '"');
+                .addArgument(this.preparePath(rulesDir));
         }
 
         command
             .addArgument("--config")
-            .addArgument('"' + configFile + '"')
+            .addArgument(this.preparePath(configFile))
             .setNewShell(false);
 
         return command;
@@ -50,7 +69,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
         int currentBatchLength = 0;
         for (int i = 0; i < files.size(); i++) {
-            String nextPath = '"' + files.get(i).trim() + '"';
+            String nextPath = this.preparePath(files.get(i).trim());
 
             // +1 for the space we'll be adding between filenames
             if (currentBatchLength + nextPath.length() + 1 > availableForBatching) {

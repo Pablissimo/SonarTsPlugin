@@ -1,8 +1,5 @@
 package com.pablissimo.sonar;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.sonar.api.*;
 
 @Properties({
@@ -88,7 +85,7 @@ import org.sonar.api.*;
         global = false
     )
 })
-public class TypeScriptPlugin extends SonarPlugin {
+public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludetypedefinitionfiles";
     public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.forceZeroCoverage";
     public static final String SETTING_IGNORE_NOT_FOUND = "sonar.ts.ignoreNotFound";
@@ -99,15 +96,13 @@ public class TypeScriptPlugin extends SonarPlugin {
     public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
     public static final String SETTING_TS_RULE_CONFIGS = "sonar.ts.ruleconfigs";
 
-    public List getExtensions() {
-        return Arrays.asList
-                (
-                        TypeScriptRuleProfile.class,
-                        TypeScriptLanguage.class,
-                        TsLintSensor.class,
-                        LOCSensor.class,
-                        TsCoverageSensor.class,
-                        TsRulesDefinition.class
-                );
+    @Override
+    public void define(Context ctx) {
+        ctx
+            .addExtension(TypeScriptRuleProfile.class)
+            .addExtension(TypeScriptLanguage.class)
+            .addExtension(TsLintSensor.class)
+            .addExtension(CombinedCoverageSensor.class)
+            .addExtension(TsRulesDefinition.class);
     }
 }
