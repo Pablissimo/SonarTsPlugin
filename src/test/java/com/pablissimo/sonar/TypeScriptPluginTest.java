@@ -1,25 +1,21 @@
 package com.pablissimo.sonar;
 
-import static org.junit.Assert.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.sonar.api.*;
+import org.sonar.api.internal.SonarRuntimeImpl;
+import org.sonar.api.utils.Version;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.codehaus.plexus.context.DefaultContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.sonar.api.Plugin;
-import org.sonar.api.Properties;
-import org.sonar.api.Property;
-import org.sonar.api.PropertyType;
-import org.sonar.api.SonarQubeVersion;
+import static org.junit.Assert.*;
 
 public class TypeScriptPluginTest {
-    TypeScriptPlugin plugin;
+    private TypeScriptPlugin plugin;
 
     @Before
     public void setUp() throws Exception {
@@ -32,10 +28,11 @@ public class TypeScriptPluginTest {
 
     @Test
     public void advertisesAppropriateExtensions() {
-        Plugin.Context context = new Plugin.Context(SonarQubeVersion.V5_6);
+        SonarRuntime runtime = SonarRuntimeImpl.forSonarQube(Version.create(6, 0), SonarQubeSide.SERVER);
+        Plugin.Context context = new Plugin.Context(runtime);
 
         this.plugin.define(context);
-        
+
         List extensions = context.getExtensions();
 
         assertEquals(5, extensions.size());
@@ -168,11 +165,6 @@ public class TypeScriptPluginTest {
     private static Property findPropertyByName(Property[] properties,
             final String name) {
         return (Property) CollectionUtils.find(Arrays.asList(properties),
-                new Predicate() {
-                    @Override
-                    public boolean evaluate(Object arg0) {
-                        return ((Property) arg0).key().equals(name);
-                    }
-                });
+            arg0 -> ((Property) arg0).key().equals(name));
     }
 }
