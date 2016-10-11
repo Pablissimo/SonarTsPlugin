@@ -98,7 +98,7 @@ The plugin has so far *only been tested on Windows* and it'll be no surprise if 
 </table>
 
 ##TsLint installation and configuration
-By default, SonarTsPlugin will look for a version of TsLint installed locally within your project (i.e. in node_modules\tslint\bin), relative to the sonar-project.properties file. Thismay not be what you want, so you can set this directly via the ```sonar.ts.tslintpath``` configuration setting:
+By default, SonarTsPlugin will look for a version of TsLint installed locally within your project (i.e. in node_modules\tslint\bin), relative to the sonar-project.properties file. This may not be what you want, so you can set this directly via the ```sonar.ts.tslintpath``` configuration setting:
 * At project level
 * Globally, for all projects
 
