@@ -16,6 +16,7 @@ import org.sonar.api.rule.RuleKey;
 import org.sonar.api.rules.Rule;
 import org.sonar.api.rules.RuleFinder;
 import org.sonar.api.rules.RuleQuery;
+import org.sonar.api.utils.System2;
 
 import java.io.File;
 import java.util.*;
@@ -31,13 +32,15 @@ public class TsLintSensor implements Sensor {
     private FilePredicates filePredicates;
     private ResourcePerspectives perspectives;
     private RuleFinder ruleFinder;
-
-    public TsLintSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RuleFinder ruleFinder) {
+    private System2 system;
+    
+    public TsLintSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RuleFinder ruleFinder, System2 system) {
         this.settings = settings;
         this.fileSystem = fileSystem;
         this.filePredicates = fileSystem.predicates();
         this.perspectives = perspectives;
         this.ruleFinder = ruleFinder;
+        this.system = system;
     }
 
     public boolean shouldExecuteOnProject(Project project) {
@@ -178,7 +181,7 @@ public class TsLintSensor implements Sensor {
     }
 
     protected TsLintExecutor getTsLintExecutor() {
-        return new TsLintExecutorImpl();
+        return new TsLintExecutorImpl(this.system);
     }
 
     protected TsLintParser getTsLintParser() {
