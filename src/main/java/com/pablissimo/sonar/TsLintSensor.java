@@ -41,13 +41,13 @@ public class TsLintSensor implements Sensor {
     }
 
     public boolean shouldExecuteOnProject(Project project) {
-        return hasFilesToAnalyze();
+        return settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_ENABLED) && hasFilesToAnalyze();
     }
 
     private boolean hasFilesToAnalyze() {
         return fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY)).iterator().hasNext();
     }
-    
+
     private String getPath(String settingKey, String defaultValue) {
         // Prefer the specified path
         String toReturn = settings.getString(settingKey);
@@ -60,27 +60,27 @@ public class TsLintSensor implements Sensor {
         else {
             LOG.debug("Found " + settingKey + " Lint path to be '" + toReturn + "'");
         }
-        
+
         return getAbsolutePath(toReturn);
     }
-    
+
     protected String getAbsolutePath(String toReturn) {
         if (toReturn != null) {
             File candidateFile = new java.io.File(toReturn);
             if (!candidateFile.isAbsolute()) {
                 candidateFile = new java.io.File(this.fileSystem.baseDir().getAbsolutePath(), toReturn);
             }
-            
+
             if (!doesFileExist(candidateFile)) {
                 return null;
             }
 
             return candidateFile.getAbsolutePath();
         }
-        
+
         return null;
     }
-    
+
     protected boolean doesFileExist(File f) {
         return f.exists();
     }
@@ -89,7 +89,7 @@ public class TsLintSensor implements Sensor {
         String pathToTsLint = this.getPath(TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH);
         String pathToTsLintConfig = this.getPath(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME);
         String rulesDir = this.getPath(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null);
-        
+
         Integer tsLintTimeoutMs = Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
 
         if (pathToTsLint == null) {
@@ -142,7 +142,7 @@ public class TsLintSensor implements Sensor {
             }
 
             String filePath = batchIssues[0].getName();
-            
+
             if (!fileMap.containsKey(filePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;
