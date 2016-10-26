@@ -5,23 +5,28 @@
   <groupId>com.pablissimo.sonar</groupId>
   <artifactId>sonar-typescript-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.93-SNAPSHOT</version>
+  <version>0.94-SNAPSHOT</version>
 
   <name>TypeScript</name>
   <description>Analyse TypeScript projects</description>
   <inceptionYear>2013</inceptionYear>
   <url>https://github.com/pablissimo/SonarTsPlugin</url>
-  
+
   <organisation>
     <name>Paul O'Neill (pablissimo) and contributors</name>
     <url>https://github.com/pablissimo/SonarTsPlugin</url>
   </organisation>
-  
+
   <developers>
     <developer>
       <id>pablissimo</id>
       <name>Paul O'Neill</name>
       <url>http://pablissimo.com</url>
+    </developer>
+    <developer>
+      <id>stheves</id>
+      <name>Sascha Theves</name>
+      <url>http://thev.es</url>
     </developer>
   </developers>
 
@@ -39,13 +44,13 @@
     <system>Travis</system>
     <url>https://travis-ci.org/pablissimo/SonarTsPlugin</url>
   </ciManagement>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    
-    <sonar.buildVersion>5.6</sonar.buildVersion>
+    <sonar.buildVersion>6.0</sonar.buildVersion>
     <jdk.min.version>1.8</jdk.min.version>
     <sslr.version>1.21</sslr.version>
+    <slf4j.version>1.7.21</slf4j.version>
   </properties>
 
   <dependencies>
@@ -55,13 +60,23 @@
       <version>${sonar.buildVersion}</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+        <groupId>org.sonarsource.sslr</groupId>
+        <artifactId>sslr-core</artifactId>
+        <version>${sslr.version}</version>
+    </dependency>
+      <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>${slf4j.version}</version>
+          <scope>provided</scope>
+      </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.3</version>
     </dependency>
-    
+
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -78,6 +93,7 @@
     <dependency>
         <groupId>org.sonarsource.sslr</groupId>
         <artifactId>sslr-testing-harness</artifactId>
+        <scope>test</scope>
         <version>${sslr.version}</version>
     </dependency>
     <dependency>
@@ -135,7 +151,7 @@
         <configuration>
           <source>${jdk.min.version}</source>
           <target>${jdk.min.version}</target>
-          
+
           <showDeprecation>true</showDeprecation>
           <compilerArgs>
             <arg>-Xlint:all</arg>
