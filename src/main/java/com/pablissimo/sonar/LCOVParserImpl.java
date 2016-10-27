@@ -21,7 +21,6 @@
  */
 package com.pablissimo.sonar;
 
-import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -197,7 +196,7 @@ public class LCOVParserImpl implements LCOVParser {
         branches.put(lineNumber, branchesForLine);
       }
       Integer currentValue = branchesForLine.get(branchNumber);
-      branchesForLine.put(branchNumber, Objects.firstNonNull(currentValue, 0) + taken);
+      branchesForLine.put(branchNumber, (currentValue == null ? 0 : currentValue) + taken);
     }
 
     void addLine(Integer lineNumber, Integer executionCount) {
