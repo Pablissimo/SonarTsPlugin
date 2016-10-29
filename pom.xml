@@ -8,7 +8,7 @@
     <packaging>sonar-plugin</packaging>
     <version>0.94-SNAPSHOT</version>
 
-    <name>SonarQube TypeScript Plugin</name>
+    <name>TypeScript</name>
     <description>Analyse TypeScript projects</description>
     <inceptionYear>2013</inceptionYear>
     <url>https://github.com/pablissimo/SonarTsPlugin</url>
@@ -62,11 +62,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.sonarsource.sslr</groupId>
-            <artifactId>sslr-core</artifactId>
-            <version>${sslr.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
@@ -77,7 +72,6 @@
             <artifactId>gson</artifactId>
             <version>2.3</version>
         </dependency>
-
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -156,7 +150,6 @@
                     <showDeprecation>true</showDeprecation>
                     <compilerArgs>
                         <arg>-Xlint:all</arg>
-                        <arg>-Werror</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
