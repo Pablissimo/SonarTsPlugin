@@ -8,15 +8,12 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.codehaus.plexus.context.DefaultContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonar.api.Plugin;
-import org.sonar.api.Properties;
-import org.sonar.api.Property;
-import org.sonar.api.PropertyType;
-import org.sonar.api.SonarQubeVersion;
+import org.sonar.api.*;
+import org.sonar.api.internal.SonarRuntimeImpl;
+import org.sonar.api.utils.Version;
 
 public class TypeScriptPluginTest {
     TypeScriptPlugin plugin;
@@ -32,10 +29,10 @@ public class TypeScriptPluginTest {
 
     @Test
     public void advertisesAppropriateExtensions() {
-        Plugin.Context context = new Plugin.Context(SonarQubeVersion.V5_6);
+        Plugin.Context context = new Plugin.Context(SonarRuntimeImpl.forSonarQube(Version.create(5, 6), SonarQubeSide.SERVER));
 
         this.plugin.define(context);
-        
+
         List extensions = context.getExtensions();
 
         assertEquals(5, extensions.size());
