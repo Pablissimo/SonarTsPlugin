@@ -1,8 +1,6 @@
 package com.pablissimo.sonar;
 
 import com.pablissimo.sonar.model.TsLintRule;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonar.api.profiles.ProfileDefinition;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.rules.Rule;
@@ -10,8 +8,6 @@ import org.sonar.api.utils.ValidationMessages;
 
 public class TypeScriptRuleProfile extends ProfileDefinition {
     public static final String PROFILE_NAME = "tslint";
-
-    private static final Logger LOG = LoggerFactory.getLogger(TypeScriptRuleProfile.class);
 
     @Override
     public RulesProfile createProfile(ValidationMessages validation) {
@@ -21,8 +17,9 @@ public class TypeScriptRuleProfile extends ProfileDefinition {
 
         activateRule(profile, TsRulesDefinition.TSLINT_UNKNOWN_RULE.key);
 
-        for (TsLintRule coreRule : rules.getCoreRules())
+        for (TsLintRule coreRule : rules.getCoreRules()) {
             activateRule(profile, coreRule.key);
+        }
 
         return profile;
     }

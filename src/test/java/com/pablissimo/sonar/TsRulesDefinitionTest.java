@@ -5,8 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.Severity;
+import org.sonar.api.rules.RuleType;
 import org.sonar.api.server.debt.DebtRemediationFunction;
-import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.server.rule.RulesDefinition.Context;
 import org.sonar.api.server.rule.RulesDefinition.Rule;
 
@@ -71,6 +71,7 @@ public class TsRulesDefinitionTest {
                 "custom-rule-3.debtFunc=" + DebtRemediationFunction.Type.CONSTANT_ISSUE + "\n" +
                 "custom-rule-3.debtScalar=15min\n" +
                 "custom-rule-3.debtOffset=1min\n" +
+                "custom-rule-3.debtType=INVALID_TYPE_GOES_HERE\n" +
                 "\n" +
                 "custom-rule-4=true\n" +
                 "custom-rule-4.name=test rule #4\n" +
@@ -79,7 +80,7 @@ public class TsRulesDefinitionTest {
                 "custom-rule-4.debtFunc=" + DebtRemediationFunction.Type.LINEAR + "\n" +
                 "custom-rule-4.debtScalar=5min\n" +
                 "custom-rule-4.debtOffset=2h\n" +
-                "custom-rule-4.debtType=" + RulesDefinition.SubCharacteristics.EXCEPTION_HANDLING + "\n" +
+                "custom-rule-4.debtType=" + RuleType.BUG.name() + "\n" +
                 "\n" +
                 "custom-rule-5=true\n" +
                 "custom-rule-5.name=test rule #5\n" +
@@ -88,7 +89,7 @@ public class TsRulesDefinitionTest {
                 "custom-rule-5.debtFunc=" + DebtRemediationFunction.Type.LINEAR_OFFSET + "\n" +
                 "custom-rule-5.debtScalar=30min\n" +
                 "custom-rule-5.debtOffset=15min\n" +
-                "custom-rule-5.debtType=" + RulesDefinition.SubCharacteristics.HARDWARE_RELATED_PORTABILITY + "\n" +
+                "custom-rule-5.debtType=" + RuleType.VULNERABILITY.name() + "\n" +
                 "\n"
             );
 
@@ -510,7 +511,7 @@ public class TsRulesDefinitionTest {
         assertEquals(Severity.MINOR, rule2.severity());
         assertEquals("#2 description", rule2.htmlDescription());
         assertEquals(null, rule2.debtRemediationFunction());
-        assertEquals(null, rule2.debtSubCharacteristic());
+        assertEquals(RuleType.CODE_SMELL, rule2.type());
 
         // cfg3
         Rule rule3 = getRule("custom-rule-3");
@@ -522,13 +523,11 @@ public class TsRulesDefinitionTest {
             DebtRemediationFunction.Type.CONSTANT_ISSUE,
             rule3.debtRemediationFunction().type()
         );
-        assertEquals(null, rule3.debtRemediationFunction().coefficient());
-        assertEquals("15min", rule3.debtRemediationFunction().offset());
-        assertEquals(
-            TsRulesDefinition.DEFAULT_RULE_DEBT_TYPE,
-            rule3.debtSubCharacteristic()
-        );
+        assertEquals(null, rule3.debtRemediationFunction().gapMultiplier());
+        assertEquals("15min", rule3.debtRemediationFunction().baseEffort());
+        assertEquals(RuleType.CODE_SMELL, rule3.type());
 
+        // cfg4
         Rule rule4 = getRule("custom-rule-4");
         assertNotNull(rule4);
         assertEquals("test rule #4", rule4.name());
@@ -538,28 +537,20 @@ public class TsRulesDefinitionTest {
             DebtRemediationFunction.Type.LINEAR,
             rule4.debtRemediationFunction().type()
         );
-        assertEquals("5min", rule4.debtRemediationFunction().coefficient());
-        assertEquals(null, rule4.debtRemediationFunction().offset());
-        assertEquals(
-            RulesDefinition.SubCharacteristics.EXCEPTION_HANDLING,
-            rule4.debtSubCharacteristic()
-        );
+        assertEquals("5min", rule4.debtRemediationFunction().gapMultiplier());
+        assertEquals(null, rule4.debtRemediationFunction().baseEffort());
+        assertEquals(RuleType.BUG, rule4.type());
 
+        // cfg5
         Rule rule5 = getRule("custom-rule-5");
         assertNotNull(rule5);
         assertEquals("test rule #5", rule5.name());
         assertEquals(Severity.MAJOR, rule5.severity());
         assertEquals("#5 description", rule5.htmlDescription());
-        assertEquals(
-            DebtRemediationFunction.Type.LINEAR_OFFSET,
-            rule5.debtRemediationFunction().type()
-        );
-        assertEquals("30min", rule5.debtRemediationFunction().coefficient());
-        assertEquals("15min", rule5.debtRemediationFunction().offset());
-        assertEquals(
-            RulesDefinition.SubCharacteristics.HARDWARE_RELATED_PORTABILITY,
-            rule5.debtSubCharacteristic()
-        );
+        assertEquals(RuleType.VULNERABILITY, rule5.type());
+        
+        assertEquals("30min", rule5.debtRemediationFunction().gapMultiplier());
+        assertEquals("15min", rule5.debtRemediationFunction().baseEffort());
     }
 
     @Test
@@ -596,9 +587,5 @@ public class TsRulesDefinitionTest {
 
     private Rule getRule(String name) {
         return this.context.repository(TsRulesDefinition.REPOSITORY_NAME).rule(name);
-    }
-
-    private RulesDefinition.Param getParam(Rule rule, String name) {
-        return rule.param(name);
     }
 }

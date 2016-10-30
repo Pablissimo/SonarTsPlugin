@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleStatus;
 import org.sonar.api.rule.Severity;
+import org.sonar.api.rules.RuleType;
 import org.sonar.api.server.debt.DebtRemediationFunction;
 import org.sonar.api.server.rule.RulesDefinition;
 
@@ -22,7 +23,7 @@ public class TsRulesDefinition implements RulesDefinition {
     public static final String DEFAULT_RULE_DESCRIPTION = "No description provided for this TsLint rule";
     public static final String DEFAULT_RULE_DEBT_SCALAR = "0min";
     public static final String DEFAULT_RULE_DEBT_OFFSET = "0min";
-    public static final String DEFAULT_RULE_DEBT_TYPE = SubCharacteristics.ARCHITECTURE_RELIABILITY;
+    public static final String DEFAULT_RULE_DEBT_TYPE = RuleType.CODE_SMELL.name();
 
     private static final String CORE_RULES_CONFIG_RESOURCE_PATH = "/tslint/tslint-rules.properties";
 
@@ -98,7 +99,7 @@ public class TsRulesDefinition implements RulesDefinition {
             String debtRemediationFunction = properties.getProperty(propKey + ".debtFunc", null);
             String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", DEFAULT_RULE_DEBT_SCALAR);
             String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", DEFAULT_RULE_DEBT_OFFSET);
-            String debtCharacteristic = properties.getProperty(propKey + ".debtType", DEFAULT_RULE_DEBT_TYPE);
+            String debtType = properties.getProperty(propKey + ".debtType", DEFAULT_RULE_DEBT_TYPE);
 
             TsLintRule tsRule = null;
 
@@ -114,7 +115,7 @@ public class TsRulesDefinition implements RulesDefinition {
                     debtRemediationFunctionEnum,
                     debtRemediationScalar,
                     debtRemediationOffset,
-                    debtCharacteristic
+                    debtType
                 );
             }
 
@@ -140,12 +141,13 @@ public class TsRulesDefinition implements RulesDefinition {
     }
 
     private void createRule(NewRepository repository, TsLintRule tsRule) {
-        NewRule sonarRule = repository
-            .createRule(tsRule.key)
-            .setName(tsRule.name)
-            .setSeverity(tsRule.severity)
-            .setHtmlDescription(tsRule.htmlDescription)
-            .setStatus(RuleStatus.READY);
+        NewRule sonarRule = 
+                    repository
+                    .createRule(tsRule.key)
+                    .setName(tsRule.name)
+                    .setSeverity(tsRule.severity)
+                    .setHtmlDescription(tsRule.htmlDescription)
+                    .setStatus(RuleStatus.READY);
 
         if (tsRule.hasDebtRemediation) {
             DebtRemediationFunction debtRemediationFn = null;
@@ -167,8 +169,21 @@ public class TsRulesDefinition implements RulesDefinition {
             }
 
             sonarRule.setDebtRemediationFunction(debtRemediationFn);
-            sonarRule.setDebtSubCharacteristic(tsRule.debtCharacteristic);
         }
+        
+        RuleType type = null;
+
+        if (tsRule.debtType != null && RuleType.names().contains(tsRule.debtType)) {
+            // Try and parse it as a new-style rule type (since 5.5 SQALE's been replaced
+            // with something simpler, and there's really only three buckets)
+            type = RuleType.valueOf(tsRule.debtType);
+        }
+        
+        if (type == null) {
+            type = RuleType.CODE_SMELL;
+        }
+                
+        sonarRule.setType(type);
     }
 
     public void define(Context context) {

@@ -8,12 +8,15 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
+import org.codehaus.plexus.context.DefaultContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sonar.api.Plugin;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.PropertyType;
+import org.sonar.api.SonarQubeVersion;
 
 public class TypeScriptPluginTest {
     TypeScriptPlugin plugin;
@@ -29,13 +32,17 @@ public class TypeScriptPluginTest {
 
     @Test
     public void advertisesAppropriateExtensions() {
-        List extensions = this.plugin.getExtensions();
+        Plugin.Context context = new Plugin.Context(SonarQubeVersion.V5_6);
 
-        assertEquals(6, extensions.size());
+        this.plugin.define(context);
+        
+        List extensions = context.getExtensions();
+
+        assertEquals(5, extensions.size());
         assertTrue(extensions.contains(TypeScriptRuleProfile.class));
         assertTrue(extensions.contains(TypeScriptLanguage.class));
         assertTrue(extensions.contains(TsLintSensor.class));
-        assertTrue(extensions.contains(TsCoverageSensor.class));
+        assertTrue(extensions.contains(CombinedCoverageSensor.class));
         assertTrue(extensions.contains(TsRulesDefinition.class));
     }
 
