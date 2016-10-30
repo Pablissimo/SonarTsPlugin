@@ -37,7 +37,7 @@ It's presented only for the interested, and the brave.
 
 ##Requirements
 * Java 1.8+
-* SonarQube 5.4 LTS+
+* SonarQube 5.6 LTS+
 * TsLint 2.4.0+
 
 ##Building
