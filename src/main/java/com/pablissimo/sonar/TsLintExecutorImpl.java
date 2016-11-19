@@ -1,26 +1,31 @@
 package com.pablissimo.sonar;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.utils.System2;
+import org.sonar.api.utils.TempFolder;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
-import org.sonar.api.utils.command.StreamConsumer;
+import org.sonar.api.utils.command.StringStreamConsumer;
 
 public class TsLintExecutorImpl implements TsLintExecutor {
     public static final int MAX_COMMAND_LENGTH = 4096;
     private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 
-    private StringBuilder stdOut;
-    private StringBuilder stdErr;
-
     private boolean mustQuoteSpaceContainingPaths = false;
+    private TempFolder tempFolder;
     
-    public TsLintExecutorImpl(System2 system) {
+    public TsLintExecutorImpl(System2 system, TempFolder tempFolder) {
         this.mustQuoteSpaceContainingPaths = system.isOsWindows();
+        this.tempFolder = tempFolder;
     }
     
     public String preparePath(String path) {
@@ -35,7 +40,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         }
     }
     
-    private Command getBaseCommand(String pathToTsLint, String configFile, String rulesDir) {
+    private Command getBaseCommand(String pathToTsLint, String configFile, String rulesDir, String tempPath) {
         Command command =
                 Command
                 .create("node")
@@ -47,6 +52,12 @@ public class TsLintExecutorImpl implements TsLintExecutor {
             command
                 .addArgument("--rules-dir")
                 .addArgument(this.preparePath(rulesDir));
+        }
+        
+        if (tempPath != null && tempPath.length() > 0) {
+            command
+                .addArgument("--out")
+                .addArgument(this.preparePath(tempPath));
         }
 
         command
@@ -60,7 +71,12 @@ public class TsLintExecutorImpl implements TsLintExecutor {
     public String execute(String pathToTsLint, String configFile, String rulesDir, List<String> files, Integer timeoutMs) {
         // New up a command that's everything we need except the files to process
         // We'll use this as our reference for chunking up files
-        int baseCommandLength = getBaseCommand(pathToTsLint, configFile, rulesDir).toCommandLine().length();
+        File tslintOutputFile = this.tempFolder.newFile();
+        String tslintOutputFilePath = tslintOutputFile.getAbsolutePath();
+        
+        LOG.debug("Using a temporary path for TsLint output: " + tslintOutputFilePath);
+        
+        int baseCommandLength = getBaseCommand(pathToTsLint, configFile, rulesDir, tslintOutputFilePath).toCommandLine().length();
         int availableForBatching = MAX_COMMAND_LENGTH - baseCommandLength;
 
         List<List<String>> batches = new ArrayList<List<String>>();
@@ -84,26 +100,16 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         }
 
         LOG.debug("Split " + files.size() + " files into " + batches.size() + " batches for processing");
-
-        this.stdOut = new StringBuilder();
-        this.stdErr = new StringBuilder();
-
-        StreamConsumer stdOutConsumer = new StreamConsumer() {
-            public void consumeLine(String line) {
-                stdOut.append(line);
-            }
-        };
-
-        StreamConsumer stdErrConsumer = new StreamConsumer() {
-            public void consumeLine(String line) {
-                LOG.error("TsLint Err: " + line);
-                stdErr.append(line + "\n");
-            }
-        };
-
+        
+        StringStreamConsumer stdOutConsumer = new StringStreamConsumer();
+        StringStreamConsumer stdErrConsumer = new StringStreamConsumer();
+        
+        StringBuilder outputBuilder = new StringBuilder();
+        
         for (int i = 0; i < batches.size(); i++) {
             List<String> thisBatch = batches.get(i);
-            Command thisCommand = getBaseCommand(pathToTsLint, configFile, rulesDir);
+
+            Command thisCommand = getBaseCommand(pathToTsLint, configFile, rulesDir, tslintOutputFilePath);
 
             for (int fileIndex = 0; fileIndex < thisBatch.size(); fileIndex++) {
                 thisCommand.addArgument(thisBatch.get(fileIndex));
@@ -114,13 +120,35 @@ public class TsLintExecutorImpl implements TsLintExecutor {
             // Timeout is specified per file, not per batch (which can vary a lot)
             // so multiply it up
             this.createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, timeoutMs * thisBatch.size());
+            
+            try {
+                BufferedReader reader = this.getBufferedReaderForFile(tslintOutputFile);
+                
+                String str;
+                while ((str = reader.readLine()) != null) {
+                    outputBuilder.append(str);
+                }
+                
+                reader.close();
+            }
+            catch (IOException ex) {
+                LOG.error("Failed to re-read TsLint output from " + tslintOutputFilePath, ex);
+            }
         }
 
-        String rawOutput = stdOut.toString();
+        String rawOutput = outputBuilder.toString();
         
+        LOG.debug("Got " + rawOutput.length() + " chars of TsLint output");
+                
         // TsLint returns nonsense for its JSON output when faced with multiple files
         // so we need to fix it up before we do anything else
         return "[" + rawOutput.replaceAll("\\]\\[", "],[") + "]";
+    }
+    
+    protected BufferedReader getBufferedReaderForFile(File file) throws IOException {
+        return new BufferedReader(
+                new InputStreamReader(
+                           new FileInputStream(file), "UTF8"));
     }
 
     protected CommandExecutor createExecutor() {

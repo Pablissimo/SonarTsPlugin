@@ -3,6 +3,8 @@ package com.pablissimo.sonar;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonar.api.utils.System2;
+import org.sonar.api.utils.TempFolder;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
 import org.sonar.api.utils.command.StreamConsumer;
@@ -20,16 +23,25 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 public class TsLintExecutorImplTest {
     TsLintExecutorImpl executorImpl;
     CommandExecutor commandExecutor;
+    TempFolder tempFolder;
+    File tempOutputFile;
     
     System2 system;
     
     @Before
     public void setUp() throws Exception {
         this.system = mock(System2.class);
+        this.tempFolder = mock(TempFolder.class);
+        
+        this.tempOutputFile = mock(File.class);
+        when(this.tempOutputFile.getAbsolutePath()).thenReturn("path/to/temp");
+        when(this.tempFolder.newFile()).thenReturn(this.tempOutputFile);
         
         this.commandExecutor = mock(CommandExecutor.class);
-        this.executorImpl = spy(new TsLintExecutorImpl(this.system));
+        
+        this.executorImpl = spy(new TsLintExecutorImpl(this.system, this.tempFolder));
         when(this.executorImpl.createExecutor()).thenReturn(this.commandExecutor);
+        doReturn(mock(BufferedReader.class)).when(this.executorImpl).getBufferedReaderForFile(any(File.class));
     }
     
     @Test
@@ -54,7 +66,7 @@ public class TsLintExecutorImplTest {
         Command theCommand = capturedCommands.get(0);
         long theTimeout = capturedTimeouts.get(0);
         
-        assertEquals("node path/to/tslint --format json --rules-dir path/to/rules --config path/to/config path/to/file path/to/another", theCommand.toCommandLine());
+        assertEquals("node path/to/tslint --format json --rules-dir path/to/rules --out path/to/temp --config path/to/config path/to/file path/to/another", theCommand.toCommandLine());
         // Expect one timeout period per file processed
         assertEquals(2 * 40000, theTimeout);        
     }
@@ -105,7 +117,7 @@ public class TsLintExecutorImplTest {
     public void BatchesExecutions_IfTooManyFilesForCommandLine() {
         List<String> filenames = new ArrayList<String>();
         int currentLength = 0;
-        int standardCmdLength = "node path/to/tslint --format json --rules-dir path/to/rules --config path/to/config".length();
+        int standardCmdLength = "node path/to/tslint --format json --rules-dir path/to/rules --out path/to/temp --config path/to/config".length();
         
         String firstBatch = "first batch";
         while (currentLength + 12 < TsLintExecutorImpl.MAX_COMMAND_LENGTH - standardCmdLength) {

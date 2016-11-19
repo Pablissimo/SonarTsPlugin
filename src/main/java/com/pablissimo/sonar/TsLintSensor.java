@@ -13,6 +13,7 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.utils.System2;
+import org.sonar.api.utils.TempFolder;
 
 import java.util.*;
 
@@ -24,10 +25,12 @@ public class TsLintSensor implements Sensor {
 
     private Settings settings;
     private System2 system;
-
-    public TsLintSensor(Settings settings, System2 system) {
+    private TempFolder tempFolder;
+    
+    public TsLintSensor(Settings settings, System2 system, TempFolder tempFolder) {
         this.settings = settings;
         this.system = system;
+        this.tempFolder = tempFolder;
     }
     
     protected PathResolver getPathResolver() {
@@ -35,7 +38,7 @@ public class TsLintSensor implements Sensor {
     }
 
     protected TsLintExecutor getTsLintExecutor() {
-        return new TsLintExecutorImpl(this.system);
+        return new TsLintExecutorImpl(this.system, this.tempFolder);
     }
 
     protected TsLintParser getTsLintParser() {

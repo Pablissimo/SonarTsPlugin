@@ -5,7 +5,7 @@
   <groupId>com.pablissimo.sonar</groupId>
   <artifactId>sonar-typescript-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.94-SNAPSHOT</version>
+  <version>0.95-SNAPSHOT</version>
 
   <name>TypeScript</name>
   <description>Analyse TypeScript projects</description>
