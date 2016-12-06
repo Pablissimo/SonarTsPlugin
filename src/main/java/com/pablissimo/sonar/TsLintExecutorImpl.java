@@ -139,12 +139,6 @@ public class TsLintExecutorImpl implements TsLintExecutor {
                 LOG.error("Failed to re-read TsLint output from " + tslintOutputFilePath, ex);
             }
         }
-                
-        // TsLint returns nonsense for its JSON output when faced with multiple files
-        // so we need to fix it up before we do anything else
-        for (String s : toReturn) {
-            LOG.debug(s);
-        }
 
         return toReturn;
     }
