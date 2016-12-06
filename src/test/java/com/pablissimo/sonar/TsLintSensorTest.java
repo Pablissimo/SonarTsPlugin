@@ -5,8 +5,10 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +25,7 @@ import com.pablissimo.sonar.model.TsLintPosition;
 
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.utils.System2;
+import org.sonar.api.utils.TempFolder;
 
 public class TsLintSensorTest {
     Settings settings;
@@ -39,6 +42,7 @@ public class TsLintSensorTest {
     HashMap<String, String> fakePathResolutions;
     
     System2 system;
+    TempFolder tempFolder;
     
     @Before
     public void setUp() throws Exception {
@@ -49,12 +53,13 @@ public class TsLintSensorTest {
         
         this.settings = mock(Settings.class);
         this.system = mock(System2.class);
+        this.tempFolder = mock(TempFolder.class);
         
         when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(45000);
         this.executor = mock(TsLintExecutor.class);
         this.parser = mock(TsLintParser.class);
         this.resolver = mock(PathResolver.class);
-        this.sensor = spy(new TsLintSensor(settings, this.system));
+        this.sensor = spy(new TsLintSensor(settings, this.system, this.tempFolder));
 
         this.file = new DefaultInputFile("", "path/to/file")
                         .setLanguage(TypeScriptLanguage.LANGUAGE_KEY)
@@ -113,11 +118,13 @@ public class TsLintSensorTest {
 
         issue.setStartPosition(startPosition);
 
-        TsLintIssue[][] issues = new TsLintIssue[][] {
-                new TsLintIssue[] { issue }
-        };
+        List<TsLintIssue> issueList = new ArrayList<TsLintIssue>();
+        issueList.add(issue);
+
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(issue.getName(), issueList);
         
-        when(this.parser.parse(any(String.class))).thenReturn(issues);
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
         this.sensor.execute(this.context);
         
         assertEquals(1, this.context.allIssues().size());
