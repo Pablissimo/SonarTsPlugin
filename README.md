@@ -6,8 +6,6 @@ SonarQube plugin for TypeScript files
 [![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
 [![Coverage Status](https://coveralls.io/repos/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/r/Pablissimo/SonarTsPlugin?branch=master)
 
-***For SonarQube 6.0 support (or errors about 'MethodNotFound' exceptions) see the SonarQube 6.0 section at the bottom of the README***
-
 ##Demos
 
 A live deployed demo hitting a few large open-source TypeScript projects can be found here:
@@ -39,7 +37,7 @@ It's presented only for the interested, and the brave.
 
 ##Requirements
 * Java 1.8+
-* SonarQube 5.4 LTS+
+* SonarQube 5.6 LTS+
 * TsLint 2.4.0+
 
 ##Building
@@ -121,15 +119,8 @@ a configuration for that rule in SonarTsPlugin could look as follows:
 
 **You will need to restart the SonarQube server after configuring custom rules this way before subsequent analyses will pick them up. You will also need to activate the new rules after restart for any quality profile you want them to participate in - by default they will be disabled.**
 
-* for documentation about the `technical debt` parameters look [here](http://docs.sonarqube.org/display/PLUG/Rule+Remediation+Costs) and [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/debt/DebtRemediationFunction.html)
-* for possible values for `debtType` go [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/rule/RulesDefinition.SubCharacteristics.html)
-
-##SonarQube 6.0 support
-There is a **very preliminary** version of the plugin aimed at supporting SonarQube 6.0 (and nothing lower than 5.6 LTS) here:
-
-https://github.com/Pablissimo/SonarTsPlugin/releases/tag/v0.93
-
-There are almost certainly regressions due to the scale of changes that were required, but it's worth giving a go on a test install of 6.0 if you're planning on using it or getting any 'MethodNotFound' exceptions (which are the symptom of 0.9 and below's incompatibility).
+* For documentation about the `technical debt` parameters look [here](http://docs.sonarqube.org/display/PLUG/Rule+Remediation+Costs) and [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/debt/DebtRemediationFunction.html)
+* For possible values for `debtType` go [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/rule/RulesDefinition.SubCharacteristics.html)
 
 ##Licence
 MIT
