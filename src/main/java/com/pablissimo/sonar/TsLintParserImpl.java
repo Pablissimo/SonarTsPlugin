@@ -1,14 +1,67 @@
 package com.pablissimo.sonar;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pablissimo.sonar.model.TsLintIssue;
 
 public class TsLintParserImpl implements TsLintParser {
-    public TsLintIssue[][] parse(String toParse) {
+    private static final Logger LOG = LoggerFactory.getLogger(TsLintParserImpl.class);
+    
+    public Map<String, List<TsLintIssue>> parse(List<String> toParse) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
+        
+        List<TsLintIssue> allIssues = new ArrayList<TsLintIssue>();
+        
+        for (String batch : toParse) {
+            TsLintIssue[] batchIssues = gson.fromJson(getFixedUpOutput(batch), TsLintIssue[].class);
+            for (TsLintIssue batchIssue : batchIssues) {
+                allIssues.add(batchIssue);
+            }
+        }
 
-        return gson.fromJson(toParse, TsLintIssue[][].class);
+        // Remap by filename
+        Map<String, List<TsLintIssue>> toReturn = new HashMap<String, List<TsLintIssue>>();
+        for (TsLintIssue issue : allIssues) {
+            List<TsLintIssue> issuesByFile = toReturn.get(issue.getName());
+            if (issuesByFile == null) {
+                issuesByFile = new ArrayList<TsLintIssue>();
+                toReturn.put(issue.getName(), issuesByFile);
+            }
+            
+            issuesByFile.add(issue);
+        }
+
+        return toReturn;
+    }
+    
+    private String getFixedUpOutput(String toParse) {
+        if (toParse.contains("][")) {
+            // Pre 4.0.0-versions of TsLint return nonsense for its JSON output 
+            // when faced with multiple files so we need to fix it up before we 
+            // do anything else
+            String basis = toParse.replaceAll("\\]\\[", ",");
+            
+            StringBuilder builder = new StringBuilder(toParse.replaceAll("\\]\\[", ","));
+            if (!basis.startsWith("[")) {
+                builder.insert(0, "[");
+            }
+            
+            if (!basis.endsWith("]")) {
+                builder.append("]");
+            }
+            
+            return builder.toString();
+        }
+        
+        return toParse;
     }
 }

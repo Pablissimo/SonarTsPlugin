@@ -99,9 +99,9 @@ public class TsLintSensor implements Sensor {
             fileMap.put(pathAdjusted, file);
         }
 
-        String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, rulesDir, paths, tsLintTimeoutMs);
+        List<String> jsonResults = executor.execute(pathToTsLint, pathToTsLintConfig, rulesDir, paths, tsLintTimeoutMs);
 
-        TsLintIssue[][] issues = parser.parse(jsonResult);
+        Map<String, List<TsLintIssue>> issues = parser.parse(jsonResults);
 
         if (issues == null) {
             LOG.warn("TsLint returned no result at all");
@@ -109,12 +109,12 @@ public class TsLintSensor implements Sensor {
         }
 
         // Each issue bucket will contain info about a single file
-        for (TsLintIssue[] batchIssues : issues) {
-            if (batchIssues == null || batchIssues.length == 0) {
+        for (String filePath : issues.keySet()) {
+            List<TsLintIssue> batchIssues = issues.get(filePath);
+            
+            if (batchIssues == null || batchIssues.size() == 0) {
                 continue;
             }
-
-            String filePath = batchIssues[0].getName();
             
             if (!fileMap.containsKey(filePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);

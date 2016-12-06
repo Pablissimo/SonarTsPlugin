@@ -68,7 +68,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         return command;
     }
 
-    public String execute(String pathToTsLint, String configFile, String rulesDir, List<String> files, Integer timeoutMs) {
+    public List<String> execute(String pathToTsLint, String configFile, String rulesDir, List<String> files, Integer timeoutMs) {
         // New up a command that's everything we need except the files to process
         // We'll use this as our reference for chunking up files
         File tslintOutputFile = this.tempFolder.newFile();
@@ -104,9 +104,11 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         StringStreamConsumer stdOutConsumer = new StringStreamConsumer();
         StringStreamConsumer stdErrConsumer = new StringStreamConsumer();
         
-        StringBuilder outputBuilder = new StringBuilder();
+        List<String> toReturn = new ArrayList<String>();
         
         for (int i = 0; i < batches.size(); i++) {
+            StringBuilder outputBuilder = new StringBuilder();
+
             List<String> thisBatch = batches.get(i);
 
             Command thisCommand = getBaseCommand(pathToTsLint, configFile, rulesDir, tslintOutputFilePath);
@@ -130,19 +132,21 @@ public class TsLintExecutorImpl implements TsLintExecutor {
                 }
                 
                 reader.close();
+                
+                toReturn.add(outputBuilder.toString());
             }
             catch (IOException ex) {
                 LOG.error("Failed to re-read TsLint output from " + tslintOutputFilePath, ex);
             }
         }
-
-        String rawOutput = outputBuilder.toString();
-        
-        LOG.debug("Got " + rawOutput.length() + " chars of TsLint output");
                 
         // TsLint returns nonsense for its JSON output when faced with multiple files
         // so we need to fix it up before we do anything else
-        return "[" + rawOutput.replaceAll("\\]\\[", "],[") + "]";
+        for (String s : toReturn) {
+            LOG.debug(s);
+        }
+
+        return toReturn;
     }
     
     protected BufferedReader getBufferedReaderForFile(File file) throws IOException {
