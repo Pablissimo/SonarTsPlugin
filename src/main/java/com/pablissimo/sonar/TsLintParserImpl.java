@@ -48,18 +48,7 @@ public class TsLintParserImpl implements TsLintParser {
             // Pre 4.0.0-versions of TsLint return nonsense for its JSON output 
             // when faced with multiple files so we need to fix it up before we 
             // do anything else
-            String basis = toParse.replaceAll("\\]\\[", ",");
-            
-            StringBuilder builder = new StringBuilder(toParse.replaceAll("\\]\\[", ","));
-            if (!basis.startsWith("[")) {
-                builder.insert(0, "[");
-            }
-            
-            if (!basis.endsWith("]")) {
-                builder.append("]");
-            }
-            
-            return builder.toString();
+            return toParse.replaceAll("\\]\\[", ",");
         }
         
         return toParse;

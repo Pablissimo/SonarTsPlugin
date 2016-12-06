@@ -5,8 +5,10 @@ import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -116,11 +118,13 @@ public class TsLintSensorTest {
 
         issue.setStartPosition(startPosition);
 
-        TsLintIssue[][] issues = new TsLintIssue[][] {
-                new TsLintIssue[] { issue }
-        };
+        List<TsLintIssue> issueList = new ArrayList<TsLintIssue>();
+        issueList.add(issue);
+
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(issue.getName(), issueList);
         
-        when(this.parser.parse(any(String.class))).thenReturn(issues);
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
         this.sensor.execute(this.context);
         
         assertEquals(1, this.context.allIssues().size());

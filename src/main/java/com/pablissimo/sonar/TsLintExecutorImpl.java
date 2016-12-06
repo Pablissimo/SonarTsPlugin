@@ -28,7 +28,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         this.tempFolder = tempFolder;
     }
     
-    public String preparePath(String path) {
+    private String preparePath(String path) {
         if (path == null) {
             return null;
         }
