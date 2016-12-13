@@ -1,36 +1,33 @@
 package com.pablissimo.sonar;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import com.pablissimo.sonar.model.TsLintIssue;
 
-import java.lang.annotation.Annotation;
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
-import org.sonar.api.Properties;
-import org.sonar.api.Property;
-
-import com.pablissimo.sonar.model.TsLintIssue;
+import static org.junit.Assert.assertEquals;
 
 public class TsLintParserTest {
 
-
     @Test
     public void parsesValidTsLintRecordIntoObject() {
-        String parseRow1 = "[{\"endPosition\":{\"character\":44,\"line\":23,\"position\":658},\"failure\":\"for statements must be braced\",\"name\":\"Tools.ts\",\"ruleName\":\"curly\",\"startPosition\":{\"character\":6,\"line\":22,\"position\":587}}]";
+        String
+            parseRow1 =
+            "[{\"endPosition\":{\"character\":44,\"line\":23,\"position\":658},\"failure\":\"for statements must be braced\",\"name\":\"Tools.ts\",\"ruleName\":\"curly\",\"startPosition\":{\"character\":6,\"line\":22,\"position\":587}}]";
         List<String> toParse = new ArrayList<String>();
         toParse.add(parseRow1);
-        
+
         Map<String, List<TsLintIssue>> issues = new TsLintParserImpl().parse(toParse);
 
         assertEquals(1, issues.size());
 
         List<TsLintIssue> fileIssues = issues.get("Tools.ts");
-        
+
         assertEquals(1, fileIssues.size());
-        
+
         TsLintIssue issue = fileIssues.get(0);
         assertEquals(44, issue.getEndPosition().getCharacter());
         assertEquals(23, issue.getEndPosition().getLine());
@@ -44,26 +41,35 @@ public class TsLintParserTest {
         assertEquals(22, issue.getStartPosition().getLine());
         assertEquals(587, issue.getStartPosition().getPosition());
     }
-    
+
+    @Test
+    public void parsesEmptyJson() {
+        List<String> toParse = new ArrayList<>();
+        toParse.add("");
+
+        new TsLintParserImpl().parse(toParse);
+    }
+
     @Test
     public void parsesIssuesWithSameNameIntoSameBucket() {
         List<String> toParse = new ArrayList<String>();
         toParse.add("[{\"name\":\"Tools.ts\",\"ruleName\":\"tools1\"}]");
         toParse.add("[{\"name\":\"Tools.ts\",\"ruleName\":\"tools2\"}]");
-        
+
         Map<String, List<TsLintIssue>> issues = new TsLintParserImpl().parse(toParse);
-        
+
         assertEquals(1, issues.size());
         assertEquals(2, issues.get("Tools.ts").size());
     }
-    
+
     @Test
     public void fixesUpBrokenBatchedOutputFromTsLintPriorTo_4_0_0() {
         List<String> toParse = new ArrayList<String>();
-        toParse.add("[{\"name\":\"Tools.ts\",\"ruleName\":\"tools1\"}][{\"name\":\"Tools.ts\",\"ruleName\":\"tools2\"}]");
-        
+        toParse
+            .add("[{\"name\":\"Tools.ts\",\"ruleName\":\"tools1\"}][{\"name\":\"Tools.ts\",\"ruleName\":\"tools2\"}]");
+
         Map<String, List<TsLintIssue>> issues = new TsLintParserImpl().parse(toParse);
-        
+
         assertEquals(1, issues.size());
         assertEquals(2, issues.get("Tools.ts").size());
     }

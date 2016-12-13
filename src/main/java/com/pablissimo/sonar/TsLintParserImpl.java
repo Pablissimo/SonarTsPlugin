@@ -1,56 +1,43 @@
 package com.pablissimo.sonar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import com.pablissimo.sonar.model.TsLintIssue;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 public class TsLintParserImpl implements TsLintParser {
-    private static final Logger LOG = LoggerFactory.getLogger(TsLintParserImpl.class);
-    
+
     public Map<String, List<TsLintIssue>> parse(List<String> toParse) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        
-        List<TsLintIssue> allIssues = new ArrayList<TsLintIssue>();
-        
-        for (String batch : toParse) {
-            TsLintIssue[] batchIssues = gson.fromJson(getFixedUpOutput(batch), TsLintIssue[].class);
-            for (TsLintIssue batchIssue : batchIssues) {
-                allIssues.add(batchIssue);
-            }
-        }
+
+        List<TsLintIssue> allIssues = toParse.stream()
+            .map(batch -> gson.fromJson(getFixedUpOutput(batch), TsLintIssue[].class))
+            .filter(Objects::nonNull)
+            .flatMap(Arrays::stream)
+            .collect(Collectors.toList());
 
         // Remap by filename
-        Map<String, List<TsLintIssue>> toReturn = new HashMap<String, List<TsLintIssue>>();
-        for (TsLintIssue issue : allIssues) {
-            List<TsLintIssue> issuesByFile = toReturn.get(issue.getName());
-            if (issuesByFile == null) {
-                issuesByFile = new ArrayList<TsLintIssue>();
-                toReturn.put(issue.getName(), issuesByFile);
-            }
-            
-            issuesByFile.add(issue);
-        }
-
-        return toReturn;
+        return allIssues.stream()
+            .collect(Collectors.groupingBy(TsLintIssue::getName));
     }
-    
+
     private String getFixedUpOutput(String toParse) {
-        if (toParse.contains("][")) {
-            // Pre 4.0.0-versions of TsLint return nonsense for its JSON output 
-            // when faced with multiple files so we need to fix it up before we 
+        if (StringUtils.contains(toParse, ("]["))) {
+            // Pre 4.0.0-versions of TsLint return nonsense for its JSON output
+            // when faced with multiple files so we need to fix it up before we
             // do anything else
             return toParse.replaceAll("\\]\\[", ",");
         }
-        
+
         return toParse;
     }
 }
