@@ -5,19 +5,19 @@
   <groupId>com.pablissimo.sonar</groupId>
   <artifactId>sonar-typescript-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.96-SNAPSHOT</version>
+    <version>0.96.1-SNAPSHOT</version>
 
   <name>TypeScript</name>
   <description>Analyse TypeScript projects</description>
   <inceptionYear>2013</inceptionYear>
   <url>https://github.com/pablissimo/SonarTsPlugin</url>
-  
-  <organisation>
+
+    <organisation>
     <name>Paul O'Neill (pablissimo) and contributors</name>
     <url>https://github.com/pablissimo/SonarTsPlugin</url>
   </organisation>
-  
-  <developers>
+
+    <developers>
     <developer>
       <id>pablissimo</id>
       <name>Paul O'Neill</name>
@@ -39,11 +39,11 @@
     <system>Travis</system>
     <url>https://travis-ci.org/pablissimo/SonarTsPlugin</url>
   </ciManagement>
-  
-  <properties>
+
+    <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    
-    <sonar.buildVersion>5.6</sonar.buildVersion>
+
+        <sonar.buildVersion>5.6</sonar.buildVersion>
     <jdk.min.version>1.8</jdk.min.version>
     <sslr.version>1.21</sslr.version>
   </properties>
@@ -61,8 +61,8 @@
       <artifactId>gson</artifactId>
       <version>2.3</version>
     </dependency>
-    
-    <dependency>
+
+      <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.4</version>
@@ -135,8 +135,8 @@
         <configuration>
           <source>${jdk.min.version}</source>
           <target>${jdk.min.version}</target>
-          
-          <showDeprecation>true</showDeprecation>
+
+            <showDeprecation>true</showDeprecation>
           <compilerArgs>
             <arg>-Xlint:all</arg>
             <arg>-Werror</arg>
