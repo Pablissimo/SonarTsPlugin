@@ -1,10 +1,10 @@
 package com.pablissimo.sonar;
 
 public class TsLintExecutorConfig {
-    String pathToTsLint;
-    String configFile;
-    String rulesDir;
-    Integer timeoutMs;
+    private String pathToTsLint;
+    private String configFile;
+    private String rulesDir;
+    private Integer timeoutMs;
 
     public String getPathToTsLint() {
         return pathToTsLint;

@@ -41,10 +41,7 @@ public class TsLintSensorTest {
     
     PathResolver resolver;
     HashMap<String, String> fakePathResolutions;
-    
-    System2 system;
-    TempFolder tempFolder;
-    
+        
     ArgumentCaptor<TsLintExecutorConfig> configCaptor;
     
     @Before
@@ -55,25 +52,19 @@ public class TsLintSensorTest {
         this.fakePathResolutions.put(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, "/path/to/rules");
         
         this.settings = mock(Settings.class);
-        this.system = mock(System2.class);
-        this.tempFolder = mock(TempFolder.class);
         
         when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(45000);
         this.executor = mock(TsLintExecutor.class);
         this.parser = mock(TsLintParser.class);
         this.resolver = mock(PathResolver.class);
-        this.sensor = spy(new TsLintSensor(settings, this.system, this.tempFolder));
+        this.sensor = spy(new TsLintSensor(settings, this.resolver, this.executor, this.parser));
 
         this.file = new DefaultInputFile("", "path/to/file")
                         .setLanguage(TypeScriptLanguage.LANGUAGE_KEY)
                         .setLines(1)
                         .setLastValidOffset(999)
                         .setOriginalLineOffsets(new int[] { 5 });
-        
-        doReturn(this.executor).when(this.sensor).getTsLintExecutor();
-        doReturn(this.parser).when(this.sensor).getTsLintParser();
-        doReturn(this.resolver).when(this.sensor).getPathResolver();
-        
+                
         this.context = SensorContextTester.create(new File(""));
         this.context.fileSystem().add(this.file);      
         

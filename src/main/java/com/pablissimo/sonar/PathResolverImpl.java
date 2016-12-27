@@ -5,7 +5,6 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.sensor.SensorContext;
-import org.sonar.api.utils.System2;
 
 public class PathResolverImpl implements PathResolver {
     private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);

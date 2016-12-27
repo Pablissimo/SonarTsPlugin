@@ -12,8 +12,6 @@ import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleKey;
-import org.sonar.api.utils.System2;
-import org.sonar.api.utils.TempFolder;
 
 import java.util.*;
 
@@ -24,29 +22,16 @@ public class TsLintSensor implements Sensor {
     private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 
     private Settings settings;
-    private System2 system;
-    private TempFolder tempFolder;
+    private PathResolver resolver;
+    private TsLintExecutor executor;
+    private TsLintParser parser;
     
-    public TsLintSensor(Settings settings, System2 system, TempFolder tempFolder) {
+    public TsLintSensor(Settings settings, PathResolver resolver, 
+            TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
-        this.system = system;
-        this.tempFolder = tempFolder;
-    }
-    
-    protected PathResolver getPathResolver() {
-        return new PathResolverImpl();
-    }
-
-    protected TsLintExecutor getTsLintExecutor() {
-        return new TsLintExecutorImpl(this.system, this.tempFolder);
-    }
-
-    protected TsLintParser getTsLintParser() {
-        return new TsLintParserImpl();
-    }
-
-    protected TsRulesDefinition getTsRulesDefinition() {
-        return new TsRulesDefinition(this.settings);
+        this.resolver = resolver;
+        this.executor = executor;
+        this.parser = parser;
     }
 
     @Override
@@ -57,12 +42,10 @@ public class TsLintSensor implements Sensor {
     }
 
     @Override
-    public void execute(SensorContext ctx) {
-        PathResolver resolver = getPathResolver();
-        
-        String pathToTsLint = resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH);
-        String pathToTsLintConfig = resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME);
-        String rulesDir = resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null);
+    public void execute(SensorContext ctx) {        
+        String pathToTsLint = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH);
+        String pathToTsLintConfig = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME);
+        String rulesDir = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null);
         
         Integer tsLintTimeoutMs = Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
 
@@ -74,9 +57,6 @@ public class TsLintSensor implements Sensor {
             LOG.warn("Path to tslint.json configuration file not defined or not found. Skipping tslint analysis.");
             return;
         }
-
-        TsLintExecutor executor = this.getTsLintExecutor();
-        TsLintParser parser = this.getTsLintParser();
 
         boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
 
@@ -105,9 +85,9 @@ public class TsLintSensor implements Sensor {
         config.setRulesDir(rulesDir);
         config.setTimeoutMs(tsLintTimeoutMs);
         
-        List<String> jsonResults = executor.execute(config, paths);
+        List<String> jsonResults = this.executor.execute(config, paths);
 
-        Map<String, List<TsLintIssue>> issues = parser.parse(jsonResults);
+        Map<String, List<TsLintIssue>> issues = this.parser.parse(jsonResults);
 
         if (issues == null) {
             LOG.warn("TsLint returned no result at all");

@@ -7,11 +7,13 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.BatchSide;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.pablissimo.sonar.model.TsLintIssue;
 
+@BatchSide
 public class TsLintParserImpl implements TsLintParser {
     private static final Logger LOG = LoggerFactory.getLogger(TsLintParserImpl.class);
     

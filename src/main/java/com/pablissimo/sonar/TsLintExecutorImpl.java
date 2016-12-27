@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.internal.apachecommons.lang.NullArgumentException;
 import org.sonar.api.utils.System2;
 import org.sonar.api.utils.TempFolder;
 import org.sonar.api.utils.command.Command;
@@ -72,11 +71,11 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
     public List<String> execute(TsLintExecutorConfig config, List<String> files) {
         if (config == null) {
-            throw new NullArgumentException("config");
+            throw new IllegalArgumentException("config");
         }
         
         if (files == null) {
-            throw new NullArgumentException("files");
+            throw new IllegalArgumentException("files");
         }
         
         // New up a command that's everything we need except the files to process

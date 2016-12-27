@@ -118,11 +118,18 @@ public class TypeScriptPlugin implements Plugin {
 
     @Override
     public void define(Context ctx) {
+        // Core components - the actual sensors doing the work or configuring
+        // the plugin
         ctx
             .addExtension(TypeScriptRuleProfile.class)
             .addExtension(TypeScriptLanguage.class)
             .addExtension(TsLintSensor.class)
             .addExtension(CombinedCoverageSensor.class)
             .addExtension(TsRulesDefinition.class);
+        
+        // Additional services to be DI'd into the above
+        ctx.addExtension(PathResolverImpl.class);
+        ctx.addExtension(TsLintExecutorImpl.class);
+        ctx.addExtension(TsLintParserImpl.class);
     }
 }

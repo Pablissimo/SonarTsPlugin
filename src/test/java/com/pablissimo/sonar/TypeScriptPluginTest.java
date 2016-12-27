@@ -38,7 +38,6 @@ public class TypeScriptPluginTest {
         
         List extensions = context.getExtensions();
 
-        assertEquals(5, extensions.size());
         assertTrue(extensions.contains(TypeScriptRuleProfile.class));
         assertTrue(extensions.contains(TypeScriptLanguage.class));
         assertTrue(extensions.contains(TsLintSensor.class));
