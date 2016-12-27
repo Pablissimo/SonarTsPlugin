@@ -86,11 +86,11 @@ public class TsLintSensorTest {
         Answer<String> lookUpFakePath = new Answer<String>() {
             @Override
             public String answer(InvocationOnMock invocation) throws Throwable {
-                return fakePathResolutions.get(invocation.getArgumentAt(1, String.class));
+                return fakePathResolutions.get(invocation.<String>getArgument(1));
             }   
         };
         
-        doAnswer(lookUpFakePath).when(this.resolver).getPath(any(SensorContext.class), any(String.class), any(String.class));
+        doAnswer(lookUpFakePath).when(this.resolver).getPath(any(SensorContext.class), any(String.class), (String) any());
         
         this.configCaptor = ArgumentCaptor.forClass(TsLintExecutorConfig.class);
     }
