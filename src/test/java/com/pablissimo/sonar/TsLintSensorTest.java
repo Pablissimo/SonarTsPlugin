@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonar.api.batch.fs.internal.DefaultInputFile;
@@ -43,6 +44,8 @@ public class TsLintSensorTest {
     
     System2 system;
     TempFolder tempFolder;
+    
+    ArgumentCaptor<TsLintExecutorConfig> configCaptor;
     
     @Before
     public void setUp() throws Exception {
@@ -88,6 +91,8 @@ public class TsLintSensorTest {
         };
         
         doAnswer(lookUpFakePath).when(this.resolver).getPath(any(SensorContext.class), any(String.class), any(String.class));
+        
+        this.configCaptor = ArgumentCaptor.forClass(TsLintExecutorConfig.class);
     }
 
     @Test
@@ -137,7 +142,7 @@ public class TsLintSensorTest {
 
         this.sensor.execute(this.context);
         
-        verify(this.executor, times(0)).execute(any(String.class), any(String.class), any(String.class), any(List.class), any(Integer.class));
+        verify(this.executor, times(0)).execute(any(TsLintExecutorConfig.class), any(List.class));
         
         assertEquals(0, this.context.allIssues().size());
     }
@@ -148,7 +153,7 @@ public class TsLintSensorTest {
         
         this.sensor.execute(this.context);
         
-        verify(this.executor, times(0)).execute(any(String.class), any(String.class), any(String.class), any(List.class), any(Integer.class));
+        verify(this.executor, times(0)).execute(any(TsLintExecutorConfig.class), any(List.class));
         
         assertEquals(0, this.context.allIssues().size());
     }
@@ -157,7 +162,8 @@ public class TsLintSensorTest {
     public void execute_callsExecutorWithSuppliedTimeout() throws IOException {
         this.sensor.execute(this.context);
 
-        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(List.class), eq(45000));
+        verify(this.executor, times(1)).execute(this.configCaptor.capture(), any(List.class));
+        assertEquals((Integer) 45000, this.configCaptor.getValue().getTimeoutMs());
     }
 
     @Test
@@ -165,14 +171,18 @@ public class TsLintSensorTest {
         when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(-500);
         
         this.sensor.execute(this.context);
-
-        verify(this.executor, times(1)).execute(any(String.class), any(String.class), any(String.class), any(List.class), eq(5000));
+        
+        verify(this.executor, times(1)).execute(this.configCaptor.capture(), any(List.class));
+        assertEquals((Integer) 5000, this.configCaptor.getValue().getTimeoutMs());
     }
 
     @Test
     public void execute_callsExecutorWithConfiguredPaths() {
         this.sensor.execute(this.context);
         
-        verify(this.executor, times(1)).execute(eq("/path/to/tslint"), eq("/path/to/tslint.json"), eq("/path/to/rules"), any(List.class), any(Integer.class));
+        verify(this.executor, times(1)).execute(this.configCaptor.capture(), any(List.class));
+        assertEquals("/path/to/tslint", this.configCaptor.getValue().getPathToTsLint());
+        assertEquals("/path/to/tslint.json", this.configCaptor.getValue().getConfigFile());
+        assertEquals("/path/to/rules", this.configCaptor.getValue().getRulesDir());
     }
 }

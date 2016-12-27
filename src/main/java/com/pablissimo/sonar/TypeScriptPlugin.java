@@ -83,7 +83,25 @@ import org.sonar.api.*;
         description = "Maximum time to wait for TsLint execution to finish before aborting (in milliseconds)",
         project = true,
         global = false
-    )
+    )/*,
+    @Property(
+        key = TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK,
+        defaultValue = "false",
+        type = PropertyType.BOOLEAN,
+        name = "Forces tslint to run a type-check",
+        description = "Equivalent to --type-check tslint argument - requires tslintconfigpath also set",
+        project = true,
+        global = false
+    ),
+    @Property(
+        key = TypeScriptPlugin.SETTING_TS_LINT_TSCONFIG_PATH,
+        defaultValue = "",
+        type = PropertyType.STRING,
+        name = "Path to tsconfig.json file, if required",
+        description = "Required if tslinttypecheck parameter specified, the path to the tsconfig.json file that describes the files to lint and build",
+        project = true,
+        global = false
+    )*/
 })
 public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludetypedefinitionfiles";
@@ -95,6 +113,8 @@ public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_TS_LINT_RULES_DIR = "sonar.ts.tslintrulesdir";
     public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
     public static final String SETTING_TS_RULE_CONFIGS = "sonar.ts.ruleconfigs";
+    public static final String SETTING_TS_LINT_TYPECHECK = "sonar.ts.tslinttypecheck";
+    public static final String SETTING_TS_LINT_TSCONFIG_PATH = "sonar.ts.tslinttsconfigpath";
 
     @Override
     public void define(Context ctx) {

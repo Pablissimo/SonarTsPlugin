@@ -99,7 +99,13 @@ public class TsLintSensor implements Sensor {
             fileMap.put(pathAdjusted, file);
         }
 
-        List<String> jsonResults = executor.execute(pathToTsLint, pathToTsLintConfig, rulesDir, paths, tsLintTimeoutMs);
+        TsLintExecutorConfig config = new TsLintExecutorConfig();
+        config.setPathToTsLint(pathToTsLint);
+        config.setConfigFile(pathToTsLintConfig);
+        config.setRulesDir(rulesDir);
+        config.setTimeoutMs(tsLintTimeoutMs);
+        
+        List<String> jsonResults = executor.execute(config, paths);
 
         Map<String, List<TsLintIssue>> issues = parser.parse(jsonResults);
 
@@ -141,16 +147,7 @@ public class TsLintSensor implements Sensor {
                         .newLocation()
                         .on(file)
                         .message(issue.getFailure())
-                        .at(file.selectLine(issue.getStartPosition().getLine() + 1))
-                        /*.at(
-                                file
-                                .newRange(
-                                        issue.getStartPosition().getLine(), 
-                                        issue.getStartPosition().getCharacter(), 
-                                        issue.getEndPosition().getLine(), 
-                                        issue.getEndPosition().getCharacter()
-                                )
-                         )*/;
+                        .at(file.selectLine(issue.getStartPosition().getLine() + 1));
                 
                 newIssue.at(newIssueLocation);
                 newIssue.save();
