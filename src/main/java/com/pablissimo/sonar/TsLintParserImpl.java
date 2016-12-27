@@ -23,6 +23,11 @@ public class TsLintParserImpl implements TsLintParser {
         
         for (String batch : toParse) {
             TsLintIssue[] batchIssues = gson.fromJson(getFixedUpOutput(batch), TsLintIssue[].class);
+            
+            if (batchIssues == null) {
+                continue;
+            }
+            
             for (TsLintIssue batchIssue : batchIssues) {
                 allIssues.add(batchIssue);
             }

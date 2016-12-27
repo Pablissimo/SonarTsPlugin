@@ -67,4 +67,14 @@ public class TsLintParserTest {
         assertEquals(1, issues.size());
         assertEquals(2, issues.get("Tools.ts").size());
     }
+    
+    @Test
+    public void parseAGoodProjectWithNoIssues() {
+        List<String> toParse = new ArrayList<String>();
+        toParse.add("");
+                
+        Map<String, List<TsLintIssue>> issues = new TsLintParserImpl().parse(toParse);
+        
+        assertEquals(0, issues.size());        
+    }
 }
