@@ -131,13 +131,14 @@ public class LCOVParserImplTest {
     }
     
     private File resource(String testName) {        
-        URL lcovUrl = LCOVParserImplTest.class.getClassLoader().getResource("lcov/" + testName + ".lcov");;
+        URL lcovUrl = LCOVParserImplTest.class.getClassLoader().getResource("lcov/" + testName + ".lcov");
         
         try {
             File lcovFile = new File(lcovUrl.toURI());
             return lcovFile;
         } 
         catch (URISyntaxException e) {
+            e.printStackTrace();
             return null;
         }
     }
