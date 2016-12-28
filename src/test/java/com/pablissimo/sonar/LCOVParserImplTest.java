@@ -136,10 +136,12 @@ public class LCOVParserImplTest {
         
         try {
             File lcovFile = new File(lcovUrl.toURI());
+            System.out.println(lcovFile == null ? "couldn't turn it into a file" : "got a file!");
             return lcovFile;
         } 
         catch (URISyntaxException e) {
             e.printStackTrace();
+            System.out.println("Didn't manage it " + e.getMessage());
             return null;
         }
     }
