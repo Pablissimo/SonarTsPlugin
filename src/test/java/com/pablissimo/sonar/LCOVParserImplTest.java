@@ -25,7 +25,7 @@ public class LCOVParserImplTest {
         this.sensorContext = SensorContextTester.create(new File(""));
                 
         this.inputFile = 
-                new DefaultInputFile("", "/path/to/file.ts")
+                new DefaultInputFile("", "path/to/file.ts")
                     .setLanguage(TypeScriptLanguage.LANGUAGE_KEY)
                     .setLines(3);
         
@@ -137,11 +137,11 @@ public class LCOVParserImplTest {
         try {
             File lcovFile = new File(lcovUrl.toURI());
             System.out.println(lcovFile == null ? "couldn't turn it into a file" : "got a file!");
+            
+            System.out.println("And it " + (lcovFile.exists() ? "exists!" : "doesn't exist"));
             return lcovFile;
         } 
         catch (URISyntaxException e) {
-            e.printStackTrace();
-            System.out.println("Didn't manage it " + e.getMessage());
             return null;
         }
     }
