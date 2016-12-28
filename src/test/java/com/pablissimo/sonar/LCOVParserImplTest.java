@@ -132,13 +132,9 @@ public class LCOVParserImplTest {
     
     private File resource(String testName) {        
         URL lcovUrl = LCOVParserImplTest.class.getClassLoader().getResource("./lcov/" + testName + ".lcov");
-        System.out.println(lcovUrl.getFile());
         
         try {
             File lcovFile = new File(lcovUrl.toURI());
-            System.out.println(lcovFile == null ? "couldn't turn it into a file" : "got a file!");
-            
-            System.out.println("And it " + (lcovFile.exists() ? "exists!" : "doesn't exist"));
             return lcovFile;
         } 
         catch (URISyntaxException e) {
