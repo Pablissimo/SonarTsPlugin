@@ -120,6 +120,9 @@
     <testResources>
         <testResource>
             <directory>${project.basedir}/src/test/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
         </testResource>
     </testResources>
     
