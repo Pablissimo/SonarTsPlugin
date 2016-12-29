@@ -150,6 +150,15 @@ public class LCOVParserImpl implements LCOVParser {
     FileData fileData = null;
     // some tools (like Istanbul, Karma) provide relative paths, so let's consider them relative to project directory
     InputFile inputFile = context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(filePath));
+    
+    // Try to accommodate Angular projects that, when the angular template loader's used
+    // by checking for a ! in the filepath if the path isn't found - have a bash at seeking
+    // everything after the ! as a second fallback pass
+    if (inputFile == null && filePath.contains("!") && (filePath.indexOf("!") + 1) < filePath.length()) {
+        String amendedPath = filePath.substring(filePath.indexOf("!") + 1);
+        inputFile = context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(amendedPath));
+    }
+    
     if (inputFile != null) {
       fileData = files.get(inputFile);
       if (fileData == null) {
