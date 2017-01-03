@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.codehaus.plexus.context.DefaultContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

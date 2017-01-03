@@ -25,8 +25,6 @@ import com.pablissimo.sonar.model.TsLintIssue;
 import com.pablissimo.sonar.model.TsLintPosition;
 
 import org.sonar.api.rule.RuleKey;
-import org.sonar.api.utils.System2;
-import org.sonar.api.utils.TempFolder;
 
 public class TsLintSensorTest {
     Settings settings;

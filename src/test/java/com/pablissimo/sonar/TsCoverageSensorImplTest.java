@@ -17,7 +17,6 @@ import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.DefaultInputFile;
 import org.sonar.api.config.Settings;
-import org.sonar.api.measures.CoreMetrics;
 
 public class TsCoverageSensorImplTest {
     TsCoverageSensorImpl sensor;
