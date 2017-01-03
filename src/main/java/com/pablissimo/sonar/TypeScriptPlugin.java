@@ -131,5 +131,7 @@ public class TypeScriptPlugin implements Plugin {
         ctx.addExtension(PathResolverImpl.class);
         ctx.addExtension(TsLintExecutorImpl.class);
         ctx.addExtension(TsLintParserImpl.class);
+        ctx.addExtension(LOCSensorImpl.class);
+        ctx.addExtension(TsCoverageSensorImpl.class);
     }
 }
