@@ -32,6 +32,7 @@ public class TsLintSensorTest {
     Settings settings;
     
     DefaultInputFile file;
+    DefaultInputFile typeDefFile;
 
     TsLintExecutor executor;
     TsLintParser parser;
@@ -64,9 +65,16 @@ public class TsLintSensorTest {
                         .setLines(1)
                         .setLastValidOffset(999)
                         .setOriginalLineOffsets(new int[] { 5 });
+        
+        this.typeDefFile = new DefaultInputFile("", "path/to/file.d.ts")
+                        .setLanguage(TypeScriptLanguage.LANGUAGE_KEY)
+                        .setLines(1)
+                        .setLastValidOffset(999)
+                        .setOriginalLineOffsets(new int[] { 5 });
                 
         this.context = SensorContextTester.create(new File(""));
-        this.context.fileSystem().add(this.file);      
+        this.context.fileSystem().add(this.file);
+        this.context.fileSystem().add(this.typeDefFile);
         
         ActiveRulesBuilder rulesBuilder = new ActiveRulesBuilder();
         rulesBuilder.create(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, "rule name")).activate();
@@ -125,6 +133,103 @@ public class TsLintSensorTest {
         
         assertEquals(1, this.context.allIssues().size());
         assertEquals("rule name", this.context.allIssues().iterator().next().ruleKey().rule());
+    }
+    
+    @Test
+    public void execute_doesNotThrow_ifParserReturnsNoResult() {
+        when(this.parser.parse(any(List.class))).thenReturn(null);
+        
+        this.sensor.execute(this.context);
+    }
+    
+    @Test
+    public void execute_doesNotThrow_ifFileIssuesNull() {
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(this.file.absolutePath().replace("\\",  "/"), null);
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        
+        this.sensor.execute(this.context);
+    }
+    
+    @Test
+    public void execute_doesNotThrow_ifFileIssuesEmpty() {
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(this.file.absolutePath().replace("\\",  "/"), new ArrayList<TsLintIssue>());
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        
+        this.sensor.execute(this.context);
+    }    
+
+    @Test
+    public void execute_addsToUnknownRuleBucket_whenRuleNameNotRecognised() {
+        TsLintIssue issue = new TsLintIssue();
+        issue.setFailure("failure");
+        issue.setRuleName("unknown name");
+        issue.setName(this.file.absolutePath().replace("\\",  "/"));
+
+        TsLintPosition startPosition = new TsLintPosition();
+        startPosition.setLine(0);
+
+        issue.setStartPosition(startPosition);
+
+        List<TsLintIssue> issueList = new ArrayList<TsLintIssue>();
+        issueList.add(issue);
+
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(issue.getName(), issueList);
+        
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        this.sensor.execute(this.context);
+        
+        assertEquals(1, this.context.allIssues().size());
+        assertEquals(TsRulesDefinition.TSLINT_UNKNOWN_RULE.key, this.context.allIssues().iterator().next().ruleKey().rule());
+    }
+    
+    @Test
+    public void execute_doesNotThrow_ifTsLintReportsAgainstFileNotInAnalysisSet() {
+        TsLintIssue issue = new TsLintIssue();
+        issue.setFailure("failure");
+        issue.setRuleName("rule name");
+        issue.setName(this.file.absolutePath().replace("\\",  "/") + "/nonexistent");
+
+        TsLintPosition startPosition = new TsLintPosition();
+        startPosition.setLine(0);
+
+        issue.setStartPosition(startPosition);
+
+        List<TsLintIssue> issueList = new ArrayList<TsLintIssue>();
+        issueList.add(issue);
+
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(issue.getName(), issueList);
+        
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        this.sensor.execute(this.context);        
+    }
+    
+    @Test
+    public void execute_ignoresTypeDefinitionFilesIfConfigured() {       
+        TsLintIssue issue = new TsLintIssue();
+        issue.setFailure("failure");
+        issue.setRuleName("rule name");
+        issue.setName(this.typeDefFile.absolutePath().replace("\\",  "/"));
+
+        TsLintPosition startPosition = new TsLintPosition();
+        startPosition.setLine(0);
+
+        issue.setStartPosition(startPosition);
+
+        List<TsLintIssue> issueList = new ArrayList<TsLintIssue>();
+        issueList.add(issue);
+
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(issue.getName(), issueList);
+        
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        when(this.settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES)).thenReturn(true);
+        this.sensor.execute(this.context); 
+
+        assertEquals(0, this.context.allIssues().size());
     }
 
     @Test
