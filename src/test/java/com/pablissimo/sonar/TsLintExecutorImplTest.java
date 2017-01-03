@@ -161,4 +161,14 @@ public class TsLintExecutorImplTest {
         assertFalse(theSecondCommand.toCommandLine().contains("first batch"));
         assertTrue(theSecondCommand.toCommandLine().contains("second batch"));
     }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void execute_throws_ifNullConfigSupplied() {
+        this.executorImpl.execute(null, new ArrayList<String>());
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void execute_throws_ifNullFileListSupplied() {
+        this.executorImpl.execute(this.config, null);
+    }
 }
