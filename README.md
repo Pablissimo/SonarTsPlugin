@@ -4,7 +4,7 @@ SonarTsPlugin
 SonarQube plugin for TypeScript files
 
 [![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
-[![Coverage Status](https://coveralls.io/repos/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/r/Pablissimo/SonarTsPlugin?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/github/Pablissimo/SonarTsPlugin?branch=master)
 
 ##Demos
 
