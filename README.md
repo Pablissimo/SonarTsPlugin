@@ -60,7 +60,25 @@ It's presented only for the interested, and the brave.
 
 ##Configuration
 
-###Global configuration
+###Example project configuration
+This is an example of what a project configuration file (`sonar-project.properties`) could look like:
+```
+sonar.projectKey=company:my-application
+sonar.projectName=My Application
+sonar.projectVersion=1.0
+sonar.sourceEncoding=UTF-8
+sonar.sources=src/app
+sonar.exclusions=**/node_modules/**,**/*.spec.ts
+sonar.tests=src/app
+sonar.test.inclusions=**/*.spec.ts
+sonar.ts.tslintconfigpath=tslint.json
+sonar.ts.lcov.reportpath=test-results/coverage/coverage.lcov
+```
+- See the [Analysis Parameters](http://docs.sonarqube.org/display/SONAR/Analysis+Parameters) documentation page for general configuration options.
+- See the [Narrowing the Focus](http://docs.sonarqube.org/display/SONAR/Narrowing+the+Focus) documentation page for configuration options related to which files to include.
+- See the rest of this README for the SonarTsPlugin specific configuration options. 
+
+###Global configuration options
 
 <table>
 <thead>
@@ -71,7 +89,7 @@ It's presented only for the interested, and the brave.
 </tbody>
 </table>
 
-###Project-level configuration
+###Project-level configuration options
 
 <table>
 <thead>
