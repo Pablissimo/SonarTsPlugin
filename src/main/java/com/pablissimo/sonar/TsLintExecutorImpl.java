@@ -40,14 +40,15 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         }
     }
     
-    private Command getBaseCommand(String pathToTsLint, String configFile, String rulesDir, String tempPath) {
+    private Command getBaseCommand(TsLintExecutorConfig config, String tempPath) {
         Command command =
                 Command
                 .create("node")
-                .addArgument(this.preparePath(pathToTsLint))
+                .addArgument(this.preparePath(config.getPathToTsLint()))
                 .addArgument("--format")
                 .addArgument("json");
 
+        String rulesDir = config.getRulesDir();
         if (rulesDir != null && rulesDir.length() > 0) {
             command
                 .addArgument("--rules-dir")
@@ -62,13 +63,21 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
         command
             .addArgument("--config")
-            .addArgument(this.preparePath(configFile))
+            .addArgument(this.preparePath(config.getConfigFile()))
             .setNewShell(false);
 
         return command;
     }
 
-    public List<String> execute(String pathToTsLint, String configFile, String rulesDir, List<String> files, Integer timeoutMs) {
+    public List<String> execute(TsLintExecutorConfig config, List<String> files) {
+        if (config == null) {
+            throw new IllegalArgumentException("config");
+        }
+        
+        if (files == null) {
+            throw new IllegalArgumentException("files");
+        }
+        
         // New up a command that's everything we need except the files to process
         // We'll use this as our reference for chunking up files
         File tslintOutputFile = this.tempFolder.newFile();
@@ -76,7 +85,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         
         LOG.debug("Using a temporary path for TsLint output: " + tslintOutputFilePath);
         
-        int baseCommandLength = getBaseCommand(pathToTsLint, configFile, rulesDir, tslintOutputFilePath).toCommandLine().length();
+        int baseCommandLength = getBaseCommand(config, tslintOutputFilePath).toCommandLine().length();
         int availableForBatching = MAX_COMMAND_LENGTH - baseCommandLength;
 
         List<List<String>> batches = new ArrayList<List<String>>();
@@ -111,7 +120,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
             List<String> thisBatch = batches.get(i);
 
-            Command thisCommand = getBaseCommand(pathToTsLint, configFile, rulesDir, tslintOutputFilePath);
+            Command thisCommand = getBaseCommand(config, tslintOutputFilePath);
 
             for (int fileIndex = 0; fileIndex < thisBatch.size(); fileIndex++) {
                 thisCommand.addArgument(thisBatch.get(fileIndex));
@@ -121,7 +130,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
             // Timeout is specified per file, not per batch (which can vary a lot)
             // so multiply it up
-            this.createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, timeoutMs * thisBatch.size());
+            this.createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, config.getTimeoutMs() * thisBatch.size());
             
             try {
                 BufferedReader reader = this.getBufferedReaderForFile(tslintOutputFile);

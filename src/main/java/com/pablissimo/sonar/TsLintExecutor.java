@@ -2,6 +2,9 @@ package com.pablissimo.sonar;
 
 import java.util.List;
 
+import org.sonar.api.batch.BatchSide;
+
+@BatchSide
 public interface TsLintExecutor {
-    List<String> execute(String pathToTsLint, String configFile, String rulesDir, List<String> files, Integer timeoutMs);
+    List<String> execute(TsLintExecutorConfig config, List<String> files);
 }

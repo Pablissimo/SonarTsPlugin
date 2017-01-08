@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
-import org.codehaus.plexus.context.DefaultContext;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +37,6 @@ public class TypeScriptPluginTest {
         
         List extensions = context.getExtensions();
 
-        assertEquals(5, extensions.size());
         assertTrue(extensions.contains(TypeScriptRuleProfile.class));
         assertTrue(extensions.contains(TypeScriptLanguage.class));
         assertTrue(extensions.contains(TsLintSensor.class));

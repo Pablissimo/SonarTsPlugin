@@ -23,7 +23,7 @@ public class LOCSensorImpl implements LOCSensor {
         return getClass().getSimpleName();
     }
 
-    protected BufferedReader getReaderFromFile(InputFile inputFile) throws FileNotFoundException {
+    private BufferedReader getReaderFromFile(InputFile inputFile) throws FileNotFoundException {
         return new BufferedReader(new FileReader(inputFile.file()));
     }
 

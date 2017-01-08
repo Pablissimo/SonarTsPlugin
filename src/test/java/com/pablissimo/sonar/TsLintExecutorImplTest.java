@@ -28,6 +28,8 @@ public class TsLintExecutorImplTest {
     
     System2 system;
     
+    TsLintExecutorConfig config;
+    
     @Before
     public void setUp() throws Exception {
         this.system = mock(System2.class);
@@ -42,6 +44,13 @@ public class TsLintExecutorImplTest {
         this.executorImpl = spy(new TsLintExecutorImpl(this.system, this.tempFolder));
         when(this.executorImpl.createExecutor()).thenReturn(this.commandExecutor);
         doReturn(mock(BufferedReader.class)).when(this.executorImpl).getBufferedReaderForFile(any(File.class));
+        
+        // Setup a default config, which each method will mutate as required
+        this.config = new TsLintExecutorConfig();
+        this.config.setPathToTsLint("path/to/tslint");
+        this.config.setConfigFile("path/to/config");
+        this.config.setRulesDir("path/to/rules");
+        this.config.setTimeoutMs(40000);
     }
     
     @Test
@@ -59,7 +68,7 @@ public class TsLintExecutorImplTest {
         };
         
         when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute("path/to/tslint", "path/to/config", "path/to/rules", Arrays.asList(new String[] { "path/to/file", "path/to/another" }), 40000);
+        this.executorImpl.execute(this.config, Arrays.asList(new String[] { "path/to/file", "path/to/another" }));
         
         assertEquals(1, capturedCommands.size());
         
@@ -86,7 +95,9 @@ public class TsLintExecutorImplTest {
         };
         
         when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute("path/to/tslint", "path/to/config", null, Arrays.asList(new String[] { "path/to/file" }), 40000);
+        
+        this.config.setRulesDir(null);
+        this.executorImpl.execute(this.config, Arrays.asList(new String[] { "path/to/file" }));
         
         Command theCommand = capturedCommands.get(0);
         assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
@@ -107,7 +118,9 @@ public class TsLintExecutorImplTest {
         };
         
         when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute("path/to/tslint", "path/to/config", "", Arrays.asList(new String[] { "path/to/file" }), 40000);
+        
+        this.config.setRulesDir("");
+        this.executorImpl.execute(this.config, Arrays.asList(new String[] { "path/to/file" }));
         
         Command theCommand = capturedCommands.get(0);
         assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
@@ -139,7 +152,7 @@ public class TsLintExecutorImplTest {
         };
         
         when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute("path/to/tslint", "path/to/config", "path/to/rules", filenames, 40000);
+        this.executorImpl.execute(this.config, filenames);
         
         assertEquals(2, capturedCommands.size());
         
@@ -147,5 +160,15 @@ public class TsLintExecutorImplTest {
         
         assertFalse(theSecondCommand.toCommandLine().contains("first batch"));
         assertTrue(theSecondCommand.toCommandLine().contains("second batch"));
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void execute_throws_ifNullConfigSupplied() {
+        this.executorImpl.execute(null, new ArrayList<String>());
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void execute_throws_ifNullFileListSupplied() {
+        this.executorImpl.execute(this.config, null);
     }
 }

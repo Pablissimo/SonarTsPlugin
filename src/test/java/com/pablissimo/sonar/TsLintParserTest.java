@@ -1,16 +1,12 @@
 package com.pablissimo.sonar;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
-import org.sonar.api.Properties;
-import org.sonar.api.Property;
 
 import com.pablissimo.sonar.model.TsLintIssue;
 

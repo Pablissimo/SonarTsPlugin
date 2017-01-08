@@ -26,7 +26,6 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.coverage.CoverageType;
 import org.sonar.api.batch.sensor.coverage.NewCoverage;
-import org.sonar.api.measures.CoreMetrics;
 
 import java.io.File;
 import java.util.HashMap;

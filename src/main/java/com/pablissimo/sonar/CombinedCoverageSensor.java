@@ -9,13 +9,12 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 
 public class CombinedCoverageSensor implements Sensor {
-
-    protected LOCSensor getLOCSensor() {
-        return new LOCSensorImpl();
-    }
+    private LOCSensor locSensor;
+    private TsCoverageSensor coverageSensor;
     
-    protected TsCoverageSensor getCoverageSensor() {
-        return new TsCoverageSensorImpl();
+    public CombinedCoverageSensor(LOCSensor locSensor, TsCoverageSensor coverageSensor) {
+        this.locSensor = locSensor;
+        this.coverageSensor = coverageSensor;
     }
     
     @Override
@@ -27,11 +26,11 @@ public class CombinedCoverageSensor implements Sensor {
     @Override
     public void execute(SensorContext context) {
         // First - LOC everything up, as we'll need LOC for uncovered lines metrics
-        Map<InputFile, Set<Integer>> nonCommentLinesByFile = getLOCSensor().execute(context);
+        Map<InputFile, Set<Integer>> nonCommentLinesByFile = this.locSensor.execute(context);
 
         // Now the LCOV pass can properly handle files that don't appear in 
         // configuration and set lines-to-cover values as required
-        getCoverageSensor().execute(context, nonCommentLinesByFile);
+        this.coverageSensor.execute(context, nonCommentLinesByFile);
     }
     
 }
