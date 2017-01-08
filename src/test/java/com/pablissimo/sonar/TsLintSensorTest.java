@@ -51,10 +51,11 @@ public class TsLintSensorTest {
         this.fakePathResolutions.put(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, "/path/to/rules");
         
         this.settings = mock(Settings.class);
-        
         when(this.settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)).thenReturn(45000);
+        when(this.settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_ENABLED)).thenReturn(true);
         this.executor = mock(TsLintExecutor.class);
         this.parser = mock(TsLintParser.class);
+
         this.resolver = mock(PathResolver.class);
         this.sensor = spy(new TsLintSensor(settings, this.resolver, this.executor, this.parser));
 
@@ -234,6 +235,17 @@ public class TsLintSensorTest {
     public void execute_doesNothingWhenNotConfigured() throws IOException {
         this.fakePathResolutions.remove(TypeScriptPlugin.SETTING_TS_LINT_PATH);
 
+        this.sensor.execute(this.context);
+        
+        verify(this.executor, times(0)).execute(any(TsLintExecutorConfig.class), any(List.class));
+        
+        assertEquals(0, this.context.allIssues().size());
+    }
+
+    @Test
+    public void analyse_doesNothingWhenDisabled() throws IOException {
+        when(this.settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_ENABLED)).thenReturn(Boolean.FALSE);
+    
         this.sensor.execute(this.context);
         
         verify(this.executor, times(0)).execute(any(TsLintExecutorConfig.class), any(List.class));
