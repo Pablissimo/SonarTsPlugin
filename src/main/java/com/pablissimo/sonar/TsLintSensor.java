@@ -33,7 +33,7 @@ public class TsLintSensor implements Sensor {
         this.executor = executor;
         this.parser = parser;
     }
-
+    
     @Override
     public void describe(SensorDescriptor desc) {
         desc
@@ -42,7 +42,12 @@ public class TsLintSensor implements Sensor {
     }
 
     @Override
-    public void execute(SensorContext ctx) {        
+    public void execute(SensorContext ctx) {    
+        if (!this.settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_ENABLED)) {
+            LOG.debug("Skipping tslint execution - " + TypeScriptPlugin.SETTING_TS_LINT_ENABLED + " set to false");
+            return;
+        }
+        
         String pathToTsLint = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH);
         String pathToTsLintConfig = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME);
         String rulesDir = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null);
@@ -101,7 +106,7 @@ public class TsLintSensor implements Sensor {
             if (batchIssues == null || batchIssues.size() == 0) {
                 continue;
             }
-            
+
             if (!fileMap.containsKey(filePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;

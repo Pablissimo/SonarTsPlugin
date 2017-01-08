@@ -57,7 +57,7 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(8, propertiesAnnotation.value().length);
+        assertEquals(9, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties,
@@ -66,6 +66,8 @@ public class TypeScriptPluginTest {
                 TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
+        assertNotNull(findPropertyByName(properties,
+            TypeScriptPlugin.SETTING_TS_LINT_ENABLED));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_LINT_PATH));
         assertNotNull(findPropertyByName(properties,
