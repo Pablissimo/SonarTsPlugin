@@ -1,10 +1,36 @@
 package com.pablissimo.sonar;
 
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.config.Settings;
+
 public class TsLintExecutorConfig {
+    public static final String CONFIG_FILENAME = "tslint.json";
+    public static final String TSLINT_FALLBACK_PATH = "node_modules/tslint/bin/tslint";
+    
     private String pathToTsLint;
     private String configFile;
     private String rulesDir;
+    private String pathToTsConfig;
+    private boolean shouldPerformTypeCheck;
+    
     private Integer timeoutMs;
+    
+    public static TsLintExecutorConfig fromSettings(Settings settings, SensorContext ctx, PathResolver resolver) {
+        TsLintExecutorConfig toReturn = new TsLintExecutorConfig();
+        
+        toReturn.setPathToTsLint(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH));
+        toReturn.setConfigFile(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME));
+        toReturn.setRulesDir(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null));
+        toReturn.setTimeoutMs(Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)));
+        toReturn.setPathToTsConfig(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_TSCONFIG_PATH, null));
+        toReturn.setShouldPerformTypeCheck(settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK));
+        
+        return toReturn;
+    }
+    
+    public Boolean useTsConfigInsteadOfFileList() {
+        return this.getPathToTsConfig() != null;
+    }
 
     public String getPathToTsLint() {
         return pathToTsLint;
@@ -36,5 +62,21 @@ public class TsLintExecutorConfig {
 
     public void setTimeoutMs(Integer timeoutMs) {
         this.timeoutMs = timeoutMs;
+    }
+
+    public String getPathToTsConfig() {
+        return pathToTsConfig;
+    }
+
+    public void setPathToTsConfig(String pathToTsConfig) {
+        this.pathToTsConfig = pathToTsConfig;
+    }
+
+    public boolean shouldPerformTypeCheck() {
+        return this.shouldPerformTypeCheck;
+    }
+
+    public void setShouldPerformTypeCheck(boolean performTypeCheck) {
+        this.shouldPerformTypeCheck = performTypeCheck;
     }
 }
