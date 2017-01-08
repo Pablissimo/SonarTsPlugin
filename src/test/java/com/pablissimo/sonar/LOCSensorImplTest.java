@@ -1,7 +1,6 @@
 package com.pablissimo.sonar;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,7 +19,7 @@ public class LOCSensorImplTest {
     @Before
     public void setUp() throws Exception {
         this.sensorContext = SensorContextTester.create(new File(""));
-        this.sensor = spy(new LOCSensorImpl());
+        this.sensor = new LOCSensorImpl();
     }
         
     @Test
