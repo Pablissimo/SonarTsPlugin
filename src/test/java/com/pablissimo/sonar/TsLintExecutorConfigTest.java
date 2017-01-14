@@ -104,7 +104,7 @@ public class TsLintExecutorConfigTest {
         ).thenReturn("rulesdir");
         
         when(resolver.getPath(any(SensorContext.class), 
-                               eq(TypeScriptPlugin.SETTING_TS_LINT_TSCONFIG_PATH), 
+                               eq(TypeScriptPlugin.SETTING_TS_LINT_PROJECT_PATH), 
                                eq((String) null))
         ).thenReturn("tsconfig.json");
         
