@@ -21,15 +21,16 @@ public class TsLintExecutorConfig {
         toReturn.setPathToTsLint(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH));
         toReturn.setConfigFile(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME));
         toReturn.setRulesDir(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null));
-        toReturn.setTimeoutMs(Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)));
         toReturn.setPathToTsConfig(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_TSCONFIG_PATH, null));
+        
+        toReturn.setTimeoutMs(Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)));
         toReturn.setShouldPerformTypeCheck(settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK));
         
         return toReturn;
     }
     
     public Boolean useTsConfigInsteadOfFileList() {
-        return this.getPathToTsConfig() != null;
+        return this.pathToTsConfig != null && !this.pathToTsConfig.isEmpty();
     }
 
     public String getPathToTsLint() {
