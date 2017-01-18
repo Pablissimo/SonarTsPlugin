@@ -14,6 +14,7 @@ import org.sonar.api.utils.System2;
 import org.sonar.api.utils.TempFolder;
 import org.sonar.api.utils.command.Command;
 import org.sonar.api.utils.command.CommandExecutor;
+import org.sonar.api.utils.command.StreamConsumer;
 import org.sonar.api.utils.command.StringStreamConsumer;
 
 public class TsLintExecutorImpl implements TsLintExecutor {
@@ -63,8 +64,20 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
         command
             .addArgument("--config")
-            .addArgument(this.preparePath(config.getConfigFile()))
-            .setNewShell(false);
+            .addArgument(this.preparePath(config.getConfigFile()));
+        
+        if (config.useTsConfigInsteadOfFileList()) {
+            command
+                .addArgument("--project")
+                .addArgument(this.preparePath(config.getPathToTsConfig()));
+        }
+        
+        if (config.shouldPerformTypeCheck()) {
+            command
+                .addArgument("--type-check");
+        }
+
+        command.setNewShell(false);
 
         return command;
     }
@@ -73,83 +86,104 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         if (config == null) {
             throw new IllegalArgumentException("config");
         }
-        
-        if (files == null) {
+        else if (files == null) {
             throw new IllegalArgumentException("files");
         }
         
         // New up a command that's everything we need except the files to process
-        // We'll use this as our reference for chunking up files
+        // We'll use this as our reference for chunking up files, if we need to
         File tslintOutputFile = this.tempFolder.newFile();
         String tslintOutputFilePath = tslintOutputFile.getAbsolutePath();
+        Command baseCommand = getBaseCommand(config, tslintOutputFilePath);
         
         LOG.debug("Using a temporary path for TsLint output: " + tslintOutputFilePath);
-        
-        int baseCommandLength = getBaseCommand(config, tslintOutputFilePath).toCommandLine().length();
-        int availableForBatching = MAX_COMMAND_LENGTH - baseCommandLength;
 
-        List<List<String>> batches = new ArrayList<List<String>>();
-        List<String> currentBatch = new ArrayList<String>();
-        batches.add(currentBatch);
-
-        int currentBatchLength = 0;
-        for (int i = 0; i < files.size(); i++) {
-            String nextPath = this.preparePath(files.get(i).trim());
-
-            // +1 for the space we'll be adding between filenames
-            if (currentBatchLength + nextPath.length() + 1 > availableForBatching) {
-                // Too long to add to this batch, create new
-                currentBatch = new ArrayList<String>();
-                currentBatchLength = 0;
-                batches.add(currentBatch);
-            }
-
-            currentBatch.add(nextPath);
-            currentBatchLength += nextPath.length() + 1;
-        }
-
-        LOG.debug("Split " + files.size() + " files into " + batches.size() + " batches for processing");
-        
         StringStreamConsumer stdOutConsumer = new StringStreamConsumer();
         StringStreamConsumer stdErrConsumer = new StringStreamConsumer();
         
         List<String> toReturn = new ArrayList<String>();
         
-        for (int i = 0; i < batches.size(); i++) {
-            StringBuilder outputBuilder = new StringBuilder();
-
-            List<String> thisBatch = batches.get(i);
-
-            Command thisCommand = getBaseCommand(config, tslintOutputFilePath);
-
-            for (int fileIndex = 0; fileIndex < thisBatch.size(); fileIndex++) {
-                thisCommand.addArgument(thisBatch.get(fileIndex));
-            }
-
-            LOG.debug("Executing TsLint with command: " + thisCommand.toCommandLine());
-
-            // Timeout is specified per file, not per batch (which can vary a lot)
-            // so multiply it up
-            this.createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, config.getTimeoutMs() * thisBatch.size());
+        if (config.useTsConfigInsteadOfFileList()) {
+            LOG.debug("Running against a single project JSON file");
             
-            try {
-                BufferedReader reader = this.getBufferedReaderForFile(tslintOutputFile);
-                
-                String str;
-                while ((str = reader.readLine()) != null) {
-                    outputBuilder.append(str);
+            // If we're being asked to use a tsconfig.json file, it'll contain
+            // the file list to lint - so don't batch, and just run with it
+            toReturn.add(this.getCommandOutput(baseCommand, stdOutConsumer, stdErrConsumer, tslintOutputFile, config.getTimeoutMs()));
+        }
+        else {        
+            int baseCommandLength = baseCommand.toCommandLine().length();
+            int availableForBatching = MAX_COMMAND_LENGTH - baseCommandLength;
+    
+            List<List<String>> batches = new ArrayList<List<String>>();
+            List<String> currentBatch = new ArrayList<String>();
+            batches.add(currentBatch);
+    
+            int currentBatchLength = 0;
+            for (int i = 0; i < files.size(); i++) {
+                String nextPath = this.preparePath(files.get(i).trim());
+    
+                // +1 for the space we'll be adding between filenames
+                if (currentBatchLength + nextPath.length() + 1 > availableForBatching) {
+                    // Too long to add to this batch, create new
+                    currentBatch = new ArrayList<String>();
+                    currentBatchLength = 0;
+                    batches.add(currentBatch);
                 }
-                
-                reader.close();
-                
-                toReturn.add(outputBuilder.toString());
+    
+                currentBatch.add(nextPath);
+                currentBatchLength += nextPath.length() + 1;
             }
-            catch (IOException ex) {
-                LOG.error("Failed to re-read TsLint output from " + tslintOutputFilePath, ex);
+    
+            LOG.debug("Split " + files.size() + " files into " + batches.size() + " batches for processing");
+                        
+            for (int i = 0; i < batches.size(); i++) {
+                StringBuilder outputBuilder = new StringBuilder();
+    
+                List<String> thisBatch = batches.get(i);
+    
+                Command thisCommand = getBaseCommand(config, tslintOutputFilePath);
+    
+                for (int fileIndex = 0; fileIndex < thisBatch.size(); fileIndex++) {
+                    thisCommand.addArgument(thisBatch.get(fileIndex));
+                }
+    
+                LOG.debug("Executing TsLint with command: " + thisCommand.toCommandLine());
+    
+                // Timeout is specified per file, not per batch (which can vary a lot)
+                // so multiply it up
+                toReturn.add(this.getCommandOutput(thisCommand, stdOutConsumer, stdErrConsumer, tslintOutputFile, config.getTimeoutMs() * thisBatch.size()));
             }
         }
 
         return toReturn;
+    }
+    
+    private String getCommandOutput(Command thisCommand, StreamConsumer stdOutConsumer, StreamConsumer stdErrConsumer, File tslintOutputFile, Integer timeoutMs) {
+        LOG.debug("Executing TsLint with command: " + thisCommand.toCommandLine());
+
+        // Timeout is specified per file, not per batch (which can vary a lot)
+        // so multiply it up
+        this.createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, timeoutMs);
+
+        StringBuilder outputBuilder = new StringBuilder();
+
+        try {
+            BufferedReader reader = this.getBufferedReaderForFile(tslintOutputFile);
+            
+            String str;
+            while ((str = reader.readLine()) != null) {
+                outputBuilder.append(str);
+            }
+            
+            reader.close();
+            
+            return outputBuilder.toString();
+        }
+        catch (IOException ex) {
+            LOG.error("Failed to re-read TsLint output", ex);
+        }
+        
+        return "";
     }
     
     protected BufferedReader getBufferedReaderForFile(File file) throws IOException {

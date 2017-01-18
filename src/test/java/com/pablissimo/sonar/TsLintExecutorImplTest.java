@@ -81,6 +81,61 @@ public class TsLintExecutorImplTest {
     }
     
     @Test
+    public void doesNotSendFileListToTsLint_ifConfigSaysToUseProjectFile() {
+        final ArrayList<Command> capturedCommands = new ArrayList<Command>();
+        final ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
+        
+        Answer<Integer> captureCommand = new Answer<Integer>() {
+            @Override
+            public Integer answer(InvocationOnMock invocation) throws Throwable {
+                capturedCommands.add((Command) invocation.getArguments()[0]);
+                capturedTimeouts.add((long) invocation.getArguments()[3]);
+                return 0;
+            }
+        };
+        
+        this.config.setPathToTsConfig("path/to/tsconfig.json");
+        
+        when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
+        this.executorImpl.execute(this.config, Arrays.asList(new String[] { "path/to/file", "path/to/another" }));
+        
+        assertEquals(1, capturedCommands.size());
+
+        Command theCommand = capturedCommands.get(0);
+        long theTimeout = capturedTimeouts.get(0);
+        
+        assertEquals("node path/to/tslint --format json --rules-dir path/to/rules --out path/to/temp --config path/to/config --project path/to/tsconfig.json", theCommand.toCommandLine());
+        // Timeout should be just what we specified since we're not batching
+        
+        assertEquals(40000, theTimeout);        
+    }
+
+    @Test
+    public void usesTypeCheckParameter_ifConfigSaysToUseTypeCheck() {
+        final ArrayList<Command> capturedCommands = new ArrayList<Command>();
+        
+        Answer<Integer> captureCommand = new Answer<Integer>() {
+            @Override
+            public Integer answer(InvocationOnMock invocation) throws Throwable {
+                capturedCommands.add((Command) invocation.getArguments()[0]);
+                return 0;
+            }
+        };
+        
+        this.config.setPathToTsConfig("path/to/tsconfig.json");
+        this.config.setShouldPerformTypeCheck(true);
+        
+        when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
+        this.executorImpl.execute(this.config, Arrays.asList(new String[] { "path/to/file", "path/to/another" }));
+        
+        assertEquals(1, capturedCommands.size());
+
+        Command theCommand = capturedCommands.get(0);
+        
+        assertEquals("node path/to/tslint --format json --rules-dir path/to/rules --out path/to/temp --config path/to/config --project path/to/tsconfig.json --type-check", theCommand.toCommandLine());        
+    }
+    
+    @Test
     public void DoesNotAddRulesDirParameter_IfNull() {
         final ArrayList<Command> capturedCommands = new ArrayList<Command>();
         final ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
