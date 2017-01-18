@@ -16,9 +16,6 @@ import org.sonar.api.rule.RuleKey;
 import java.util.*;
 
 public class TsLintSensor implements Sensor {
-    public static final String CONFIG_FILENAME = "tslint.json";
-    public static final String TSLINT_FALLBACK_PATH = "node_modules/tslint/bin/tslint";
-
     private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 
     private Settings settings;
@@ -48,18 +45,14 @@ public class TsLintSensor implements Sensor {
             return;
         }
         
-        String pathToTsLint = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH);
-        String pathToTsLintConfig = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME);
-        String rulesDir = this.resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null);
+        TsLintExecutorConfig config = TsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
         
-        Integer tsLintTimeoutMs = Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
-
-        if (pathToTsLint == null) {
+        if (config.getPathToTsLint() == null) {
             LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
             return;
         }
-        else if (pathToTsLintConfig == null) {
-            LOG.warn("Path to tslint.json configuration file not defined or not found. Skipping tslint analysis.");
+        else if (config.getConfigFile() == null && config.getPathToTsConfig() == null) {
+            LOG.warn("Path to tslint.json and tsconfig.json configuration files either not defined or not found - at least one is required. Skipping tslint analysis.");
             return;
         }
 
@@ -83,12 +76,6 @@ public class TsLintSensor implements Sensor {
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
-
-        TsLintExecutorConfig config = new TsLintExecutorConfig();
-        config.setPathToTsLint(pathToTsLint);
-        config.setConfigFile(pathToTsLintConfig);
-        config.setRulesDir(rulesDir);
-        config.setTimeoutMs(tsLintTimeoutMs);
         
         List<String> jsonResults = this.executor.execute(config, paths);
 

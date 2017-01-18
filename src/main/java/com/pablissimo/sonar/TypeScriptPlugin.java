@@ -123,7 +123,7 @@ public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.lcov.reportpath";
     public static final String SETTING_TS_RULE_CONFIGS = "sonar.ts.ruleconfigs";
     public static final String SETTING_TS_LINT_TYPECHECK = "sonar.ts.tslinttypecheck";
-    public static final String SETTING_TS_LINT_TSCONFIG_PATH = "sonar.ts.tslinttsconfigpath";
+    public static final String SETTING_TS_LINT_PROJECT_PATH = "sonar.ts.tslintprojectpath";
 
     @Override
     public void define(Context ctx) {
