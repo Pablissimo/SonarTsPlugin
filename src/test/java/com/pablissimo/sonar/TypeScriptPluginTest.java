@@ -11,9 +11,11 @@ import org.apache.commons.collections.Predicate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sonar.api.Plugin;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.PropertyType;
+import org.sonar.api.SonarQubeVersion;
 
 public class TypeScriptPluginTest {
     TypeScriptPlugin plugin;
@@ -29,13 +31,16 @@ public class TypeScriptPluginTest {
 
     @Test
     public void advertisesAppropriateExtensions() {
-        List extensions = this.plugin.getExtensions();
+        Plugin.Context context = new Plugin.Context(SonarQubeVersion.V5_6);
 
-        assertEquals(6, extensions.size());
+        this.plugin.define(context);
+        
+        List extensions = context.getExtensions();
+
         assertTrue(extensions.contains(TypeScriptRuleProfile.class));
         assertTrue(extensions.contains(TypeScriptLanguage.class));
         assertTrue(extensions.contains(TsLintSensor.class));
-        assertTrue(extensions.contains(TsCoverageSensor.class));
+        assertTrue(extensions.contains(CombinedCoverageSensor.class));
         assertTrue(extensions.contains(TsRulesDefinition.class));
     }
 
@@ -52,7 +57,7 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(8, propertiesAnnotation.value().length);
+        assertEquals(9, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties,
@@ -61,6 +66,8 @@ public class TypeScriptPluginTest {
                 TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
+        assertNotNull(findPropertyByName(properties,
+            TypeScriptPlugin.SETTING_TS_LINT_ENABLED));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_LINT_PATH));
         assertNotNull(findPropertyByName(properties,
@@ -79,7 +86,7 @@ public class TypeScriptPluginTest {
 
         assertEquals(PropertyType.STRING, property.type());
         assertEquals("", property.defaultValue());
-        assertEquals(false, property.project());
+        assertEquals(true, property.project());
         assertEquals(true, property.global());
     }
 

@@ -3,93 +3,83 @@ package com.pablissimo.sonar;
 import com.pablissimo.sonar.model.TsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonar.api.batch.Sensor;
-import org.sonar.api.batch.SensorContext;
-import org.sonar.api.batch.fs.FilePredicates;
-import org.sonar.api.batch.fs.FileSystem;
-import org.sonar.api.component.ResourcePerspectives;
+import org.sonar.api.batch.rule.ActiveRule;
+import org.sonar.api.batch.sensor.Sensor;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.SensorDescriptor;
+import org.sonar.api.batch.sensor.issue.NewIssue;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.Settings;
-import org.sonar.api.issue.Issuable;
-import org.sonar.api.resources.Project;
-import org.sonar.api.resources.Resource;
 import org.sonar.api.rule.RuleKey;
-import org.sonar.api.rules.Rule;
-import org.sonar.api.rules.RuleFinder;
-import org.sonar.api.rules.RuleQuery;
 
-import java.io.File;
 import java.util.*;
 
 public class TsLintSensor implements Sensor {
-    public static final String CONFIG_FILENAME = "tslint.json";
-
     private static final Logger LOG = LoggerFactory.getLogger(TsLintExecutorImpl.class);
 
     private Settings settings;
-    private FileSystem fileSystem;
-    private FilePredicates filePredicates;
-    private ResourcePerspectives perspectives;
-    private RuleFinder ruleFinder;
-
-    public TsLintSensor(Settings settings, FileSystem fileSystem, ResourcePerspectives perspectives, RuleFinder ruleFinder) {
+    private PathResolver resolver;
+    private TsLintExecutor executor;
+    private TsLintParser parser;
+    
+    public TsLintSensor(Settings settings, PathResolver resolver, 
+            TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
-        this.fileSystem = fileSystem;
-        this.filePredicates = fileSystem.predicates();
-        this.perspectives = perspectives;
-        this.ruleFinder = ruleFinder;
+        this.resolver = resolver;
+        this.executor = executor;
+        this.parser = parser;
+    }
+    
+    @Override
+    public void describe(SensorDescriptor desc) {
+        desc
+            .name("Linting sensor for TypeScript files")
+            .onlyOnLanguage(TypeScriptLanguage.LANGUAGE_KEY);
     }
 
-    public boolean shouldExecuteOnProject(Project project) {
-        return hasFilesToAnalyze();
-    }
-
-    private boolean hasFilesToAnalyze() {
-        return fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY)).iterator().hasNext();
-    }
-
-    public void analyse(Project project, SensorContext context) {
-        String pathToTsLint = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_PATH);
-        String pathToTsLintConfig = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH);
-        String rulesDir = settings.getString(TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR);
-        Integer tsLintTimeoutMs = Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT));
-
-        if (pathToTsLint == null) {
-            LOG.warn("Path to tslint (" + TypeScriptPlugin.SETTING_TS_LINT_PATH + ") is not defined. Skipping tslint analysis.");
+    @Override
+    public void execute(SensorContext ctx) {    
+        if (!this.settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_ENABLED)) {
+            LOG.debug("Skipping tslint execution - " + TypeScriptPlugin.SETTING_TS_LINT_ENABLED + " set to false");
             return;
         }
-        else if (pathToTsLintConfig == null) {
-            LOG.warn("Path to tslint.json configuration file (" + TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH + ") is not defined. Skipping tslint analysis.");
+        
+        TsLintExecutorConfig config = TsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
+        
+        if (config.getPathToTsLint() == null) {
+            LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
             return;
         }
-
-        TsLintExecutor executor = this.getTsLintExecutor();
-        TsLintParser parser = this.getTsLintParser();
+        else if (config.getConfigFile() == null && config.getPathToTsConfig() == null) {
+            LOG.warn("Path to tslint.json and tsconfig.json configuration files either not defined or not found - at least one is required. Skipping tslint analysis.");
+            return;
+        }
 
         boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
 
-        RuleQuery ruleQuery = RuleQuery.create().withRepositoryKey(TsRulesDefinition.REPOSITORY_NAME);
-        Collection<Rule> allRules = this.ruleFinder.findAll(ruleQuery);
+        Collection<ActiveRule> allRules = ctx.activeRules().findByRepository(TsRulesDefinition.REPOSITORY_NAME);
         HashSet<String> ruleNames = new HashSet<>();
-        for (Rule rule : allRules) {
-            ruleNames.add(rule.getKey());
+        for (ActiveRule rule : allRules) {
+            ruleNames.add(rule.ruleKey().rule());
         }
 
         List<String> paths = new ArrayList<String>();
-        HashMap<String, File> fileMap = new HashMap<String, File>();
+        HashMap<String, InputFile> fileMap = new HashMap<String, InputFile>();
 
-        for (File file : fileSystem.files(this.filePredicates.hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
-            if (skipTypeDefFiles && file.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
+        for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
+            if (skipTypeDefFiles && file.file().getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
                 continue;
             }
 
-            String pathAdjusted = file.getAbsolutePath().replace('\\', '/');
+            String pathAdjusted = file.absolutePath().replace('\\', '/');
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
+        
+        List<String> jsonResults = this.executor.execute(config, paths);
 
-        String jsonResult = executor.execute(pathToTsLint, pathToTsLintConfig, rulesDir, paths, tsLintTimeoutMs);
-
-        TsLintIssue[][] issues = parser.parse(jsonResult);
+        Map<String, List<TsLintIssue>> issues = this.parser.parse(jsonResults);
 
         if (issues == null) {
             LOG.warn("TsLint returned no result at all");
@@ -97,22 +87,20 @@ public class TsLintSensor implements Sensor {
         }
 
         // Each issue bucket will contain info about a single file
-        for (TsLintIssue[] batchIssues : issues) {
-            if (batchIssues == null || batchIssues.length == 0) {
+        for (String filePath : issues.keySet()) {
+            List<TsLintIssue> batchIssues = issues.get(filePath);
+            
+            if (batchIssues == null || batchIssues.size() == 0) {
                 continue;
             }
-
-            String filePath = batchIssues[0].getName();
 
             if (!fileMap.containsKey(filePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;
             }
 
-            File file = fileMap.get(filePath);
-            Resource resource = this.getFileFromIOFile(file, project);
-            Issuable issuable = perspectives.as(Issuable.class, resource);
-
+            InputFile file = fileMap.get(filePath);
+            
             for (TsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll
                 // fall back to the generic 'tslint-issue' rule
@@ -121,32 +109,21 @@ public class TsLintSensor implements Sensor {
                     ruleName = TsRulesDefinition.TSLINT_UNKNOWN_RULE.key;
                 }
 
-                issuable.addIssue
-                (
-                        issuable
-                        .newIssueBuilder()
-                        .line(issue.getStartPosition().getLine() + 1)
+                NewIssue newIssue = 
+                        ctx
+                        .newIssue()
+                        .forRule(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, ruleName));
+                
+                NewIssueLocation newIssueLocation = 
+                        newIssue
+                        .newLocation()
+                        .on(file)
                         .message(issue.getFailure())
-                        .ruleKey(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, ruleName))
-                        .build()
-                        );
+                        .at(file.selectLine(issue.getStartPosition().getLine() + 1));
+                
+                newIssue.at(newIssueLocation);
+                newIssue.save();
             }
         }
-    }
-
-    protected org.sonar.api.resources.File getFileFromIOFile(File file, Project project) {
-        return org.sonar.api.resources.File.fromIOFile(file, project);
-    }
-
-    protected TsLintExecutor getTsLintExecutor() {
-        return new TsLintExecutorImpl();
-    }
-
-    protected TsLintParser getTsLintParser() {
-        return new TsLintParserImpl();
-    }
-
-    protected TsRulesDefinition getTsRulesDefinition() {
-        return new TsRulesDefinition(this.settings);
     }
 }

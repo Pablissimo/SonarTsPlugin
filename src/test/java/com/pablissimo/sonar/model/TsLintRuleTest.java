@@ -2,6 +2,7 @@ package com.pablissimo.sonar.model;
 
 import org.junit.Test;
 import org.sonar.api.rule.Severity;
+import org.sonar.api.rules.RuleType;
 import org.sonar.api.server.debt.DebtRemediationFunction;
 import org.sonar.api.server.rule.RulesDefinition;
 
@@ -25,7 +26,7 @@ public class TsLintRuleTest {
         assertEquals(DebtRemediationFunction.Type.CONSTANT_ISSUE, rule.debtRemediationFunction);
         assertEquals("0min", rule.debtRemediationScalar);
         assertEquals("0min", rule.debtRemediationOffset);
-        assertEquals(null, rule.debtCharacteristic);
+        assertEquals(null, rule.debtType);
     }
 
     @Test
@@ -38,7 +39,7 @@ public class TsLintRuleTest {
             DebtRemediationFunction.Type.LINEAR_OFFSET,
             "1min",
             "2min",
-            RulesDefinition.SubCharacteristics.COMPILER_RELATED_PORTABILITY
+            RuleType.CODE_SMELL.name()
         );
 
         assertEquals("key", rule.key);
@@ -49,6 +50,6 @@ public class TsLintRuleTest {
         assertEquals(DebtRemediationFunction.Type.LINEAR_OFFSET, rule.debtRemediationFunction);
         assertEquals("1min", rule.debtRemediationScalar);
         assertEquals("2min", rule.debtRemediationOffset);
-        assertEquals(RulesDefinition.SubCharacteristics.COMPILER_RELATED_PORTABILITY, rule.debtCharacteristic);
+        assertEquals(RuleType.CODE_SMELL.name(), rule.debtType);
     }
 }

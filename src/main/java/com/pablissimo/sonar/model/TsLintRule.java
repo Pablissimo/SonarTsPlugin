@@ -12,7 +12,7 @@ public class TsLintRule {
     public final DebtRemediationFunction.Type debtRemediationFunction;
     public final String debtRemediationScalar;
     public final String debtRemediationOffset;
-    public final String debtCharacteristic;
+    public final String debtType;
 
     public TsLintRule(
         String key,
@@ -28,7 +28,7 @@ public class TsLintRule {
         this.debtRemediationFunction = DebtRemediationFunction.Type.CONSTANT_ISSUE;
         this.debtRemediationScalar = "0min";
         this.debtRemediationOffset = "0min";
-        this.debtCharacteristic = null;
+        this.debtType = null;
     }
 
     public TsLintRule(
@@ -39,7 +39,7 @@ public class TsLintRule {
         DebtRemediationFunction.Type debtRemediationFunction,
         String debtRemediationScalar,
         String debtRemediationOffset,
-        String debtCharacteristic
+        String debtType
     ) {
         this.key = key;
         this.severity = severity;
@@ -50,6 +50,6 @@ public class TsLintRule {
         this.debtRemediationFunction = debtRemediationFunction;
         this.debtRemediationScalar = debtRemediationScalar;
         this.debtRemediationOffset = debtRemediationOffset;
-        this.debtCharacteristic = debtCharacteristic;
+        this.debtType = debtType;
     }
 }
