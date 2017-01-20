@@ -34,7 +34,7 @@ public class TypeScriptPluginTest {
         Plugin.Context context = new Plugin.Context(SonarQubeVersion.V5_6);
 
         this.plugin.define(context);
-        
+
         List extensions = context.getExtensions();
 
         assertTrue(extensions.contains(TypeScriptRuleProfile.class));
@@ -57,7 +57,7 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(9, propertiesAnnotation.value().length);
+        assertEquals(11, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties,
@@ -78,6 +78,10 @@ public class TypeScriptPluginTest {
                 TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR));
         assertNotNull(findPropertyByName(properties,
                 TypeScriptPlugin.SETTING_TS_RULE_CONFIGS));
+        assertNotNull(findPropertyByName(properties,
+            TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK));
+        assertNotNull(findPropertyByName(properties,
+            TypeScriptPlugin.SETTING_TS_LINT_PROJECT_PATH));
     }
 
     @Test
