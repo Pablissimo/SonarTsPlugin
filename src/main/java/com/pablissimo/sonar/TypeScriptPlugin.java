@@ -109,6 +109,15 @@ import org.sonar.api.*;
         description = "Required if tslinttypecheck parameter specified, the path to the tsconfig.json file that describes the files to lint and build",
         project = true,
         global = false
+    ),
+    @Property(
+        key = TypeScriptPlugin.SETTING_TS_LINT_OUTPUT_PATH,
+        defaultValue = "",
+        type = PropertyType.STRING,
+        name = "Path to TSLint Json output file, if required",
+        description = "Required if TSLint running before SonarQube checks",
+        project = true,
+        global = false
     )
 })
 public class TypeScriptPlugin implements Plugin {
@@ -124,6 +133,7 @@ public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_TS_RULE_CONFIGS = "sonar.ts.ruleconfigs";
     public static final String SETTING_TS_LINT_TYPECHECK = "sonar.ts.tslinttypecheck";
     public static final String SETTING_TS_LINT_PROJECT_PATH = "sonar.ts.tslintprojectpath";
+    public static final String SETTING_TS_LINT_OUTPUT_PATH = "sonar.ts.tslintoutputpath";
 
     @Override
     public void define(Context ctx) {
