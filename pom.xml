@@ -2,19 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.pablissimo.sonar</groupId>
-  <artifactId>sonar-typescript-plugin</artifactId>
+  <groupId>org.github.sleroy.io</groupId>
+  <artifactId>sonar-eslint-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>0.99-SNAPSHOT</version>
+  <version>0.1.0-SNAPSHOT</version>
 
-  <name>TypeScript</name>
-  <description>Analyse TypeScript projects</description>
+  <name>ESLint</name>
+  <description>Analyse ESLint projects</description>
   <inceptionYear>2013</inceptionYear>
-  <url>https://github.com/pablissimo/SonarTsPlugin</url>
+  <url>https://github.com/sleroy/SonarTsPlugin</url>
   
   <organisation>
-    <name>Paul O'Neill (pablissimo) and contributors</name>
-    <url>https://github.com/pablissimo/SonarTsPlugin</url>
+    <name>Sylvain Leroy, Paul O'Neill (pablissimo) and contributors</name>
+    <url>https://github.com/sleroy/SonarTsPlugin</url>
   </organisation>
   
   <developers>
@@ -23,27 +23,32 @@
       <name>Paul O'Neill</name>
       <url>http://pablissimo.com</url>
     </developer>
+    <developer>
+      <id>sleroy</id>
+      <name>Sylvain Leroy</name>
+      <url>http://www.sylvainleroy.fr</url>
+    </developer>
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</connection>
-    <developerConnection>scm:git:git@github.com:Pablissimo/SonarTsPlugin.git</developerConnection>
-    <url>https://github.com/Pablissimo/SonarTsPlugin</url>
+    <connection>scm:git:git@github.com:sleroy/SonarTsPlugin.git</connection>
+    <developerConnection>scm:git:git@github.com:sleroy/SonarTsPlugin.git</developerConnection>
+    <url>https://github.com/sleroy/SonarTsPlugin</url>
     <tag>1.0</tag>
   </scm>
   <issueManagement>
     <system>Github</system>
-    <url>https://github.com/Pablissimo/SonarTsPlugin/issues</url>
+    <url>https://github.com/sleroy/SonarTsPlugin/issues</url>
   </issueManagement>
   <ciManagement>
     <system>Travis</system>
-    <url>https://travis-ci.org/pablissimo/SonarTsPlugin</url>
+    <url>https://travis-ci.org/sleroy/SonarTsPlugin</url>
   </ciManagement>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     
-    <sonar.buildVersion>5.6</sonar.buildVersion>
+    <sonar.buildVersion>5.6.5</sonar.buildVersion>
     <jdk.min.version>1.8</jdk.min.version>
     <sslr.version>1.21</sslr.version>
   </properties>
@@ -80,15 +85,17 @@
         <artifactId>sslr-testing-harness</artifactId>
         <version>${sslr.version}</version>
     </dependency>
+
     <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>2.6</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.5</version>
     </dependency>
+
     <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.0</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>4.1</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -111,7 +118,7 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>2.4.2</version>
+      <version>2.6.9</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -130,11 +137,11 @@
       <plugin>
         <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
         <artifactId>sonar-packaging-maven-plugin</artifactId>
-        <version>1.16</version>
+        <version>1.17</version>
         <extensions>true</extensions>
         <configuration>
           <pluginKey>typescript</pluginKey>
-          <pluginClass>com.pablissimo.sonar.TypeScriptPlugin</pluginClass>
+          <pluginClass>io.github.sleroy.sonar.EsLintPlugin</pluginClass>
         </configuration>
       </plugin>
       <plugin>
