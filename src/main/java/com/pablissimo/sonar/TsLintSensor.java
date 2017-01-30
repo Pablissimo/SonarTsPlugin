@@ -96,9 +96,28 @@ public class TsLintSensor implements Sensor {
 
             String lowerFilePath = filePath.toLowerCase();
 
+
+
             if (!fileMap.containsKey(lowerFilePath)) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + lowerFilePath);
-                continue;
+
+                // TODO: Remove after fix https://github.com/palantir/tslint/issues/1794
+                String newLowerFilePath = lowerFilePath;
+
+                for (String key : fileMap.keySet()) {
+                    if(key.contains(lowerFilePath)){
+                        newLowerFilePath = key;
+                        break;
+                    }
+                }
+
+                if(!newLowerFilePath.equals(lowerFilePath)) {
+                    LOG.warn("Find TSLint relative issue (fixed): " + lowerFilePath + ", "+ newLowerFilePath);
+                    lowerFilePath = newLowerFilePath;
+                }else{
+                    LOG.warn("Find TSLint relative issue (not fixed): " + lowerFilePath + ", "+ newLowerFilePath);
+                    continue;
+                }
             }
 
             InputFile file = fileMap.get(lowerFilePath);
