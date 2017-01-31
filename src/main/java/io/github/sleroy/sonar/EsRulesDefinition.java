@@ -10,34 +10,36 @@ import org.sonar.api.rules.RuleType;
 import org.sonar.api.server.debt.DebtRemediationFunction;
 import org.sonar.api.server.rule.RulesDefinition;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Properties;
 
 public class EsRulesDefinition implements RulesDefinition {
-    private static final Logger LOG = LoggerFactory.getLogger(EsRulesDefinition.class);
-
-    public static final String REPOSITORY_NAME = "tslint";
-
+    public static final String REPOSITORY_NAME = "eslint";
     public static final String DEFAULT_RULE_SEVERITY = Severity.defaultSeverity();
-    public static final String DEFAULT_RULE_DESCRIPTION = "No description provided for this TsLint rule";
+    public static final String DEFAULT_RULE_DESCRIPTION = "No description provided for this ESLint rule";
     public static final String DEFAULT_RULE_DEBT_SCALAR = "0min";
     public static final String DEFAULT_RULE_DEBT_OFFSET = "0min";
     public static final String DEFAULT_RULE_DEBT_TYPE = RuleType.CODE_SMELL.name();
-
-    private static final String CORE_RULES_CONFIG_RESOURCE_PATH = "/tslint/tslint-rules.properties";
-
-    /** The SonarQube rule that will contain all unknown TsLint issues. */
+    /**
+     * The SonarQube rule that will contain all unknown ESLint issues.
+     */
     public static final EsLintRule ESLINT_UNKNOWN_RULE = new EsLintRule(
-        "tslint-issue",
+            "eslint-issue",
         Severity.MAJOR,
-        "tslint issues that are not yet known to the plugin",
-        "No description for TsLint rule");
-
-    private List<EsLintRule> tslintCoreRules = new ArrayList<>();
-    private List<EsLintRule> tslintRules = new ArrayList<>();
-
+            "eslint issues that are not yet known to the plugin",
+            "No description for ESLint rule");
+    private static final Logger LOG = LoggerFactory.getLogger(EsRulesDefinition.class);
+    private static final String CORE_RULES_CONFIG_RESOURCE_PATH = "/eslint/eslint-rules.properties";
     private final Settings settings;
+    private List<EsLintRule> eslintCoreRules = new ArrayList<>();
+    private List<EsLintRule> eslintRules = new ArrayList<>();
 
     public EsRulesDefinition() {
         this(null);
@@ -51,34 +53,13 @@ public class EsRulesDefinition implements RulesDefinition {
         loadCustomRules();
     }
 
-    private void loadCoreRules() {
-        InputStream coreRulesStream = EsRulesDefinition.class.getResourceAsStream(CORE_RULES_CONFIG_RESOURCE_PATH);
-        loadRules(coreRulesStream, tslintCoreRules);
-    }
-
-    private void loadCustomRules() {
-        if (this.settings == null)
-            return;
-
-        List<String> configKeys = settings.getKeysStartingWith(EsLintPlugin.SETTING_ES_RULE_CONFIGS);
-
-        for (String cfgKey : configKeys) {
-            if (!cfgKey.endsWith("config"))
-                continue;
-
-            String rulesConfig = settings.getString(cfgKey);
-            InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
-            loadRules(rulesConfigStream, tslintRules);
-        }
-    }
-
     public static void loadRules(InputStream stream, List<EsLintRule> rulesCollection) {
         Properties properties = new Properties();
 
         try {
             properties.load(stream);
         } catch (IOException e) {
-            LOG.error("Error while loading TsLint rules: " + e.getMessage());
+            LOG.error("Error while loading ESLint rules: " + e.getMessage());
         }
 
         for(String propKey : properties.stringPropertyNames()) {
@@ -140,6 +121,27 @@ public class EsRulesDefinition implements RulesDefinition {
         });
     }
 
+    private void loadCoreRules() {
+        InputStream coreRulesStream = EsRulesDefinition.class.getResourceAsStream(CORE_RULES_CONFIG_RESOURCE_PATH);
+        loadRules(coreRulesStream, eslintCoreRules);
+    }
+
+    private void loadCustomRules() {
+        if (this.settings == null)
+            return;
+
+        List<String> configKeys = settings.getKeysStartingWith(EsLintPlugin.SETTING_ES_RULE_CONFIGS);
+
+        for (String cfgKey : configKeys) {
+            if (!cfgKey.endsWith("config"))
+                continue;
+
+            String rulesConfig = settings.getString(cfgKey);
+            InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
+            loadRules(rulesConfigStream, eslintRules);
+        }
+    }
+
     private void createRule(NewRepository repository, EsLintRule tsRule) {
         NewRule sonarRule = 
                     repository
@@ -190,17 +192,17 @@ public class EsRulesDefinition implements RulesDefinition {
         NewRepository repository =
                 context
                 .createRepository(REPOSITORY_NAME, EsLintLanguage.LANGUAGE_KEY)
-                .setName("TsLint Analyzer");
+                        .setName("ESLint Analyzer");
 
         createRule(repository, ESLINT_UNKNOWN_RULE);
 
-        // add the TsLint builtin core rules
-        for (EsLintRule coreRule : tslintCoreRules) {
+        // add the ESLint builtin core rules
+        for (EsLintRule coreRule : eslintCoreRules) {
             createRule(repository, coreRule);
         }
 
-        // add additional custom TsLint rules
-        for (EsLintRule customRule : tslintRules) {
+        // add additional custom ESLint rules
+        for (EsLintRule customRule : eslintRules) {
             createRule(repository, customRule);
         }
 
@@ -208,10 +210,10 @@ public class EsRulesDefinition implements RulesDefinition {
     }
 
     public List<EsLintRule> getCoreRules() {
-        return tslintCoreRules;
+        return eslintCoreRules;
     }
 
     public List<EsLintRule> getRules() {
-        return tslintRules;
+        return eslintRules;
     }
 }

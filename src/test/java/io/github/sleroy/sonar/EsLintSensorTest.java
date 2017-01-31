@@ -1,15 +1,9 @@
 package io.github.sleroy.sonar;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import io.github.sleroy.sonar.api.EsLintExecutor;
+import io.github.sleroy.sonar.api.EsLintParser;
+import io.github.sleroy.sonar.api.PathResolver;
+import io.github.sleroy.sonar.model.EsLintIssue;
 import io.github.sleroy.sonar.model.EsLintPosition;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,9 +16,18 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.config.Settings;
-import io.github.sleroy.sonar.model.EsLintIssue;
-
 import org.sonar.api.rule.RuleKey;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.*;
 
 public class EsLintSensorTest {
     Settings settings;
@@ -46,8 +49,8 @@ public class EsLintSensorTest {
     @Before
     public void setUp() throws Exception {
         this.fakePathResolutions = new HashMap<String, String>();
-        this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_PATH, "/path/to/tslint");
-        this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH, "/path/to/tslint.json");
+        this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_PATH, "/path/to/eslint");
+        this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH, "/path/to/.eslintrc.json");
         this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_RULES_DIR, "/path/to/rules");
         
         this.settings = mock(Settings.class);
@@ -87,8 +90,8 @@ public class EsLintSensorTest {
                 return fakePathResolutions.get(invocation.<String>getArgument(1));
             }   
         };
-        
-        doAnswer(lookUpFakePath).when(this.resolver).getPath(any(SensorContext.class), any(String.class), (String) any());
+
+        doAnswer(lookUpFakePath).when(this.resolver).getPath(any(SensorContext.class), any(String.class), any());
         
         this.configCaptor = ArgumentCaptor.forClass(EsLintExecutorConfig.class);
     }
@@ -206,30 +209,7 @@ public class EsLintSensorTest {
         this.sensor.execute(this.context);        
     }
     
-    @Test
-    public void execute_ignoresTypeDefinitionFilesIfConfigured() {       
-        EsLintIssue issue = new EsLintIssue();
-        issue.setFailure("failure");
-        issue.setRuleName("rule name");
-        issue.setName(this.typeDefFile.absolutePath().replace("\\",  "/"));
 
-        EsLintPosition startPosition = new EsLintPosition();
-        startPosition.setLine(0);
-
-        issue.setStartPosition(startPosition);
-
-        List<EsLintIssue> issueList = new ArrayList<EsLintIssue>();
-        issueList.add(issue);
-
-        Map<String, List<EsLintIssue>> issues = new HashMap<String, List<EsLintIssue>>();
-        issues.put(issue.getName(), issueList);
-        
-        when(this.parser.parse(any(List.class))).thenReturn(issues);
-        when(this.settings.getBoolean(EsLintPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES)).thenReturn(true);
-        this.sensor.execute(this.context); 
-
-        assertEquals(0, this.context.allIssues().size());
-    }
 
     @Test
     public void execute_doesNothingWhenNotConfigured() throws IOException {
@@ -287,8 +267,8 @@ public class EsLintSensorTest {
         this.sensor.execute(this.context);
         
         verify(this.executor, times(1)).execute(this.configCaptor.capture(), any(List.class));
-        assertEquals("/path/to/tslint", this.configCaptor.getValue().getPathToTsLint());
-        assertEquals("/path/to/tslint.json", this.configCaptor.getValue().getConfigFile());
+        assertEquals("/path/to/eslint", this.configCaptor.getValue().getPathToEsLint());
+        assertEquals("/path/to/.eslintrc.json", this.configCaptor.getValue().getConfigFile());
         assertEquals("/path/to/rules", this.configCaptor.getValue().getRulesDir());
     }
 }

@@ -1,13 +1,7 @@
 package io.github.sleroy.sonar;
 
-import static org.junit.Assert.*;
-
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +11,27 @@ import org.sonar.api.Property;
 import org.sonar.api.PropertyType;
 import org.sonar.api.SonarQubeVersion;
 
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
 public class EsLintPluginTest {
+    public static final int EXPECTED_PROPERTIES = 6;
     EsLintPlugin plugin;
+
+    private static Property findPropertyByName(Property[] properties,
+                                               final String name) {
+
+        return CollectionUtils.find(Arrays.asList(properties),
+                new Predicate() {
+                    @Override
+                    public boolean evaluate(Object arg0) {
+                        return ((Property) arg0).key().equals(name);
+                    }
+                });
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -34,13 +47,12 @@ public class EsLintPluginTest {
         Plugin.Context context = new Plugin.Context(SonarQubeVersion.V5_6);
 
         this.plugin.define(context);
-        
+
         List extensions = context.getExtensions();
 
         assertTrue(extensions.contains(EsLintRuleProfile.class));
         assertTrue(extensions.contains(EsLintLanguage.class));
         assertTrue(extensions.contains(EsLintSensor.class));
-        assertTrue(extensions.contains(CombinedCoverageSensor.class));
         assertTrue(extensions.contains(EsRulesDefinition.class));
     }
 
@@ -57,15 +69,10 @@ public class EsLintPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(9, propertiesAnnotation.value().length);
+        assertEquals(EXPECTED_PROPERTIES, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
-        assertNotNull(findPropertyByName(properties,
-                EsLintPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES));
-        assertNotNull(findPropertyByName(properties,
-                EsLintPlugin.SETTING_FORCE_ZERO_COVERAGE));
-        assertNotNull(findPropertyByName(properties,
-                EsLintPlugin.SETTING_LCOV_REPORT_PATH));
+
         assertNotNull(findPropertyByName(properties,
             EsLintPlugin.SETTING_ES_LINT_ENABLED));
         assertNotNull(findPropertyByName(properties,
@@ -88,36 +95,6 @@ public class EsLintPluginTest {
         assertEquals("", property.defaultValue());
         assertEquals(true, property.project());
         assertEquals(true, property.global());
-    }
-
-    @Test
-    public void excludeTypeDefinitionFilesSetting_definedAppropriately() {
-        Property property = findPropertyByName(EsLintPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
-
-        assertEquals(PropertyType.BOOLEAN, property.type());
-        assertEquals("true", property.defaultValue());
-        assertEquals(true, property.project());
-        assertEquals(false, property.global());
-    }
-
-    @Test
-    public void lcovReportPathSetting_definedAppropriately() {
-        Property property = findPropertyByName(EsLintPlugin.SETTING_LCOV_REPORT_PATH);
-
-        assertEquals(PropertyType.STRING, property.type());
-        assertEquals("", property.defaultValue());
-        assertEquals(true, property.project());
-        assertEquals(false, property.global());
-    }
-
-    @Test
-    public void forceZeroCoverageSetting_definedAppropriately() {
-        Property property = findPropertyByName(EsLintPlugin.SETTING_FORCE_ZERO_COVERAGE);
-
-        assertEquals(PropertyType.BOOLEAN, property.type());
-        assertEquals("false", property.defaultValue());
-        assertEquals(true, property.project());
-        assertEquals(false, property.global());
     }
 
     @Test
@@ -163,16 +140,5 @@ public class EsLintPluginTest {
     private Property findPropertyByName(String property) {
         return findPropertyByName(((Properties) plugin.getClass()
                 .getAnnotations()[0]).value(), property);
-    }
-
-    private static Property findPropertyByName(Property[] properties,
-            final String name) {
-        return (Property) CollectionUtils.find(Arrays.asList(properties),
-                new Predicate() {
-                    @Override
-                    public boolean evaluate(Object arg0) {
-                        return ((Property) arg0).key().equals(name);
-                    }
-                });
     }
 }

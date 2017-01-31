@@ -1,6 +1,10 @@
 package io.github.sleroy.sonar;
 
-import org.sonar.api.*;
+import org.sonar.api.Plugin;
+import org.sonar.api.Properties;
+import org.sonar.api.Property;
+import org.sonar.api.PropertyField;
+import org.sonar.api.PropertyType;
 
 @Properties({
     @Property(
@@ -41,9 +45,9 @@ import org.sonar.api.*;
     ),
     @Property(
         key = EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH,
-        defaultValue = "tslint.json",
+            defaultValue = ".eslintrc.js",
         type = PropertyType.STRING,
-        name = "Path to tslint.json rule configuration file",
+            name = "Path to eslint.json rule configuration file",
         description = "Path to the file that configures the rules to be included in analysis",
         project = true,
         global = false
@@ -72,14 +76,13 @@ import org.sonar.api.*;
  */
 public class EsLintPlugin implements Plugin {
     public static final String SETTING_IGNORE_NOT_FOUND = "sonar.eslint.ignoreNotFound";
-    public static final String SETTING_ES_LINT_ENABLED = "sonar.eslint.tslintenabled";
-    public static final String SETTING_ES_LINT_PATH = "sonar.eslint.tslintpath";
-    public static final String SETTING_ES_LINT_CONFIG_PATH = "sonar.eslint.tslintconfigpath";
-    public static final String SETTING_ES_LINT_TIMEOUT = "sonar.eslint.tslinttimeout";
-    public static final String SETTING_ES_LINT_RULES_DIR = "sonar.eslint.tslintrulesdir";
+    public static final String SETTING_ES_LINT_ENABLED = "sonar.eslint.eslintenabled";
+    public static final String SETTING_ES_LINT_PATH = "sonar.eslint.eslintpath";
+    public static final String SETTING_ES_LINT_CONFIG_PATH = "sonar.eslint.eslintconfigpath";
+    public static final String SETTING_ES_LINT_TIMEOUT = "sonar.eslint.eslinttimeout";
+    public static final String SETTING_ES_LINT_RULES_DIR = "sonar.eslint.eslintrulesdir";
     public static final String SETTING_ES_RULE_CONFIGS = "sonar.eslint.ruleconfigs";
 
-    public static final String SETTING_ES_LINT_PROJECT_PATH = "sonar.eslint.tslintprojectpath";
 
     @Override
     public void define(Context ctx) {

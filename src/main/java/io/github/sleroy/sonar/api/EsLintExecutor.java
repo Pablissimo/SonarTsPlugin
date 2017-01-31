@@ -1,8 +1,9 @@
-package io.github.sleroy.sonar;
+package io.github.sleroy.sonar.api;
+
+import io.github.sleroy.sonar.EsLintExecutorConfig;
+import org.sonar.api.batch.BatchSide;
 
 import java.util.List;
-
-import org.sonar.api.batch.BatchSide;
 
 @BatchSide
 public interface EsLintExecutor {

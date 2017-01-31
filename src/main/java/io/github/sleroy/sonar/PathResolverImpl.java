@@ -1,10 +1,11 @@
 package io.github.sleroy.sonar;
 
-import java.io.File;
-
+import io.github.sleroy.sonar.api.PathResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.sensor.SensorContext;
+
+import java.io.File;
 
 public class PathResolverImpl implements PathResolver {
     private static final Logger LOG = LoggerFactory.getLogger(EsLintExecutorImpl.class);

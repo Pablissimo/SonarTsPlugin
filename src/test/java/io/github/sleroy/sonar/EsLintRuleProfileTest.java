@@ -1,16 +1,17 @@
 package io.github.sleroy.sonar;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonar.api.profiles.RulesProfile;
 import org.sonar.api.rules.ActiveRule;
 import org.sonar.api.utils.ValidationMessages;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class EsLintRuleProfileTest {
     ValidationMessages validationMessages;
@@ -24,90 +25,9 @@ public class EsLintRuleProfileTest {
         this.ruleProfile = new EsLintRuleProfile();
         this.expectedRuleNames = new HashSet<String>(Arrays.asList(
                 EsRulesDefinition.ESLINT_UNKNOWN_RULE.key,
-                "align",
-                "adjacent-overload-signatures",
-                "array-type",
-                "arrow-parens",
-                "ban",
-                "class-name",
-                "comment-format",
-                "completed-docs",
-                "curly",
-                "cyclomatic-complexity",
-                "eofline",
-                "file-header",
-                "forin",
-                "indent",
-                "interface-name",
-                "jsdoc-format",
-                "label-position",
-                "label-undefined",
-                "linebreak-style",
-                "max-classes-per-file",
-                "max-file-line-count",
-                "max-line-length",
-                "member-access",
-                "member-ordering",
-                "new-parens",
-                "no-angle-bracket-type-assertion",
-                "no-any",
-                "no-arg",
-                "no-bitwise",
-                "no-conditional-assignment",
-                "no-consecutive-blank-lines",
-                "no-console",
-                "no-construct",
-                "no-constructor-vars",
-                "no-debugger",
-                "no-default-export",
-                "no-duplicate-key",
-                "no-duplicate-variable",
-                "no-empty",
-                "no-eval",
-                "no-for-in-array",
-                "no-inferrable-types",
-                "no-internal-module",
-                "no-invalid-this",
-                "no-mergeable-namespace",
-                "no-namespace",
-                "no-null-keyword",
-                "no-parameter-properties",
-                "no-reference",
-                "no-require-imports",
-                "no-shadowed-variable",
-                "no-string-literal",
-                "no-switch-case-fall-through",
-                "no-trailing-whitespace",
-                "no-unreachable",
-                "no-unsafe-finally",
-                "no-unused-expression",
-                "no-unused-new",
-                "no-unused-variable",
-                "no-use-before-declare",
-                "no-var-keyword",
-                "no-var-requires",
-                "prefer-for-of",
-                "object-literal-key-quotes",
-                "object-literal-shorthand",
-                "object-literal-sort-keys",
-                "one-line",
-                "one-variable-per-declaration",
-                "only-arrow-functions",
-                "ordered-imports",
-                "quotemark",
-                "radix",
-                "restrict-plus-operands",
-                "semicolon",
-                "switch-default",
-                "trailing-comma",
-                "triple-equals",
-                "typedef",
-                "typedef-whitespace",
-                "use-strict",
-                "use-isnan",
-                "variable-name",
-                "whitespace"
-                ));
+                "component-limit", "controller-as-route", "controller-as-vm", "controller-as", "deferred", "di-unused", "directive-restrict", "empty-controller", "no-controller", "no-inline-template", "no-run-logic", "no-services", "on-watch", "prefer-component", "no-cookiestore", "no-directive-replace", "no-http-callback", "component-name", "constant-name", "controller-name", "directive-name", "factory-name", "file-name", "filter-name", "module-name", "provider-name", "service-name", "value-name", "di-order", "di", "dumb-inject", "function-type", "module-dependency-order", "no-service-method", "one-dependency-per-line", "rest-service", "watchers-execution", "angularelement", "definedundefined", "document-service", "foreach", "interval-service", "json-functions", "log", "no-angular-mock", "no-jquery-angularelement", "timeout-service", "typecheck-array", "typecheck-date", "typecheck-function", "typecheck-number", "typecheck-object", "typecheck-string", "window-service", "on-destroy"
+
+        ));
     }
 
     @After

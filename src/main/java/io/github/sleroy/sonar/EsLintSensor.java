@@ -1,19 +1,27 @@
 package io.github.sleroy.sonar;
 
+import io.github.sleroy.sonar.api.EsLintExecutor;
+import io.github.sleroy.sonar.api.EsLintParser;
+import io.github.sleroy.sonar.api.PathResolver;
 import io.github.sleroy.sonar.model.EsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.rule.ActiveRule;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.issue.NewIssue;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
-import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleKey;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public class EsLintSensor implements Sensor {
     private static final Logger LOG = LoggerFactory.getLogger(EsLintExecutorImpl.class);
@@ -34,25 +42,24 @@ public class EsLintSensor implements Sensor {
     @Override
     public void describe(SensorDescriptor desc) {
         desc
-            .name("Linting sensor for TypeScript files")
+                .name("Linting sensor for Javascript files")
             .onlyOnLanguage(EsLintLanguage.LANGUAGE_KEY);
     }
 
     @Override
     public void execute(SensorContext ctx) {    
         if (!this.settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)) {
-            LOG.debug("Skipping tslint execution - " + EsLintPlugin.SETTING_ES_LINT_ENABLED + " set to false");
+            LOG.debug("Skipping eslint execution - " + EsLintPlugin.SETTING_ES_LINT_ENABLED + " set to false");
             return;
         }
         
         EsLintExecutorConfig config = EsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
-        
-        if (config.getPathToTsLint() == null) {
-            LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
+
+        if (config.getPathToEsLint() == null) {
+            LOG.warn("Path to eslint not defined or not found. Skipping eslint analysis.");
             return;
-        }
-        else if (config.getConfigFile() == null && config.getPathToTsConfig() == null) {
-            LOG.warn("Path to tslint.json and tsconfig.json configuration files either not defined or not found - at least one is required. Skipping tslint analysis.");
+        } else if (config.getConfigFile() == null) {
+            LOG.warn("Path to .eslintrc.* configuration file either not defined or not found - Skipping eslint analysis.");
             return;
         }
 
@@ -78,7 +85,7 @@ public class EsLintSensor implements Sensor {
         Map<String, List<EsLintIssue>> issues = this.parser.parse(jsonResults);
 
         if (issues == null) {
-            LOG.warn("TsLint returned no result at all");
+            LOG.warn("Eslint returned no result at all");
             return;
         }
 
@@ -91,7 +98,7 @@ public class EsLintSensor implements Sensor {
             }
 
             if (!fileMap.containsKey(filePath)) {
-                LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
+                LOG.warn("EsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;
             }
 
@@ -99,7 +106,7 @@ public class EsLintSensor implements Sensor {
             
             for (EsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll
-                // fall back to the generic 'tslint-issue' rule
+                // fall back to the generic 'eslint-issue' rule
                 String ruleName = issue.getRuleName();
                 if (!ruleNames.contains(ruleName)) {
                     ruleName = EsRulesDefinition.ESLINT_UNKNOWN_RULE.key;

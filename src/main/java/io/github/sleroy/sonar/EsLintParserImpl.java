@@ -1,17 +1,17 @@
 package io.github.sleroy.sonar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.github.sleroy.sonar.api.EsLintParser;
 import io.github.sleroy.sonar.model.EsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.BatchSide;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @BatchSide
 public class EsLintParserImpl implements EsLintParser {
