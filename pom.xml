@@ -149,7 +149,7 @@
         <version>1.17</version>
         <extensions>true</extensions>
         <configuration>
-          <pluginKey>typescript</pluginKey>
+          <pluginKey>eslint</pluginKey>
           <pluginClass>io.github.sleroy.sonar.EsLintPlugin</pluginClass>
         </configuration>
       </plugin>
