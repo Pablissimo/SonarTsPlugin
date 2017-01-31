@@ -1,14 +1,16 @@
 package io.github.sleroy.sonar;
 
 import io.github.sleroy.sonar.api.PathResolver;
+import org.assertj.core.util.Files;
 import org.junit.Test;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.config.Settings;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class EsLintExecutorConfigTest {
@@ -48,13 +50,33 @@ public class EsLintExecutorConfigTest {
         
         assertEquals((Integer) 12, config.getTimeoutMs());
     }
-    
+
+
+    @Test
+    public <T> void fromSettings_testDefaultValues() {
+        Settings settings = new Settings();
+        settings.setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, 12000);
+
+        FileSystem fileSystemMock = mock(FileSystem.class);
+        SensorContext sensorContextMock = mock(SensorContext.class);
+        when(sensorContextMock.settings()).thenReturn(settings);
+        when(sensorContextMock.fileSystem()).thenReturn(fileSystemMock);
+        when(fileSystemMock.baseDir()).thenReturn(Files.currentFolder());
+        PathResolver pathResolver = new PathResolverImpl();
+
+        EsLintExecutorConfig config = EsLintExecutorConfig.fromSettings(settings, sensorContextMock, pathResolver);
+        assertNotEquals("Eslint is not installed locally", EsLintExecutorConfig.ESLINT_FALLBACK_PATH, config.getPathToEsLint());
+        assertNotEquals("No local Eslint file", EsLintExecutorConfig.CONFIG_FILENAME, config.getConfigFile());
+        assertNull(config.getRulesDir());
+        assertEquals((Integer) 12000, config.getTimeoutMs());
+    }
 
     
     @Test
     public void fromSettings_initialisesFromSettingsAndResolver() {
         Settings settings = new Settings();
         settings.setProperty(EsLintPlugin.SETTING_ES_LINT_TIMEOUT, 12000);
+
 
         PathResolver resolver = mock(PathResolver.class);
         

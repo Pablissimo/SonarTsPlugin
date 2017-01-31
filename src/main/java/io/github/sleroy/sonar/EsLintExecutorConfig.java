@@ -6,7 +6,7 @@ import org.sonar.api.config.Settings;
 
 public class EsLintExecutorConfig {
     public static final String CONFIG_FILENAME = ".eslintrc.json";
-    public static final String ESLINT_FALLBACK_PATH = "node_modules/eslint/bin/eslint";
+    public static final String ESLINT_FALLBACK_PATH = "node_modules/eslint/bin/eslint.js";
 
     private String pathToEsLint;
     private String configFile;

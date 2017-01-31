@@ -75,7 +75,6 @@ import org.sonar.api.PropertyType;
  * Main class to declare the EsLint Plugin
  */
 public class EsLintPlugin implements Plugin {
-    public static final String SETTING_IGNORE_NOT_FOUND = "sonar.eslint.ignoreNotFound";
     public static final String SETTING_ES_LINT_ENABLED = "sonar.eslint.eslintenabled";
     public static final String SETTING_ES_LINT_PATH = "sonar.eslint.eslintpath";
     public static final String SETTING_ES_LINT_CONFIG_PATH = "sonar.eslint.eslintconfigpath";
