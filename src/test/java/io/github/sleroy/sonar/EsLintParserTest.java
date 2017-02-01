@@ -41,7 +41,7 @@ public class EsLintParserTest {
 
         assertEquals("Expected one file", 1, issues.size());
 
-        assertEquals("Expected fifty-eight violations", 58, issues.get("c:\\workspace\\SonarTsPlugin\\src\\test\\resources\\dashboard.js").size());
+        assertEquals("Expected fifty-eight violations", 58, issues.get("c:/workspace/SonarTsPlugin/src/test/resources/dashboard.js").size());
     }
 
     /**
@@ -57,7 +57,7 @@ public class EsLintParserTest {
 
         assertEquals("Expected one file", 1, issues.size());
 
-        assertEquals("Expected one error, parsing error", 1, issues.get("c:\\workspace\\SonarTsPlugin\\src\\test\\resources\\angular.html").size());
+        assertEquals("Expected one error, parsing error", 1, issues.get("c:/workspace/SonarTsPlugin/src/test/resources/angular.html").size());
     }
 
 

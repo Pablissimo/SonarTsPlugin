@@ -10,22 +10,22 @@ public class EsLintConfig {
     private final Map<String, Object> rules;
 
     public EsLintConfig() {
-        rules = new HashMap<>(100);
+        this.rules = new HashMap<>(100);
     }
 
     public Map<String, Object> getRules() {
-        return rules;
+        return this.rules;
     }
 
     public void addEnabledRule(String name) {
-        rules.put(name, true);
+        this.rules.put(name, true);
     }
 
     public void addDisabledRule(String name) {
-        rules.put(name, false);
+        this.rules.put(name, false);
     }
 
-    public void addRule(String name, Object... args) {
-        rules.put(name, args);
+    public void addRuleWithArgs(String name, Object... args) {
+        this.rules.put(name, args);
     }
 }

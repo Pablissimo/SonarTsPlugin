@@ -4,7 +4,6 @@ import io.github.sleroy.sonar.api.EsLintExecutor;
 import io.github.sleroy.sonar.api.EsLintParser;
 import io.github.sleroy.sonar.api.PathResolver;
 import io.github.sleroy.sonar.model.EsLintIssue;
-import io.github.sleroy.sonar.model.EsLintPosition;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -48,58 +48,67 @@ public class EsLintSensorTest {
     
     @Before
     public void setUp() throws Exception {
-        this.fakePathResolutions = new HashMap<String, String>();
-        this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_PATH, "/path/to/eslint");
-        this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH, "/path/to/.eslintrc.json");
-        this.fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_RULES_DIR, "/path/to/rules");
+        fakePathResolutions = new HashMap<String, String>();
+        fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_PATH, "/path/to/eslint");
+        fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH, "src/test/resources/.eslintrc.js");
+        fakePathResolutions.put(EsLintPlugin.SETTING_ES_LINT_RULES_DIR, "/path/to/rules");
 
-        this.settings = mock(Settings.class);
-        when(this.settings.getInt(EsLintPlugin.SETTING_ES_LINT_TIMEOUT)).thenReturn(45000);
-        when(this.settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)).thenReturn(true);
-        this.executor = mock(EsLintExecutor.class);
-        this.parser = mock(EsLintParser.class);
+        settings = mock(Settings.class);
+        when(settings.getInt(EsLintPlugin.SETTING_ES_LINT_TIMEOUT)).thenReturn(45000);
+        when(settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)).thenReturn(true);
+        executor = mock(EsLintExecutor.class);
+        parser = mock(EsLintParser.class);
 
-        this.resolver = mock(PathResolver.class);
-        this.sensor = spy(new EsLintSensor(settings, this.resolver, this.executor, this.parser));
+        resolver = mock(PathResolver.class);
+        sensor = spy(new EsLintSensor(this.settings, resolver, executor, parser));
 
-        this.file = new DefaultInputFile("", "path/to/file")
+        file = new DefaultInputFile("", "path/to/file")
                         .setLanguage(EsLintLanguage.LANGUAGE_KEY)
                         .setLines(1)
                         .setLastValidOffset(999)
                         .setOriginalLineOffsets(new int[] { 5 });
 
-        this.typeDefFile = new DefaultInputFile("", "path/to/file.d.ts")
+        typeDefFile = new DefaultInputFile("", "path/to/file.d.ts")
                         .setLanguage(EsLintLanguage.LANGUAGE_KEY)
                         .setLines(1)
                         .setLastValidOffset(999)
                         .setOriginalLineOffsets(new int[] { 5 });
 
-        this.context = SensorContextTester.create(new File(""));
-        this.context.fileSystem().add(this.file);
-        this.context.fileSystem().add(this.typeDefFile);
+        context = SensorContextTester.create(new File(""));
+        context.fileSystem().add(file);
+        context.fileSystem().add(typeDefFile);
         
         ActiveRulesBuilder rulesBuilder = new ActiveRulesBuilder();
         rulesBuilder.create(RuleKey.of(EsRulesDefinition.REPOSITORY_NAME, "rule name")).activate();
 
-        this.context.setActiveRules(rulesBuilder.build());
+        context.setActiveRules(rulesBuilder.build());
         
         // Pretend all paths are absolute
-        Answer<String> lookUpFakePath = new Answer<String>() {
+        Answer<Optional<String>> lookUpFakePath = new Answer<Optional<String>>() {
             @Override
-            public String answer(InvocationOnMock invocation) throws Throwable {
-                return fakePathResolutions.get(invocation.<String>getArgument(1));
+            public Optional<String> answer(InvocationOnMock invocation) throws Throwable {
+                return Optional.ofNullable(EsLintSensorTest.this.fakePathResolutions.get(invocation.<String>getArgument(1)));
             }   
         };
+        doAnswer(lookUpFakePath).when(resolver).getPathFromSetting(any(SensorContext.class), any(String.class), any());
 
-        doAnswer(lookUpFakePath).when(this.resolver).getPathFromSetting(any(SensorContext.class), any(String.class), any());
+        // Pretend all paths are absolute
+        Answer<Optional<String>> lookUpFakePath2 = new Answer<Optional<String>>() {
+            @Override
+            public Optional<String> answer(InvocationOnMock invocation) throws Throwable {
+                return Optional.ofNullable(EsLintSensorTest.this.fakePathResolutions.get(invocation.<String>getArgument(1)));
+            }
+        };
+        doAnswer(lookUpFakePath2).when(resolver).getPathFromSetting(any(SensorContext.class), any(String.class));
 
-        this.configCaptor = ArgumentCaptor.forClass(EsLintExecutorConfig.class);
+
+        configCaptor = ArgumentCaptor.forClass(EsLintExecutorConfig.class);
     }
 
     @Test
     public void describe_setsName() {
         DefaultSensorDescriptor desc = new DefaultSensorDescriptor();
-        this.sensor.describe(desc);
+        sensor.describe(desc);
         
         assertNotNull(desc.name());
     }
@@ -107,7 +116,7 @@ public class EsLintSensorTest {
     @Test
     public void describe_setsLanguage() {
         DefaultSensorDescriptor desc = new DefaultSensorDescriptor();
-        this.sensor.describe(desc);
+        sensor.describe(desc);
         
         assertEquals(EsLintLanguage.LANGUAGE_KEY, desc.languages().iterator().next());
     }
@@ -115,14 +124,12 @@ public class EsLintSensorTest {
     @Test
     public void execute_addsIssues() {        
         EsLintIssue issue = new EsLintIssue();
-        issue.setFailure("failure");
-        issue.setRuleName("rule name");
-        issue.setName(this.file.absolutePath().replace("\\", "/"));
+        issue.setMessage("failure");
+        issue.setRuleId("rule name");
+        issue.setName(file.absolutePath().replace("\\", "/"));
 
-        EsLintPosition startPosition = new EsLintPosition();
-        startPosition.setLine(0);
 
-        issue.setStartPosition(startPosition);
+        issue.setLine(0);
 
         List<EsLintIssue> issueList = new ArrayList<EsLintIssue>();
         issueList.add(issue);
@@ -130,49 +137,47 @@ public class EsLintSensorTest {
         Map<String, List<EsLintIssue>> issues = new HashMap<String, List<EsLintIssue>>();
         issues.put(issue.getName(), issueList);
 
-        when(this.parser.parse(any(List.class))).thenReturn(issues);
-        this.sensor.execute(this.context);
+        when(parser.parse(any(List.class))).thenReturn(issues);
+        sensor.execute(context);
 
-        assertEquals(1, this.context.allIssues().size());
-        assertEquals("rule name", this.context.allIssues().iterator().next().ruleKey().rule());
+        assertEquals(1, context.allIssues().size());
+        assertEquals("rule name", context.allIssues().iterator().next().ruleKey().rule());
     }
     
     @Test
     public void execute_doesNotThrow_ifParserReturnsNoResult() {
-        when(this.parser.parse(any(List.class))).thenReturn(null);
+        when(parser.parse(any(List.class))).thenReturn(null);
 
-        this.sensor.execute(this.context);
+        sensor.execute(context);
     }
     
     @Test
     public void execute_doesNotThrow_ifFileIssuesNull() {
         Map<String, List<EsLintIssue>> issues = new HashMap<String, List<EsLintIssue>>();
-        issues.put(this.file.absolutePath().replace("\\", "/"), null);
-        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        issues.put(file.absolutePath().replace("\\", "/"), null);
+        when(parser.parse(any(List.class))).thenReturn(issues);
 
-        this.sensor.execute(this.context);
+        sensor.execute(context);
     }
     
     @Test
     public void execute_doesNotThrow_ifFileIssuesEmpty() {
         Map<String, List<EsLintIssue>> issues = new HashMap<String, List<EsLintIssue>>();
-        issues.put(this.file.absolutePath().replace("\\", "/"), new ArrayList<EsLintIssue>());
-        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        issues.put(file.absolutePath().replace("\\", "/"), new ArrayList<EsLintIssue>());
+        when(parser.parse(any(List.class))).thenReturn(issues);
 
-        this.sensor.execute(this.context);
+        sensor.execute(context);
     }    
 
     @Test
     public void execute_addsToUnknownRuleBucket_whenRuleNameNotRecognised() {
         EsLintIssue issue = new EsLintIssue();
-        issue.setFailure("failure");
-        issue.setRuleName("unknown name");
-        issue.setName(this.file.absolutePath().replace("\\", "/"));
+        issue.setMessage("failure");
+        issue.setRuleId("unknown name");
+        issue.setName(file.absolutePath().replace("\\", "/"));
 
-        EsLintPosition startPosition = new EsLintPosition();
-        startPosition.setLine(0);
 
-        issue.setStartPosition(startPosition);
+        issue.setLine(0);
 
         List<EsLintIssue> issueList = new ArrayList<EsLintIssue>();
         issueList.add(issue);
@@ -180,24 +185,22 @@ public class EsLintSensorTest {
         Map<String, List<EsLintIssue>> issues = new HashMap<String, List<EsLintIssue>>();
         issues.put(issue.getName(), issueList);
 
-        when(this.parser.parse(any(List.class))).thenReturn(issues);
-        this.sensor.execute(this.context);
+        when(parser.parse(any(List.class))).thenReturn(issues);
+        sensor.execute(context);
 
-        assertEquals(1, this.context.allIssues().size());
-        assertEquals(EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey(), this.context.allIssues().iterator().next().ruleKey().rule());
+        assertEquals(1, context.allIssues().size());
+        assertEquals(EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey(), context.allIssues().iterator().next().ruleKey().rule());
     }
     
     @Test
     public void execute_doesNotThrow_ifTsLintReportsAgainstFileNotInAnalysisSet() {
         EsLintIssue issue = new EsLintIssue();
-        issue.setFailure("failure");
-        issue.setRuleName("rule name");
-        issue.setName(this.file.absolutePath().replace("\\", "/") + "/nonexistent");
+        issue.setMessage("failure");
+        issue.setRuleId("rule name");
+        issue.setName(file.absolutePath().replace("\\", "/") + "/nonexistent");
 
-        EsLintPosition startPosition = new EsLintPosition();
-        startPosition.setLine(0);
 
-        issue.setStartPosition(startPosition);
+        issue.setLine(0);
 
         List<EsLintIssue> issueList = new ArrayList<EsLintIssue>();
         issueList.add(issue);
@@ -205,70 +208,70 @@ public class EsLintSensorTest {
         Map<String, List<EsLintIssue>> issues = new HashMap<String, List<EsLintIssue>>();
         issues.put(issue.getName(), issueList);
 
-        when(this.parser.parse(any(List.class))).thenReturn(issues);
-        this.sensor.execute(this.context);
+        when(parser.parse(any(List.class))).thenReturn(issues);
+        sensor.execute(context);
     }
     
 
 
     @Test
     public void execute_doesNothingWhenNotConfigured() throws IOException {
-        this.fakePathResolutions.remove(EsLintPlugin.SETTING_ES_LINT_PATH);
+        fakePathResolutions.remove(EsLintPlugin.SETTING_ES_LINT_PATH);
 
-        this.sensor.execute(this.context);
+        sensor.execute(context);
 
-        verify(this.executor, times(0)).execute(any(EsLintExecutorConfig.class), any(List.class));
+        verify(executor, times(0)).execute(any(EsLintExecutorConfig.class), any(List.class));
 
-        assertEquals(0, this.context.allIssues().size());
+        assertEquals(0, context.allIssues().size());
     }
 
     @Test
     public void analyse_doesNothingWhenDisabled() throws IOException {
-        when(this.settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)).thenReturn(Boolean.FALSE);
+        when(settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)).thenReturn(Boolean.FALSE);
 
-        this.sensor.execute(this.context);
+        sensor.execute(context);
 
-        verify(this.executor, times(0)).execute(any(EsLintExecutorConfig.class), any(List.class));
+        verify(executor, times(0)).execute(any(EsLintExecutorConfig.class), any(List.class));
 
-        assertEquals(0, this.context.allIssues().size());
+        assertEquals(0, context.allIssues().size());
     }
     
     @Test
-    public void execute_doesNothingWhenNoConfigPathset() throws IOException {
-        this.fakePathResolutions.remove(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH);
+    public void execute_whenThePathDoesNotExist() throws IOException {
+        fakePathResolutions.remove(EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH);
 
-        this.sensor.execute(this.context);
+        sensor.execute(context);
 
-        verify(this.executor, times(0)).execute(any(EsLintExecutorConfig.class), any(List.class));
+        verify(executor, times(0)).execute(any(EsLintExecutorConfig.class), any(List.class));
 
-        assertEquals(0, this.context.allIssues().size());
+        assertEquals(0, context.allIssues().size());
     }
 
     @Test
     public void execute_callsExecutorWithSuppliedTimeout() throws IOException {
-        this.sensor.execute(this.context);
+        sensor.execute(context);
 
-        verify(this.executor, times(1)).execute(this.configCaptor.capture(), any(List.class));
-        assertEquals((Integer) 45000, this.configCaptor.getValue().getTimeoutMs());
+        verify(executor, times(1)).execute(configCaptor.capture(), any(List.class));
+        assertEquals((Integer) 45000, configCaptor.getValue().getTimeoutMs());
     }
 
     @Test
     public void execute_callsExecutorWithAtLeast5000msTimeout() throws IOException {
-        when(this.settings.getInt(EsLintPlugin.SETTING_ES_LINT_TIMEOUT)).thenReturn(-500);
+        when(settings.getInt(EsLintPlugin.SETTING_ES_LINT_TIMEOUT)).thenReturn(-500);
 
-        this.sensor.execute(this.context);
+        sensor.execute(context);
 
-        verify(this.executor, times(1)).execute(this.configCaptor.capture(), any(List.class));
-        assertEquals((Integer) 5000, this.configCaptor.getValue().getTimeoutMs());
+        verify(executor, times(1)).execute(configCaptor.capture(), any(List.class));
+        assertEquals((Integer) 5000, configCaptor.getValue().getTimeoutMs());
     }
 
     @Test
     public void execute_callsExecutorWithConfiguredPaths() {
-        this.sensor.execute(this.context);
+        sensor.execute(context);
 
-        verify(this.executor, times(1)).execute(this.configCaptor.capture(), any(List.class));
-        assertEquals("/path/to/eslint", this.configCaptor.getValue().getPathToEsLint());
-        assertEquals("/path/to/.eslintrc.json", this.configCaptor.getValue().getConfigFile());
-        assertEquals("/path/to/rules", this.configCaptor.getValue().getRulesDir());
+        verify(executor, times(1)).execute(configCaptor.capture(), any(List.class));
+        assertEquals("/path/to/eslint", configCaptor.getValue().getPathToEsLint());
+        assertEquals("src/test/resources/.eslintrc.js", configCaptor.getValue().getConfigFile());
+        assertEquals("/path/to/rules", configCaptor.getValue().getRulesDir());
     }
 }

@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,20 +51,22 @@ public class EsLintSensor implements Sensor {
 
     @Override
     public void execute(SensorContext ctx) {
-        if (!settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)) {
-            EsLintSensor.LOG.debug("Skipping eslint execution - {} set to false", EsLintPlugin.SETTING_ES_LINT_ENABLED);
+        if (!this.settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)) {
+            LOG.debug("Skipping eslint execution - {} set to false", EsLintPlugin.SETTING_ES_LINT_ENABLED);
             return;
         }
 
-        EsLintExecutorConfig config = EsLintExecutorConfig.fromSettings(settings, ctx, resolver);
+        EsLintExecutorConfig config = EsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
 
         if (config.getPathToEsLint() == null) {
-            EsLintSensor.LOG.warn("Path to eslint not defined or not found. Skipping eslint analysis.");
+            LOG.warn("Path to eslint not defined or not found. Skipping eslint analysis.");
             return;
         }
         if (config.getConfigFile() == null) {
-            EsLintSensor.LOG.warn("Path to .eslintrc.* configuration file either not defined or not found - Skipping eslint analysis.");
+            LOG.warn("Path to .eslintrc.* configuration file either not defined or not found - Skipping eslint analysis.");
             return;
+
+
         }
 
 
@@ -76,22 +79,23 @@ public class EsLintSensor implements Sensor {
         Map<String, InputFile> fileMap = new HashMap<>(100);
         for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(EsLintLanguage.LANGUAGE_KEY))) {
 
-            String pathAdjusted = file.absolutePath().replace('\\', '/');
+            String pathAdjusted = file.absolutePath();
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
 
-        List<String> jsonResults = executor.execute(config, paths);
 
-        Map<String, List<EsLintIssue>> issues = parser.parse(jsonResults);
+        List<String> jsonResults = this.executor.execute(config, paths);
+
+        Map<String, List<EsLintIssue>> issues = this.parser.parse(jsonResults);
 
         if (issues == null) {
-            EsLintSensor.LOG.warn("Eslint returned no result at all");
+            LOG.warn("Eslint returned no result at all");
             return;
         }
 
         // Each issue bucket will contain info about a single file
-        for (Map.Entry<String, List<EsLintIssue>> filePathEntry : issues.entrySet()) {
+        for (Entry<String, List<EsLintIssue>> filePathEntry : issues.entrySet()) {
             List<EsLintIssue> batchIssues = filePathEntry.getValue();
 
             if (batchIssues == null || batchIssues.isEmpty()) {
@@ -100,7 +104,7 @@ public class EsLintSensor implements Sensor {
 
             String filePath = filePathEntry.getKey();
             if (!fileMap.containsKey(filePath)) {
-                EsLintSensor.LOG.warn("EsLint reported issues against a file that wasn't sent to it - will be ignored: {}", filePath);
+                LOG.warn("EsLint reported issues against a file that wasn't sent to it - will be ignored: {}", filePath);
                 continue;
             }
 
@@ -109,7 +113,7 @@ public class EsLintSensor implements Sensor {
             for (EsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll
                 // fall back to the generic 'eslint-issue' rule
-                String ruleName = issue.getRuleName();
+                String ruleName = issue.getRuleId().replace('/', '-');
                 if (!ruleNames.contains(ruleName)) {
                     ruleName = EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey();
                 }
@@ -123,8 +127,8 @@ public class EsLintSensor implements Sensor {
                         newIssue
                         .newLocation()
                         .on(file)
-                        .message(issue.getFailure())
-                        .at(file.selectLine(issue.getStartPosition().getLine() + 1));
+                                .message(issue.getMessage())
+                                .at(file.selectLine(issue.getLine()));
                 
                 newIssue.at(newIssueLocation);
                 newIssue.save();

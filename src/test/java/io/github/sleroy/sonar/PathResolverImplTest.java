@@ -9,8 +9,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class PathResolverImplTest {
     private PathResolverImpl resolver;
@@ -21,53 +20,56 @@ public class PathResolverImplTest {
     @Before
     public void setUp() throws Exception {
         URL filePath = PathResolverImplTest.class.getClassLoader().getResource("./existing.ts");
-        this.existingFile = new File(filePath.toURI());
-        String parentPath = this.existingFile.getParent();
+        existingFile = new File(filePath.toURI());
+        String parentPath = existingFile.getParent();
 
-        sensorContext = SensorContextTester.create(new File(parentPath));
-        sensorContext.settings().setProperty("path key", "existing.ts");
+        this.sensorContext = SensorContextTester.create(new File(parentPath));
+        this.sensorContext.settings().setProperty("path key", "existing.ts");
         
         DefaultInputFile file = 
                 new DefaultInputFile("", "existing.ts")
                     .setLanguage(EsLintLanguage.LANGUAGE_KEY);
 
-        sensorContext.fileSystem().add(file);
+        this.sensorContext.fileSystem().add(file);
 
-        resolver = new PathResolverImpl();
+        this.resolver = new PathResolverImpl();
     }
     
     @Test
     public void returnsAbsolutePathToFile_ifSpecifiedAndExists() {
 
-        this.assertSamePath(existingFile, resolver.getPathFromSetting(sensorContext, "path key", "not me"));
+        assertSamePath(this.existingFile, this.resolver.getPathFromSetting(this.sensorContext, "path key", "not me"));
     }
     
     @Test
     public void returnsAbsolutePathToFallbackFile_ifPrimaryNotConfiguredAndFallbackExists() {
-        this.assertSamePath(existingFile, resolver.getPathFromSetting(sensorContext, "new path key", "existing.ts"));
+        assertSamePath(this.existingFile, this.resolver.getPathFromSetting(this.sensorContext, "new path key", "existing.ts"));
     }
     
     @Test
     public void returnsAbsolutePathToFallbackFile_ifPrimaryNotConfiguredButEmptyAndFallbackExists() {
-        sensorContext.settings().setProperty("new path key", "");
-        this.assertSamePath(existingFile, resolver.getPathFromSetting(sensorContext, "new path key", "existing.ts"));
+        this.sensorContext.settings().setProperty("new path key", "");
+        assertSamePath(this.existingFile, this.resolver.getPathFromSetting(this.sensorContext, "new path key", "existing.ts"));
     }
     
     @Test
     public void returnsNull_ifPrimaryNotConfiguredAndFallbackNull() {
-        assertNull(resolver.getPathFromSetting(sensorContext, "new path key", null));
+        Optional<String> pathFromSetting = this.resolver.getPathFromSetting(this.sensorContext, "new path key", null);
+        assertFalse(pathFromSetting.isPresent());
     }
     
     @Test
     public void returnsNull_ifRequestedPathDoesNotExist() {
-        sensorContext.settings().setProperty("new path key", "missing.ts");
-        assertNull(resolver.getPathFromSetting(sensorContext, "new path key", "existing.ts"));
+        this.sensorContext.settings().setProperty("new path key", "missing.ts");
+        Optional<String> pathFromSetting = this.resolver.getPathFromSetting(this.sensorContext, "new path key", "notexisting.ts");
+        assertFalse(pathFromSetting.isPresent());
     }
-    
+
+
     @Test
     public void returnsAbsolutePathToFile_ifAlreadyAbsoluteAndExists() {
-        sensorContext.settings().setProperty("new path key", existingFile.getAbsolutePath());
-        this.assertSamePath(existingFile, resolver.getPathFromSetting(sensorContext, "new path key", "not me"));
+        this.sensorContext.settings().setProperty("new path key", this.existingFile.getAbsolutePath());
+        assertSamePath(this.existingFile, this.resolver.getPathFromSetting(this.sensorContext, "new path key", "not me"));
     }
 
     /**

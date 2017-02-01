@@ -6,43 +6,40 @@ import org.junit.Test;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
-import org.sonar.api.server.debt.DebtRemediationFunction;
-import org.sonar.api.server.rule.RulesDefinition.Context;
-import org.sonar.api.server.rule.RulesDefinition.Rule;
+import org.sonar.api.server.debt.DebtRemediationFunction.Type;
+import org.sonar.api.server.rule.RulesDefinition;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class EsRulesDefinitionTest {
 
     Settings settings;
     EsRulesDefinition definition;
-    Context context;
+    RulesDefinition.Context context;
 
     @Before
     public void setUp() throws Exception {
 
-        this.settings = mock(Settings.class);
+        settings = mock(Settings.class);
 
-        when(this.settings.getKeysStartingWith(EsLintPlugin.SETTING_ES_RULE_CONFIGS))
+        when(settings.getKeysStartingWith(EsLintPlugin.SETTING_ES_RULE_CONFIGS))
             .thenReturn(new ArrayList<String>() {{
-                add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg1.name");
-                add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg1.config");
-                add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg2.name");
-                add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg2.config");
-                add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg3.name");
-                add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg3.config");
+                this.add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg1.name");
+                this.add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg1.config");
+                this.add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg2.name");
+                this.add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg2.config");
+                this.add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg3.name");
+                this.add(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg3.config");
             }});
 
         // config with one disabled rule
-        when(this.settings.getString(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg1.config"))
+        when(settings.getString(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg1.config"))
             .thenReturn(
                 "custom-rule-1=false\n" +
                 "custom-rule-1.name=test rule #1\n" +
@@ -52,7 +49,7 @@ public class EsRulesDefinitionTest {
             );
 
         // config with a basic rule (no debt settings)
-        when(this.settings.getString(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg2.config"))
+        when(settings.getString(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg2.config"))
             .thenReturn(
                 "custom-rule-2=true\n" +
                 "custom-rule-2.name=test rule #2\n" +
@@ -62,13 +59,13 @@ public class EsRulesDefinitionTest {
             );
 
         // config with a advanced rules (including debt settings)
-        when(this.settings.getString(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg3.config"))
+        when(settings.getString(EsLintPlugin.SETTING_ES_RULE_CONFIGS + ".cfg3.config"))
             .thenReturn(
                 "custom-rule-3=true\n" +
                 "custom-rule-3.name=test rule #3\n" +
                 "custom-rule-3.severity=INFO\n" +
                 "custom-rule-3.description=#3 description\n" +
-                "custom-rule-3.debtFunc=" + DebtRemediationFunction.Type.CONSTANT_ISSUE + "\n" +
+                        "custom-rule-3.debtFunc=" + Type.CONSTANT_ISSUE + "\n" +
                 "custom-rule-3.debtScalar=15min\n" +
                 "custom-rule-3.debtOffset=1min\n" +
                 "custom-rule-3.debtType=INVALID_TYPE_GOES_HERE\n" +
@@ -77,7 +74,7 @@ public class EsRulesDefinitionTest {
                 "custom-rule-4.name=test rule #4\n" +
                 "custom-rule-4.severity=MINOR\n" +
                 "custom-rule-4.description=#4 description\n" +
-                "custom-rule-4.debtFunc=" + DebtRemediationFunction.Type.LINEAR + "\n" +
+                        "custom-rule-4.debtFunc=" + Type.LINEAR + "\n" +
                 "custom-rule-4.debtScalar=5min\n" +
                 "custom-rule-4.debtOffset=2h\n" +
                 "custom-rule-4.debtType=" + RuleType.BUG.name() + "\n" +
@@ -86,22 +83,22 @@ public class EsRulesDefinitionTest {
                 "custom-rule-5.name=test rule #5\n" +
                 "custom-rule-5.severity=MAJOR\n" +
                 "custom-rule-5.description=#5 description\n" +
-                "custom-rule-5.debtFunc=" + DebtRemediationFunction.Type.LINEAR_OFFSET + "\n" +
+                        "custom-rule-5.debtFunc=" + Type.LINEAR_OFFSET + "\n" +
                 "custom-rule-5.debtScalar=30min\n" +
                 "custom-rule-5.debtOffset=15min\n" +
                 "custom-rule-5.debtType=" + RuleType.VULNERABILITY.name() + "\n" +
                 "\n"
             );
 
-        this.definition = new EsRulesDefinition(this.settings);
-        this.context = new Context();
-        this.definition.define(context);
+        definition = new EsRulesDefinition(settings);
+        context = new RulesDefinition.Context();
+        definition.define(this.context);
     }
 
     @Test
     public void CreatesRepository() {
-        Context context = mock(Context.class, RETURNS_DEEP_STUBS);
-        this.definition.define(context);
+        RulesDefinition.Context context = mock(RulesDefinition.Context.class, RETURNS_DEEP_STUBS);
+        definition.define(context);
 
         verify(context).createRepository(eq(EsRulesDefinition.REPOSITORY_NAME), eq(EsLintLanguage.LANGUAGE_KEY));
     }
@@ -109,11 +106,11 @@ public class EsRulesDefinitionTest {
     @Test
     public void ConfiguresAdditionalRules() {
         // cfg1
-        Rule rule1 = getRule("custom-rule-1");
+        RulesDefinition.Rule rule1 = this.getRule("custom-rule-1");
         assertNull(rule1);
 
         // cfg2
-        Rule rule2 = getRule("custom-rule-2");
+        RulesDefinition.Rule rule2 = this.getRule("custom-rule-2");
         assertNotNull(rule2);
         assertEquals("test rule #2", rule2.name());
         assertEquals(Severity.MINOR, rule2.severity());
@@ -122,13 +119,13 @@ public class EsRulesDefinitionTest {
         assertEquals(RuleType.CODE_SMELL, rule2.type());
 
         // cfg3
-        Rule rule3 = getRule("custom-rule-3");
+        RulesDefinition.Rule rule3 = this.getRule("custom-rule-3");
         assertNotNull(rule3);
         assertEquals("test rule #3", rule3.name());
         assertEquals(Severity.INFO, rule3.severity());
         assertEquals("#3 description", rule3.htmlDescription());
         assertEquals(
-            DebtRemediationFunction.Type.CONSTANT_ISSUE,
+                Type.CONSTANT_ISSUE,
             rule3.debtRemediationFunction().type()
         );
         assertEquals(null, rule3.debtRemediationFunction().gapMultiplier());
@@ -136,13 +133,13 @@ public class EsRulesDefinitionTest {
         assertEquals(RuleType.CODE_SMELL, rule3.type());
 
         // cfg4
-        Rule rule4 = getRule("custom-rule-4");
+        RulesDefinition.Rule rule4 = this.getRule("custom-rule-4");
         assertNotNull(rule4);
         assertEquals("test rule #4", rule4.name());
         assertEquals(Severity.MINOR, rule4.severity());
         assertEquals("#4 description", rule4.htmlDescription());
         assertEquals(
-            DebtRemediationFunction.Type.LINEAR,
+                Type.LINEAR,
             rule4.debtRemediationFunction().type()
         );
         assertEquals("5min", rule4.debtRemediationFunction().gapMultiplier());
@@ -150,13 +147,13 @@ public class EsRulesDefinitionTest {
         assertEquals(RuleType.BUG, rule4.type());
 
         // cfg5
-        Rule rule5 = getRule("custom-rule-5");
+        RulesDefinition.Rule rule5 = this.getRule("custom-rule-5");
         assertNotNull(rule5);
         assertEquals("test rule #5", rule5.name());
         assertEquals(Severity.MAJOR, rule5.severity());
         assertEquals("#5 description", rule5.htmlDescription());
         assertEquals(RuleType.VULNERABILITY, rule5.type());
-        
+
         assertEquals("30min", rule5.debtRemediationFunction().gapMultiplier());
         assertEquals("15min", rule5.debtRemediationFunction().baseEffort());
     }
@@ -173,9 +170,10 @@ public class EsRulesDefinitionTest {
         EsRulesDefinition.loadRules(testStream, rules);
     }
 
+
     @Test
     public void CheckAdditionalRulesConfigProvided() {
-        EsRulesDefinition rulesDef = new EsRulesDefinition(this.settings);
+        EsRulesDefinition rulesDef = new EsRulesDefinition(settings);
         List<EsLintRule> rules = rulesDef.getRules();
         assertNotNull(rules);
         assertEquals(4, rules.size()); // 4 enabled rules, 1 disabled rule
@@ -193,7 +191,7 @@ public class EsRulesDefinitionTest {
         assertEquals(0, rules.size());
     }
 
-    private Rule getRule(String name) {
-        return this.context.repository(EsRulesDefinition.REPOSITORY_NAME).rule(name);
+    private RulesDefinition.Rule getRule(String name) {
+        return context.repository(EsRulesDefinition.REPOSITORY_NAME).rule(name);
     }
 }

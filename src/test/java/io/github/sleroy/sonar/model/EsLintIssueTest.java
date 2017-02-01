@@ -1,17 +1,17 @@
 package io.github.sleroy.sonar.model;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class EsLintIssueTest {
     EsLintIssue model;
 
     @Before
     public void setUp() throws Exception {
-        this.model = new EsLintIssue();
+        model = new EsLintIssue();
     }
 
     @After
@@ -20,33 +20,20 @@ public class EsLintIssueTest {
 
     @Test
     public void getSetName() {
-        this.model.setName("the file");
-        assertEquals("the file", this.model.getName());
+        model.setName("the file");
+        assertEquals("the file", model.getName());
     }
 
-    @Test
-    public void getSetStartPosition() {
-        EsLintPosition startPosition = new EsLintPosition();
-        this.model.setStartPosition(startPosition);
-        assertEquals(startPosition, this.model.getStartPosition());
-    }
-
-    @Test
-    public void getSetEndPosition() {
-        EsLintPosition endPosition = new EsLintPosition();
-        this.model.setEndPosition(endPosition);
-        assertEquals(endPosition, this.model.getEndPosition());
-    }
 
     @Test
     public void getSetFailure() {
-        this.model.setFailure("the failure");
-        assertEquals("the failure", this.model.getFailure());
+        model.setMessage("the failure");
+        assertEquals("the failure", model.getMessage());
     }
 
     @Test
     public void getSetRuleName() {
-        this.model.setRuleName("the rule");
-        assertEquals("the rule", this.model.getRuleName());
+        model.setRuleId("the rule");
+        assertEquals("the rule", model.getRuleId());
     }
 }

@@ -3,9 +3,9 @@ package io.github.sleroy.sonar;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sonar.api.internal.apachecommons.lang.SystemUtils;
 import org.sonar.api.utils.System2;
 import org.sonar.api.utils.TempFolder;
 import org.sonar.api.utils.command.Command;
@@ -32,31 +32,33 @@ public class EsLintExecutorImplTest {
 
     @Before
     public void setUp() throws Exception {
-        this.system = mock(System2.class);
-        this.tempFolder = mock(TempFolder.class);
+        system = mock(System2.class);
+        when(this.system.isOsWindows()).thenReturn(SystemUtils.IS_OS_WINDOWS);
 
-        this.tempOutputFile = mock(File.class);
-        when(this.tempOutputFile.getAbsolutePath()).thenReturn("path/to/temp");
-        when(this.tempFolder.newFile()).thenReturn(this.tempOutputFile);
+        tempFolder = mock(TempFolder.class);
 
-        this.commandExecutor = mock(CommandExecutor.class);
+        tempOutputFile = mock(File.class);
+        when(tempOutputFile.getAbsolutePath()).thenReturn("path/to/temp");
+        when(tempFolder.newFile()).thenReturn(tempOutputFile);
 
-        this.executorImpl = Mockito.spy(new EsLintExecutorImpl(this.system, this.tempFolder));
-        when(this.executorImpl.createExecutor()).thenReturn(this.commandExecutor);
-        doReturn(mock(BufferedReader.class)).when(this.executorImpl).getBufferedReaderForFile(any(File.class));
+        commandExecutor = mock(CommandExecutor.class);
+
+        executorImpl = spy(new EsLintExecutorImpl(system, tempFolder));
+        when(executorImpl.createExecutor()).thenReturn(commandExecutor);
+        doReturn(mock(BufferedReader.class)).when(executorImpl).getBufferedReaderForFile(any(File.class));
 
         // Setup a default config, which each method will mutate as required
-        this.config = new EsLintExecutorConfig();
-        this.config.setPathToEsLint("path/to/eslint");
-        this.config.setConfigFile("path/to/config");
-        this.config.setRulesDir("path/to/rules");
-        this.config.setTimeoutMs(40000);
+        config = new EsLintExecutorConfig();
+        config.setPathToEsLint("path/to/eslint");
+        config.setConfigFile("path/to/config");
+        config.setRulesDir("path/to/rules");
+        config.setTimeoutMs(40000);
     }
 
     @Test
     public void executesCommandWithCorrectArgumentsAndTimeouts() {
-        final ArrayList<Command> capturedCommands = new ArrayList<Command>();
-        final ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
+        ArrayList<Command> capturedCommands = new ArrayList<Command>();
+        ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
 
         Answer<Integer> captureCommand = new Answer<Integer>() {
             @Override
@@ -67,8 +69,8 @@ public class EsLintExecutorImplTest {
             }
         };
 
-        when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute(this.config, Arrays.asList(new String[]{"path/to/file", "path/to/another"}));
+        when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
+        executorImpl.execute(config, Arrays.asList(new String[]{"path/to/file", "path/to/another"}));
 
         assertEquals(1, capturedCommands.size());
 
@@ -83,8 +85,8 @@ public class EsLintExecutorImplTest {
 
     @Test
     public void DoesNotAddRulesDirParameter_IfNull() {
-        final ArrayList<Command> capturedCommands = new ArrayList<Command>();
-        final ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
+        ArrayList<Command> capturedCommands = new ArrayList<Command>();
+        ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
 
         Answer<Integer> captureCommand = new Answer<Integer>() {
             @Override
@@ -95,10 +97,10 @@ public class EsLintExecutorImplTest {
             }
         };
 
-        when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
+        when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
 
-        this.config.setRulesDir(null);
-        this.executorImpl.execute(this.config, Arrays.asList(new String[]{"path/to/file"}));
+        config.setRulesDir(null);
+        executorImpl.execute(config, Arrays.asList(new String[]{"path/to/file"}));
 
         Command theCommand = capturedCommands.get(0);
         assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
@@ -106,8 +108,8 @@ public class EsLintExecutorImplTest {
 
     @Test
     public void DoesNotAddRulesDirParameter_IfEmptyString() {
-        final ArrayList<Command> capturedCommands = new ArrayList<Command>();
-        final ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
+        ArrayList<Command> capturedCommands = new ArrayList<Command>();
+        ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
 
         Answer<Integer> captureCommand = new Answer<Integer>() {
             @Override
@@ -118,10 +120,10 @@ public class EsLintExecutorImplTest {
             }
         };
 
-        when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
+        when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
 
-        this.config.setRulesDir("");
-        this.executorImpl.execute(this.config, Arrays.asList(new String[]{"path/to/file"}));
+        config.setRulesDir("");
+        executorImpl.execute(config, Arrays.asList(new String[]{"path/to/file"}));
 
         Command theCommand = capturedCommands.get(0);
         assertFalse(theCommand.toCommandLine().contains("--rules-dir"));
@@ -140,8 +142,8 @@ public class EsLintExecutorImplTest {
         }
         filenames.add("second batch");
 
-        final ArrayList<Command> capturedCommands = new ArrayList<Command>();
-        final ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
+        ArrayList<Command> capturedCommands = new ArrayList<Command>();
+        ArrayList<Long> capturedTimeouts = new ArrayList<Long>();
 
         Answer<Integer> captureCommand = new Answer<Integer>() {
             @Override
@@ -152,25 +154,25 @@ public class EsLintExecutorImplTest {
             }
         };
 
-        when(this.commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
-        this.executorImpl.execute(this.config, filenames);
+        when(commandExecutor.execute(any(Command.class), any(StreamConsumer.class), any(StreamConsumer.class), any(long.class))).then(captureCommand);
+        executorImpl.execute(config, filenames);
 
         assertEquals(2, capturedCommands.size());
 
         Command theSecondCommand = capturedCommands.get(1);
 
 
-        assertTrue(theSecondCommand.toCommandLine().contains("config first batch second batch"));
-        assertTrue(theSecondCommand.toCommandLine().contains("second batch"));
+        assertTrue(theSecondCommand.toCommandLine().contains("\"first batch\" \"second batch\""));
+
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void execute_throws_ifNullConfigSupplied() {
-        this.executorImpl.execute(null, new ArrayList<String>());
+        executorImpl.execute(null, new ArrayList<String>());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void execute_throws_ifNullFileListSupplied() {
-        this.executorImpl.execute(this.config, null);
+        executorImpl.execute(config, null);
     }
 }

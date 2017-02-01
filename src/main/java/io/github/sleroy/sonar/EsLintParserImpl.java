@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class EsLintParserImpl implements EsLintParser {
             // Pre 4.0.0-versions of TsLint return nonsense for its JSON output
             // when faced with multiple files so we need to fix it up before we
             // do anything else
-            return REPLACE_PATTERN.matcher(toParse).replaceAll(",");
+            return EsLintParserImpl.REPLACE_PATTERN.matcher(toParse).replaceAll(",");
         }
 
         return toParse;
@@ -40,7 +41,7 @@ public class EsLintParserImpl implements EsLintParser {
         List<EsLintFile> allScannedFiles = new ArrayList<>(100);
 
         for (String batch : toParse) {
-            EsLintFile[] batchIssues = gson.fromJson(getFixedUpOutput(batch), EsLintFile[].class);
+            EsLintFile[] batchIssues = gson.fromJson(EsLintParserImpl.getFixedUpOutput(batch), EsLintFile[].class);
 
             if (batchIssues == null) {
                 continue;
@@ -50,11 +51,11 @@ public class EsLintParserImpl implements EsLintParser {
 
         // Remap by filename
         Map<String, List<EsLintFile>> fileBag = allScannedFiles.stream()
-                .collect(Collectors.groupingBy(EsLintFile::getFilePath));
+                .collect(Collectors.groupingBy(f -> f.getFilePath().replace('\\', '/')));
 
         // Reduce all issues
         Map<String, List<EsLintIssue>> toIssues = fileBag.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
+                Entry::getKey,
                 v -> v.getValue().stream()
                         .map(EsLintFile::getMessages)
                         .flatMap(List::stream)

@@ -5,42 +5,27 @@ package io.github.sleroy.sonar.model;
  */
 public class EsLintIssue {
     private String name;
-    private EsLintPosition startPosition;
-    private EsLintPosition endPosition;
-    private String failure;
-    private String ruleName;
-    private String fileName;
+    private String message;
+    private String ruleId;
+    private int severity;
+    private int column;
+    private int line;
+    private String source;
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public EsLintPosition getStartPosition() {
-        return startPosition;
+    public String getMessage() {
+        return this.message;
     }
 
-    public void setStartPosition(EsLintPosition startPosition) {
-        this.startPosition = startPosition;
-    }
-
-    public EsLintPosition getEndPosition() {
-        return endPosition;
-    }
-
-    public void setEndPosition(EsLintPosition endPosition) {
-        this.endPosition = endPosition;
-    }
-
-    public String getFailure() {
-        return failure;
-    }
-
-    public void setFailure(String failure) {
-        this.failure = failure;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     /**
@@ -48,19 +33,57 @@ public class EsLintIssue {
      *
      * @return the rule name.
      */
-    public String getRuleName() {
-        return ruleName;
+    public String getRuleId() {
+        return this.ruleId;
     }
 
-    public void setRuleName(String ruleName) {
-        this.ruleName = ruleName;
+    public void setRuleId(String ruleId) {
+        this.ruleId = ruleId;
     }
 
-    public String getFileName() {
-        return fileName;
+
+    public int getSeverity() {
+        return this.severity;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
+    public void setSeverity(int severity) {
+        this.severity = severity;
+    }
+
+    public int getColumn() {
+        return this.column;
+    }
+
+    public void setColumn(int column) {
+        this.column = column;
+    }
+
+    public int getLine() {
+        return this.line;
+    }
+
+    public void setLine(int line) {
+        this.line = line;
+    }
+
+    public String getSource() {
+        return this.source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    @Override
+    public String toString() {
+        return "EsLintIssue{" +
+                "name='" + this.name + '\'' +
+                ", message='" + this.message + '\'' +
+                ", ruleId='" + this.ruleId + '\'' +
+                ", severity=" + this.severity +
+                ", column=" + this.column +
+                ", line=" + this.line +
+                ", source='" + this.source + '\'' +
+                '}';
     }
 }

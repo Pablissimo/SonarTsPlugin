@@ -27,28 +27,29 @@ public class EsLintExecutorConfig {
         EsLintExecutorConfig toReturn = new EsLintExecutorConfig();
 
         resolver
-                .getPathFromSetting(ctx, EsLintPlugin.SETTING_ES_LINT_PATH, EsLintExecutorConfig.ESLINT_FALLBACK_PATH)
+                .getPathFromSetting(ctx, EsLintPlugin.SETTING_ES_LINT_PATH, ESLINT_FALLBACK_PATH)
                 .ifPresent(f -> toReturn.pathToEsLint = f);
 
 
         Stream.of(
                 resolver.getPathFromSetting(ctx, EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH),
-                resolver.getAbsolutePath(ctx, EsLintExecutorConfig.CONFIG_FILENAME),
-                resolver.getAbsolutePath(ctx, EsLintExecutorConfig.CONFIG_JS_FILENAME),
-                resolver.getAbsolutePath(ctx, EsLintExecutorConfig.CONFIG_JSON_FILENAME),
-                resolver.getAbsolutePath(ctx, EsLintExecutorConfig.CONFIG_YAML2_FILENAME),
-                resolver.getAbsolutePath(ctx, EsLintExecutorConfig.CONFIG_YAML_FILENAME)
+                resolver.getAbsolutePath(ctx, CONFIG_FILENAME),
+                resolver.getAbsolutePath(ctx, CONFIG_JS_FILENAME),
+                resolver.getAbsolutePath(ctx, CONFIG_JSON_FILENAME),
+                resolver.getAbsolutePath(ctx, CONFIG_YAML2_FILENAME),
+                resolver.getAbsolutePath(ctx, CONFIG_YAML_FILENAME)
         )
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst()
-                .ifPresent(f -> toReturn.configFile = f);
+                .ifPresent(f -> toReturn.configFile = f)
+        ;
 
 
         resolver.getPathFromSetting(ctx, EsLintPlugin.SETTING_ES_LINT_RULES_DIR, null)
                 .ifPresent(f -> toReturn.rulesDir = f);
 
-        toReturn.timeoutMs = Math.max(EsLintExecutorConfig.MAX_TIMEOUT, settings.getInt(EsLintPlugin.SETTING_ES_LINT_TIMEOUT));
+        toReturn.timeoutMs = Math.max(MAX_TIMEOUT, settings.getInt(EsLintPlugin.SETTING_ES_LINT_TIMEOUT));
 
 
         return toReturn;
@@ -56,7 +57,7 @@ public class EsLintExecutorConfig {
 
 
     public String getPathToEsLint() {
-        return pathToEsLint;
+        return this.pathToEsLint;
     }
 
     public void setPathToEsLint(String pathToEsLint) {
@@ -64,7 +65,7 @@ public class EsLintExecutorConfig {
     }
 
     public String getConfigFile() {
-        return configFile;
+        return this.configFile;
     }
 
     public void setConfigFile(String configFile) {
@@ -72,7 +73,7 @@ public class EsLintExecutorConfig {
     }
 
     public String getRulesDir() {
-        return rulesDir;
+        return this.rulesDir;
     }
 
     public void setRulesDir(String rulesDir) {
@@ -80,7 +81,7 @@ public class EsLintExecutorConfig {
     }
 
     public Integer getTimeoutMs() {
-        return timeoutMs;
+        return this.timeoutMs;
     }
 
     public void setTimeoutMs(Integer timeoutMs) {
