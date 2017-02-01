@@ -75,7 +75,7 @@ public class EsLintExecutorImplTest {
         Command theCommand = capturedCommands.get(0);
         long theTimeout = capturedTimeouts.get(0);
 
-        assertEquals("node path/to/eslint --rules-dir path/to/rules --output-file path/to/temp --config path/to/config path/to/file path/to/another", theCommand.toCommandLine());
+        assertEquals("node path/to/eslint -f json --rules-dir path/to/rules --output-file path/to/temp --config path/to/config path/to/file path/to/another", theCommand.toCommandLine());
         // Expect one timeout period per file processed
         assertEquals(2 * 40000, theTimeout);
     }
@@ -159,7 +159,8 @@ public class EsLintExecutorImplTest {
 
         Command theSecondCommand = capturedCommands.get(1);
 
-        assertFalse(theSecondCommand.toCommandLine().contains("first batch"));
+
+        assertTrue(theSecondCommand.toCommandLine().contains("config first batch second batch"));
         assertTrue(theSecondCommand.toCommandLine().contains("second batch"));
     }
 

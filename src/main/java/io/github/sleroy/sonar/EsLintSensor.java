@@ -30,7 +30,7 @@ public class EsLintSensor implements Sensor {
     private PathResolver resolver;
     private EsLintExecutor executor;
     private EsLintParser parser;
-    
+
     public EsLintSensor(Settings settings, PathResolver resolver,
                         EsLintExecutor executor, EsLintParser parser) {
         this.settings = settings;

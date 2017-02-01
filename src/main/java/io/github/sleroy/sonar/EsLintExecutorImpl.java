@@ -45,6 +45,9 @@ public class EsLintExecutorImpl implements EsLintExecutor {
                 Command
                         .create("node")
                         .addArgument(this.preparePath(config.getPathToEsLint()));
+        command
+                .addArgument("-f")
+                .addArgument("json");
 
         String rulesDir = config.getRulesDir();
         if (rulesDir != null && rulesDir.length() > 0) {

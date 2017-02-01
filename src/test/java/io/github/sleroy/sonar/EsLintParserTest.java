@@ -1,68 +1,66 @@
 package io.github.sleroy.sonar;
 
-import static org.junit.Assert.assertEquals;
+import io.github.sleroy.sonar.model.EsLintIssue;
+import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.github.sleroy.sonar.model.EsLintIssue;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
 
 public class EsLintParserTest {
-
-
+    /**
+     * Tests the output of EsLint when no results are returned and the analysis is a success.
+     */
     @Test
-    public void parsesValidTsLintRecordIntoObject() {
-        String parseRow1 = "[{\"endPosition\":{\"character\":44,\"line\":23,\"position\":658},\"failure\":\"for statements must be braced\",\"name\":\"Tools.ts\",\"ruleName\":\"curly\",\"startPosition\":{\"character\":6,\"line\":22,\"position\":587}}]";
+    public void eslint_successnoresults() {
+        String parseRow1 = "[]";
         List<String> toParse = new ArrayList<String>();
         toParse.add(parseRow1);
-        
+
         Map<String, List<EsLintIssue>> issues = new EsLintParserImpl().parse(toParse);
 
-        assertEquals(1, issues.size());
-
-        List<EsLintIssue> fileIssues = issues.get("Tools.ts");
-        
-        assertEquals(1, fileIssues.size());
-        
-        EsLintIssue issue = fileIssues.get(0);
-        assertEquals(44, issue.getEndPosition().getCharacter());
-        assertEquals(23, issue.getEndPosition().getLine());
-        assertEquals(658, issue.getEndPosition().getPosition());
-
-        assertEquals("for statements must be braced", issue.getFailure());
-        assertEquals("Tools.ts", issue.getName());
-        assertEquals("curly", issue.getRuleName());
-
-        assertEquals(6, issue.getStartPosition().getCharacter());
-        assertEquals(22, issue.getStartPosition().getLine());
-        assertEquals(587, issue.getStartPosition().getPosition());
+        assertEquals(0, issues.size());
     }
-    
+
+    /**
+     * Tests the output of EsLint when the analysis is a success with results
+     */
     @Test
-    public void parsesIssuesWithSameNameIntoSameBucket() {
+    public void eslint_successWithResults() throws IOException {
+        String parseRow1 = FileUtils.readFileToString(new File("src/test/resources/results/ok.json"));
         List<String> toParse = new ArrayList<String>();
-        toParse.add("[{\"name\":\"Tools.ts\",\"ruleName\":\"tools1\"}]");
-        toParse.add("[{\"name\":\"Tools.ts\",\"ruleName\":\"tools2\"}]");
-        
+        toParse.add(parseRow1);
+
         Map<String, List<EsLintIssue>> issues = new EsLintParserImpl().parse(toParse);
-        
-        assertEquals(1, issues.size());
-        assertEquals(2, issues.get("Tools.ts").size());
+
+        assertEquals("Expected one file", 1, issues.size());
+
+        assertEquals("Expected fifty-eight violations", 58, issues.get("c:\\workspace\\SonarTsPlugin\\src\\test\\resources\\dashboard.js").size());
     }
-    
+
+    /**
+     * Tests the output of EsLint when the analysis has failed on a parsing error
+     */
     @Test
-    public void fixesUpBrokenBatchedOutputFromTsLintPriorTo_4_0_0() {
+    public void eslint_parsingFailure() throws IOException {
+        String parseRow1 = FileUtils.readFileToString(new File("src/test/resources/results/parsingFailure.json"));
         List<String> toParse = new ArrayList<String>();
-        toParse.add("[{\"name\":\"Tools.ts\",\"ruleName\":\"tools1\"}][{\"name\":\"Tools.ts\",\"ruleName\":\"tools2\"}]");
-        
+        toParse.add(parseRow1);
+
         Map<String, List<EsLintIssue>> issues = new EsLintParserImpl().parse(toParse);
-        
-        assertEquals(1, issues.size());
-        assertEquals(2, issues.get("Tools.ts").size());
+
+        assertEquals("Expected one file", 1, issues.size());
+
+        assertEquals("Expected one error, parsing error", 1, issues.get("c:\\workspace\\SonarTsPlugin\\src\\test\\resources\\angular.html").size());
     }
-    
+
+
     @Test
     public void parseAGoodProjectWithNoIssues() {
         List<String> toParse = new ArrayList<String>();
