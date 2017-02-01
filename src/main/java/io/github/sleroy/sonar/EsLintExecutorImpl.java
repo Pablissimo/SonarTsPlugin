@@ -13,27 +13,38 @@ import org.sonar.api.utils.command.StringStreamConsumer;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EsLintExecutorImpl implements EsLintExecutor {
     public static final int MAX_COMMAND_LENGTH = 4096;
     private static final Logger LOG = LoggerFactory.getLogger(EsLintExecutorImpl.class);
-
-    private boolean mustQuoteSpaceContainingPaths = false;
-    private TempFolder tempFolder;
+    private final TempFolder tempFolder;
+    private final boolean mustQuoteSpaceContainingPaths;
 
     public EsLintExecutorImpl(System2 system, TempFolder tempFolder) {
-        this.mustQuoteSpaceContainingPaths = system.isOsWindows();
+        mustQuoteSpaceContainingPaths = system.isOsWindows();
         this.tempFolder = tempFolder;
+    }
+
+    protected static BufferedReader getBufferedReaderForFile(File file) throws FileNotFoundException, UnsupportedEncodingException {
+        return new BufferedReader(
+                new InputStreamReader(
+                        new FileInputStream(file), "UTF8"));
+    }
+
+    protected static CommandExecutor createExecutor() {
+        return CommandExecutor.create();
     }
 
     private String preparePath(String path) {
         if (path == null) {
             return null;
-        } else if (path.contains(" ") && this.mustQuoteSpaceContainingPaths) {
+        } else if (path.contains(" ") && mustQuoteSpaceContainingPaths) {
             return '"' + path + '"';
         } else {
             return path;
@@ -44,27 +55,27 @@ public class EsLintExecutorImpl implements EsLintExecutor {
         Command command =
                 Command
                         .create("node")
-                        .addArgument(this.preparePath(config.getPathToEsLint()));
+                        .addArgument(preparePath(config.getPathToEsLint()));
         command
                 .addArgument("-f")
                 .addArgument("json");
 
         String rulesDir = config.getRulesDir();
-        if (rulesDir != null && rulesDir.length() > 0) {
+        if (rulesDir != null && !rulesDir.isEmpty()) {
             command
                     .addArgument("--rules-dir")
-                    .addArgument(this.preparePath(rulesDir));
+                    .addArgument(preparePath(rulesDir));
         }
 
-        if (tempPath != null && tempPath.length() > 0) {
+        if (tempPath != null && !tempPath.isEmpty()) {
             command
                     .addArgument("--output-file")
-                    .addArgument(this.preparePath(tempPath));
+                    .addArgument(preparePath(tempPath));
         }
 
         command
                 .addArgument("--config")
-                .addArgument(this.preparePath(config.getConfigFile()));
+                .addArgument(preparePath(config.getConfigFile()));
 
 
         command.setNewShell(false);
@@ -72,40 +83,42 @@ public class EsLintExecutorImpl implements EsLintExecutor {
         return command;
     }
 
+    @Override
     public List<String> execute(EsLintExecutorConfig config, List<String> files) {
         if (config == null) {
             throw new IllegalArgumentException("config");
-        } else if (files == null) {
+        }
+        if (files == null) {
             throw new IllegalArgumentException("files");
         }
 
         // New up a command that's everything we need except the files to process
         // We'll use this as our reference for chunking up files, if we need to
-        File eslintOutputFile = this.tempFolder.newFile();
+        File eslintOutputFile = tempFolder.newFile();
         String eslintOutputFilePath = eslintOutputFile.getAbsolutePath();
         Command baseCommand = getBaseCommand(config, eslintOutputFilePath);
 
-        LOG.debug("Using a temporary path for EsLint output: " + eslintOutputFilePath);
+        EsLintExecutorImpl.LOG.debug("Using a temporary path for EsLint output: {}", eslintOutputFilePath);
 
-        StringStreamConsumer stdOutConsumer = new StringStreamConsumer();
-        StringStreamConsumer stdErrConsumer = new StringStreamConsumer();
+        StreamConsumer stdOutConsumer = new StringStreamConsumer();
+        StreamConsumer stdErrConsumer = new StringStreamConsumer();
 
-        List<String> toReturn = new ArrayList<String>();
+        List<String> toReturn = new ArrayList<>(100);
         int baseCommandLength = baseCommand.toCommandLine().length();
-        int availableForBatching = MAX_COMMAND_LENGTH - baseCommandLength;
+        int availableForBatching = EsLintExecutorImpl.MAX_COMMAND_LENGTH - baseCommandLength;
 
-        List<List<String>> batches = new ArrayList<List<String>>();
-        List<String> currentBatch = new ArrayList<String>();
+        List<List<String>> batches = new ArrayList<>(100);
+        List<String> currentBatch = new ArrayList<>();
         batches.add(currentBatch);
 
         int currentBatchLength = 0;
-        for (int i = 0; i < files.size(); i++) {
-            String nextPath = this.preparePath(files.get(i).trim());
+        for (int i = 0, ni = files.size(); i < ni; i++) {
+            String nextPath = preparePath(files.get(i).trim());
 
             // +1 for the space we'll be adding between filenames
             if (currentBatchLength + nextPath.length() + 1 > availableForBatching) {
                 // Too long to add to this batch, create new
-                currentBatch = new ArrayList<String>();
+                currentBatch = new ArrayList<>(100);
                 currentBatchLength = 0;
                 batches.add(currentBatch);
             }
@@ -114,24 +127,22 @@ public class EsLintExecutorImpl implements EsLintExecutor {
             currentBatchLength += nextPath.length() + 1;
         }
 
-        LOG.debug("Split " + files.size() + " files into " + batches.size() + " batches for processing");
+        EsLintExecutorImpl.LOG.debug("Split {} files into  {} batches for processing", files.size(), batches.size());
 
-        for (int i = 0; i < batches.size(); i++) {
+        for (int i = 0, ni = batches.size(); i < ni; i++) {
             StringBuilder outputBuilder = new StringBuilder();
-
             List<String> thisBatch = batches.get(i);
-
             Command thisCommand = getBaseCommand(config, eslintOutputFilePath);
 
-            for (int fileIndex = 0; fileIndex < thisBatch.size(); fileIndex++) {
+            for (int fileIndex = 0, nf = thisBatch.size(); fileIndex < nf; fileIndex++) {
                 thisCommand.addArgument(thisBatch.get(fileIndex));
             }
 
-            LOG.debug("Executing EsLint with command: " + thisCommand.toCommandLine());
+            EsLintExecutorImpl.LOG.debug("Executing EsLint with command: {}", thisCommand.toCommandLine());
 
             // Timeout is specified per file, not per batch (which can vary a lot)
             // so multiply it up
-            String commandOutput = this.getCommandOutput(thisCommand, stdOutConsumer, stdErrConsumer, eslintOutputFile, config.getTimeoutMs() * thisBatch.size());
+            String commandOutput = getCommandOutput(thisCommand, stdOutConsumer, stdErrConsumer, eslintOutputFile, config.getTimeoutMs() * thisBatch.size());
             toReturn.add(commandOutput);
         }
 
@@ -139,39 +150,29 @@ public class EsLintExecutorImpl implements EsLintExecutor {
     }
 
     private String getCommandOutput(Command thisCommand, StreamConsumer stdOutConsumer, StreamConsumer stdErrConsumer, File tslintOutputFile, Integer timeoutMs) {
-        LOG.debug("Executing EsLint with command: " + thisCommand.toCommandLine());
+        EsLintExecutorImpl.LOG.debug("Executing EsLint with command: {}", thisCommand.toCommandLine());
 
         // Timeout is specified per file, not per batch (which can vary a lot)
         // so multiply it up
-        this.createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, timeoutMs);
+        createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, timeoutMs);
 
         StringBuilder outputBuilder = new StringBuilder();
 
-        try {
-            BufferedReader reader = this.getBufferedReaderForFile(tslintOutputFile);
+        try (final BufferedReader reader = getBufferedReaderForFile(tslintOutputFile)) {
+
 
             String str;
+            //noinspection NestedAssignment
             while ((str = reader.readLine()) != null) {
                 outputBuilder.append(str);
             }
 
-            reader.close();
 
             return outputBuilder.toString();
         } catch (IOException ex) {
-            LOG.error("Failed to re-read EsLint output", ex);
+            EsLintExecutorImpl.LOG.error("Failed to re-read EsLint output", ex);
         }
 
         return "";
-    }
-
-    protected BufferedReader getBufferedReaderForFile(File file) throws IOException {
-        return new BufferedReader(
-                new InputStreamReader(
-                        new FileInputStream(file), "UTF8"));
-    }
-
-    protected CommandExecutor createExecutor() {
-        return CommandExecutor.create();
     }
 }

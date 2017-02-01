@@ -22,14 +22,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EsLintSensor implements Sensor {
-    private static final Logger LOG = LoggerFactory.getLogger(EsLintExecutorImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EsLintSensor.class);
 
-    private Settings settings;
-    private PathResolver resolver;
-    private EsLintExecutor executor;
-    private EsLintParser parser;
+    private final Settings settings;
+    private final PathResolver resolver;
+    private final EsLintExecutor executor;
+    private final EsLintParser parser;
 
     public EsLintSensor(Settings settings, PathResolver resolver,
                         EsLintExecutor executor, EsLintParser parser) {
@@ -47,58 +49,58 @@ public class EsLintSensor implements Sensor {
     }
 
     @Override
-    public void execute(SensorContext ctx) {    
-        if (!this.settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)) {
-            LOG.debug("Skipping eslint execution - " + EsLintPlugin.SETTING_ES_LINT_ENABLED + " set to false");
+    public void execute(SensorContext ctx) {
+        if (!settings.getBoolean(EsLintPlugin.SETTING_ES_LINT_ENABLED)) {
+            EsLintSensor.LOG.debug("Skipping eslint execution - {} set to false", EsLintPlugin.SETTING_ES_LINT_ENABLED);
             return;
         }
-        
-        EsLintExecutorConfig config = EsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
+
+        EsLintExecutorConfig config = EsLintExecutorConfig.fromSettings(settings, ctx, resolver);
 
         if (config.getPathToEsLint() == null) {
-            LOG.warn("Path to eslint not defined or not found. Skipping eslint analysis.");
+            EsLintSensor.LOG.warn("Path to eslint not defined or not found. Skipping eslint analysis.");
             return;
-        } else if (config.getConfigFile() == null) {
-            LOG.warn("Path to .eslintrc.* configuration file either not defined or not found - Skipping eslint analysis.");
+        }
+        if (config.getConfigFile() == null) {
+            EsLintSensor.LOG.warn("Path to .eslintrc.* configuration file either not defined or not found - Skipping eslint analysis.");
             return;
         }
 
 
         Collection<ActiveRule> allRules = ctx.activeRules().findByRepository(EsRulesDefinition.REPOSITORY_NAME);
-        HashSet<String> ruleNames = new HashSet<>();
-        for (ActiveRule rule : allRules) {
-            ruleNames.add(rule.ruleKey().rule());
-        }
+        Set<String> ruleNames = new HashSet<>(100);
+        ruleNames.addAll(allRules.stream().map(rule -> rule.ruleKey().rule()).collect(Collectors.toList()));
 
-        List<String> paths = new ArrayList<String>();
-        HashMap<String, InputFile> fileMap = new HashMap<String, InputFile>();
+        List<String> paths = new ArrayList<>(100);
 
+        Map<String, InputFile> fileMap = new HashMap<>(100);
         for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(EsLintLanguage.LANGUAGE_KEY))) {
 
             String pathAdjusted = file.absolutePath().replace('\\', '/');
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
-        
-        List<String> jsonResults = this.executor.execute(config, paths);
 
-        Map<String, List<EsLintIssue>> issues = this.parser.parse(jsonResults);
+        List<String> jsonResults = executor.execute(config, paths);
+
+        Map<String, List<EsLintIssue>> issues = parser.parse(jsonResults);
 
         if (issues == null) {
-            LOG.warn("Eslint returned no result at all");
+            EsLintSensor.LOG.warn("Eslint returned no result at all");
             return;
         }
 
         // Each issue bucket will contain info about a single file
-        for (String filePath : issues.keySet()) {
-            List<EsLintIssue> batchIssues = issues.get(filePath);
-            
-            if (batchIssues == null || batchIssues.size() == 0) {
+        for (Map.Entry<String, List<EsLintIssue>> filePathEntry : issues.entrySet()) {
+            List<EsLintIssue> batchIssues = filePathEntry.getValue();
+
+            if (batchIssues == null || batchIssues.isEmpty()) {
                 continue;
             }
 
+            String filePath = filePathEntry.getKey();
             if (!fileMap.containsKey(filePath)) {
-                LOG.warn("EsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
+                EsLintSensor.LOG.warn("EsLint reported issues against a file that wasn't sent to it - will be ignored: {}", filePath);
                 continue;
             }
 
@@ -109,15 +111,15 @@ public class EsLintSensor implements Sensor {
                 // fall back to the generic 'eslint-issue' rule
                 String ruleName = issue.getRuleName();
                 if (!ruleNames.contains(ruleName)) {
-                    ruleName = EsRulesDefinition.ESLINT_UNKNOWN_RULE.key;
+                    ruleName = EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey();
                 }
 
-                NewIssue newIssue = 
+                NewIssue newIssue =
                         ctx
                         .newIssue()
                         .forRule(RuleKey.of(EsRulesDefinition.REPOSITORY_NAME, ruleName));
-                
-                NewIssueLocation newIssueLocation = 
+
+                NewIssueLocation newIssueLocation =
                         newIssue
                         .newLocation()
                         .on(file)

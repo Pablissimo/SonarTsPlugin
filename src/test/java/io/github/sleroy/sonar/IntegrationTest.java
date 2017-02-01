@@ -1,7 +1,7 @@
 package io.github.sleroy.sonar;
 
 /**
- * Created by Administrator on 30.01.2017.
+ *Defines a new category of Junit tests
  */
-public class IntegrationTest {
+public interface IntegrationTest {
 }

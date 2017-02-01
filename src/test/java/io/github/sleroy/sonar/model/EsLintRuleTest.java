@@ -17,15 +17,15 @@ public class EsLintRuleTest {
             "<html></html>"
         );
 
-        assertEquals("key", rule.key);
-        assertEquals(Severity.MAJOR, rule.severity);
-        assertEquals("name", rule.name);
-        assertEquals("<html></html>", rule.htmlDescription);
-        assertEquals(false, rule.hasDebtRemediation);
-        assertEquals(DebtRemediationFunction.Type.CONSTANT_ISSUE, rule.debtRemediationFunction);
-        assertEquals("0min", rule.debtRemediationScalar);
-        assertEquals("0min", rule.debtRemediationOffset);
-        assertEquals(null, rule.debtType);
+        assertEquals("key", rule.getKey());
+        assertEquals(Severity.MAJOR, rule.getSeverity());
+        assertEquals("name", rule.getName());
+        assertEquals("<html></html>", rule.getHtmlDescription());
+        assertEquals(false, rule.isHasDebtRemediation());
+        assertEquals(DebtRemediationFunction.Type.CONSTANT_ISSUE, rule.getDebtRemediationFunction());
+        assertEquals("0min", rule.getDebtRemediationScalar());
+        assertEquals("0min", rule.getDebtRemediationOffset());
+        assertEquals(null, rule.getDebtType());
     }
 
     @Test
@@ -35,20 +35,20 @@ public class EsLintRuleTest {
             Severity.MAJOR,
             "name",
             "<html></html>",
-            DebtRemediationFunction.Type.LINEAR_OFFSET,
+                DebtRemediationFunction.Type.LINEAR_OFFSET,
             "1min",
             "2min",
             RuleType.CODE_SMELL.name()
         );
 
-        assertEquals("key", rule.key);
-        assertEquals(Severity.MAJOR, rule.severity);
-        assertEquals("name", rule.name);
-        assertEquals("<html></html>", rule.htmlDescription);
-        assertEquals(true, rule.hasDebtRemediation);
-        assertEquals(DebtRemediationFunction.Type.LINEAR_OFFSET, rule.debtRemediationFunction);
-        assertEquals("1min", rule.debtRemediationScalar);
-        assertEquals("2min", rule.debtRemediationOffset);
-        assertEquals(RuleType.CODE_SMELL.name(), rule.debtType);
+        assertEquals("key", rule.getKey());
+        assertEquals(Severity.MAJOR, rule.getSeverity());
+        assertEquals("name", rule.getName());
+        assertEquals("<html></html>", rule.getHtmlDescription());
+        assertEquals(true, rule.isHasDebtRemediation());
+        assertEquals(DebtRemediationFunction.Type.LINEAR_OFFSET, rule.getDebtRemediationFunction());
+        assertEquals("1min", rule.getDebtRemediationScalar());
+        assertEquals("2min", rule.getDebtRemediationOffset());
+        assertEquals(RuleType.CODE_SMELL.name(), rule.getDebtType());
     }
 }

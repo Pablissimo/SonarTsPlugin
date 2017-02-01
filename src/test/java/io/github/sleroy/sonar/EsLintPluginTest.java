@@ -1,19 +1,18 @@
 package io.github.sleroy.sonar;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonar.api.Plugin;
+import org.sonar.api.Plugin.Context;
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.PropertyType;
 import org.sonar.api.SonarQubeVersion;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -21,21 +20,15 @@ public class EsLintPluginTest {
     public static final int EXPECTED_PROPERTIES = 6;
     EsLintPlugin plugin;
 
-    private static Property findPropertyByName(Property[] properties,
-                                               final String name) {
+    private static Optional<Property> findPropertyByName(Property[] properties,
+                                                         String name) {
 
-        return CollectionUtils.find(Arrays.asList(properties),
-                new Predicate() {
-                    @Override
-                    public boolean evaluate(Object arg0) {
-                        return ((Property) arg0).key().equals(name);
-                    }
-                });
+        return Stream.of(properties).filter(p -> p.key().equals(name)).findFirst();
     }
 
     @Before
     public void setUp() throws Exception {
-        this.plugin = new EsLintPlugin();
+        plugin = new EsLintPlugin();
     }
 
     @After
@@ -44,9 +37,9 @@ public class EsLintPluginTest {
 
     @Test
     public void advertisesAppropriateExtensions() {
-        Plugin.Context context = new Plugin.Context(SonarQubeVersion.V5_6);
+        Context context = new Context(SonarQubeVersion.V5_6);
 
-        this.plugin.define(context);
+        plugin.define(context);
 
         List extensions = context.getExtensions();
 
@@ -58,7 +51,7 @@ public class EsLintPluginTest {
 
     @Test
     public void decoratedWithPropertiesAnnotation() {
-        Annotation[] annotations = plugin.getClass().getAnnotations();
+        Annotation[] annotations = this.plugin.getClass().getAnnotations();
 
         assertEquals(1, annotations.length);
         assertEquals(Properties.class, annotations[0].annotationType());
@@ -66,30 +59,30 @@ public class EsLintPluginTest {
 
     @Test
     public void definesExpectedProperties() {
-        Annotation annotation = plugin.getClass().getAnnotations()[0];
+        Annotation annotation = this.plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(EXPECTED_PROPERTIES, propertiesAnnotation.value().length);
+        assertEquals(EsLintPluginTest.EXPECTED_PROPERTIES, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
 
-        assertNotNull(findPropertyByName(properties,
+        assertNotNull(EsLintPluginTest.findPropertyByName(properties,
             EsLintPlugin.SETTING_ES_LINT_ENABLED));
-        assertNotNull(findPropertyByName(properties,
+        assertNotNull(EsLintPluginTest.findPropertyByName(properties,
                 EsLintPlugin.SETTING_ES_LINT_PATH));
-        assertNotNull(findPropertyByName(properties,
+        assertNotNull(EsLintPluginTest.findPropertyByName(properties,
                 EsLintPlugin.SETTING_ES_LINT_CONFIG_PATH));
-        assertNotNull(findPropertyByName(properties,
+        assertNotNull(EsLintPluginTest.findPropertyByName(properties,
                 EsLintPlugin.SETTING_ES_LINT_TIMEOUT));
-        assertNotNull(findPropertyByName(properties,
+        assertNotNull(EsLintPluginTest.findPropertyByName(properties,
                 EsLintPlugin.SETTING_ES_LINT_RULES_DIR));
-        assertNotNull(findPropertyByName(properties,
+        assertNotNull(EsLintPluginTest.findPropertyByName(properties,
                 EsLintPlugin.SETTING_ES_RULE_CONFIGS));
     }
 
     @Test
     public void tsLintPathSetting_definedAppropriately() {
-        Property property = findPropertyByName(EsLintPlugin.SETTING_ES_LINT_PATH);
+        Property property = this.findPropertyByName(EsLintPlugin.SETTING_ES_LINT_PATH).get();
 
         assertEquals(PropertyType.STRING, property.type());
         assertEquals("", property.defaultValue());
@@ -99,7 +92,7 @@ public class EsLintPluginTest {
 
     @Test
     public void tsLintTimeoutSettings_definedAppropriately() {
-        Property property = findPropertyByName(EsLintPlugin.SETTING_ES_LINT_TIMEOUT);
+        Property property = this.findPropertyByName(EsLintPlugin.SETTING_ES_LINT_TIMEOUT).get();
 
         assertEquals(PropertyType.INTEGER, property.type());
         assertEquals("60000", property.defaultValue());
@@ -109,7 +102,7 @@ public class EsLintPluginTest {
 
     @Test
     public void rulesDirSetting_definedAppropriately() {
-        Property property = findPropertyByName(EsLintPlugin.SETTING_ES_LINT_RULES_DIR);
+        Property property = this.findPropertyByName(EsLintPlugin.SETTING_ES_LINT_RULES_DIR).get();
 
         assertEquals(PropertyType.STRING, property.type());
         assertEquals("", property.defaultValue());
@@ -119,7 +112,7 @@ public class EsLintPluginTest {
 
     @Test
     public void ruleConfigsSetting_definedAppropriately() {
-        Property property = findPropertyByName(EsLintPlugin.SETTING_ES_RULE_CONFIGS);
+        Property property = this.findPropertyByName(EsLintPlugin.SETTING_ES_RULE_CONFIGS).get();
 
         assertEquals(PropertyType.STRING, property.type());
         assertEquals("", property.defaultValue());
@@ -137,8 +130,8 @@ public class EsLintPluginTest {
         assertEquals(120, property.fields()[1].indicativeSize());
     }
 
-    private Property findPropertyByName(String property) {
-        return findPropertyByName(((Properties) plugin.getClass()
+    private Optional<Property> findPropertyByName(String property) {
+        return EsLintPluginTest.findPropertyByName(((Properties) this.plugin.getClass()
                 .getAnnotations()[0]).value(), property);
     }
 }

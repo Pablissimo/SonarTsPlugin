@@ -1,6 +1,6 @@
 package io.github.sleroy.sonar;
 
-public class EsLintLanguage {
+public final class EsLintLanguage {
     public static final String LANGUAGE_KEY = "js";
 
 }

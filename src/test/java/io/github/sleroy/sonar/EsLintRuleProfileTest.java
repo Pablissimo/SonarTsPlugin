@@ -24,7 +24,7 @@ public class EsLintRuleProfileTest {
         this.validationMessages = ValidationMessages.create();
         this.ruleProfile = new EsLintRuleProfile();
         this.expectedRuleNames = new HashSet<String>(Arrays.asList(
-                EsRulesDefinition.ESLINT_UNKNOWN_RULE.key,
+                EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey(),
                 "component-limit", "controller-as-route", "controller-as-vm", "controller-as", "deferred", "di-unused", "directive-restrict", "empty-controller", "no-controller", "no-inline-template", "no-run-logic", "no-services", "on-watch", "prefer-component", "no-cookiestore", "no-directive-replace", "no-http-callback", "component-name", "constant-name", "controller-name", "directive-name", "factory-name", "file-name", "filter-name", "module-name", "provider-name", "service-name", "value-name", "di-order", "di", "dumb-inject", "function-type", "module-dependency-order", "no-service-method", "one-dependency-per-line", "rest-service", "watchers-execution", "angularelement", "definedundefined", "document-service", "foreach", "interval-service", "json-functions", "log", "no-angular-mock", "no-jquery-angularelement", "timeout-service", "typecheck-array", "typecheck-date", "typecheck-function", "typecheck-number", "typecheck-object", "typecheck-string", "window-service", "on-destroy"
 
         ));

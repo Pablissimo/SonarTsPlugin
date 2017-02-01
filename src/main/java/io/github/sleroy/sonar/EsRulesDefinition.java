@@ -8,6 +8,7 @@ import org.sonar.api.rule.RuleStatus;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
 import org.sonar.api.server.debt.DebtRemediationFunction;
+import org.sonar.api.server.debt.DebtRemediationFunction.Type;
 import org.sonar.api.server.rule.RulesDefinition;
 
 import java.io.ByteArrayInputStream;
@@ -15,8 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
@@ -32,14 +31,16 @@ public class EsRulesDefinition implements RulesDefinition {
      */
     public static final EsLintRule ESLINT_UNKNOWN_RULE = new EsLintRule(
             "eslint-issue",
-        Severity.MAJOR,
+            Severity.MAJOR,
             "eslint issues that are not yet known to the plugin",
             "No description for ESLint rule");
     private static final Logger LOG = LoggerFactory.getLogger(EsRulesDefinition.class);
+    @SuppressWarnings("HardcodedFileSeparator")
     private static final String CORE_RULES_CONFIG_RESOURCE_PATH = "/eslint/eslint-rules.properties";
+
     private final Settings settings;
-    private List<EsLintRule> eslintCoreRules = new ArrayList<>();
-    private List<EsLintRule> eslintRules = new ArrayList<>();
+    private final List<EsLintRule> eslintCoreRules = new ArrayList<>(100);
+    private final List<EsLintRule> eslintRules = new ArrayList<>(100);
 
     public EsRulesDefinition() {
         this(null);
@@ -59,75 +60,115 @@ public class EsRulesDefinition implements RulesDefinition {
         try {
             properties.load(stream);
         } catch (IOException e) {
-            LOG.error("Error while loading ESLint rules: " + e.getMessage());
+            EsRulesDefinition.LOG.error("Error while loading ESLint rules: {}", e.getMessage());
         }
 
-        for(String propKey : properties.stringPropertyNames()) {
+        for (String propKey : properties.stringPropertyNames()) {
 
             if (propKey.contains("."))
                 continue;
 
             String ruleEnabled = properties.getProperty(propKey);
 
-            if (!ruleEnabled.equals("true"))
+            if (!"true".equals(ruleEnabled))
                 continue;
 
             String ruleId = propKey;
             String ruleName = properties.getProperty(propKey + ".name", ruleId.replace("-", " "));
-            String ruleSeverity = properties.getProperty(propKey + ".severity", DEFAULT_RULE_SEVERITY);
-            String ruleDescription = properties.getProperty(propKey + ".description", DEFAULT_RULE_DESCRIPTION);
+            String ruleSeverity = properties.getProperty(propKey + ".severity", EsRulesDefinition.DEFAULT_RULE_SEVERITY);
+            String ruleDescription = properties.getProperty(propKey + ".description", EsRulesDefinition.DEFAULT_RULE_DESCRIPTION);
 
             String debtRemediationFunction = properties.getProperty(propKey + ".debtFunc", null);
-            String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", DEFAULT_RULE_DEBT_SCALAR);
-            String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", DEFAULT_RULE_DEBT_OFFSET);
-            String debtType = properties.getProperty(propKey + ".debtType", DEFAULT_RULE_DEBT_TYPE);
+            String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", EsRulesDefinition.DEFAULT_RULE_DEBT_SCALAR);
+            String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", EsRulesDefinition.DEFAULT_RULE_DEBT_OFFSET);
+            String debtType = properties.getProperty(propKey + ".debtType", EsRulesDefinition.DEFAULT_RULE_DEBT_TYPE);
 
             EsLintRule tsRule = null;
 
             // try to apply the specified debt remediation function
             if (debtRemediationFunction != null) {
-                DebtRemediationFunction.Type debtRemediationFunctionEnum = DebtRemediationFunction.Type.valueOf(debtRemediationFunction);
+                Type debtRemediationFunctionEnum = Type.valueOf(debtRemediationFunction);
 
                 tsRule = new EsLintRule(
-                    ruleId,
-                    ruleSeverity,
-                    ruleName,
-                    ruleDescription,
-                    debtRemediationFunctionEnum,
-                    debtRemediationScalar,
-                    debtRemediationOffset,
-                    debtType
+                        ruleId,
+                        ruleSeverity,
+                        ruleName,
+                        ruleDescription,
+                        debtRemediationFunctionEnum,
+                        debtRemediationScalar,
+                        debtRemediationOffset,
+                        debtType
                 );
             }
 
             // no debt remediation function specified
             if (tsRule == null) {
                 tsRule = new EsLintRule(
-                    ruleId,
-                    ruleSeverity,
-                    ruleName,
-                    ruleDescription
+                        ruleId,
+                        ruleSeverity,
+                        ruleName,
+                        ruleDescription
                 );
             }
 
             rulesCollection.add(tsRule);
         }
 
-        Collections.sort(rulesCollection, new Comparator<EsLintRule>() {
-            @Override
-            public int compare(EsLintRule r1, EsLintRule r2) {
-                return r1.key.compareTo(r2.key);
+        rulesCollection.sort((final EsLintRule r1, final EsLintRule r2) -> r1.getKey().compareTo(r2.getKey()));
+    }
+
+    private static void createRule(RulesDefinition.NewRepository repository, EsLintRule tsRule) {
+        RulesDefinition.NewRule sonarRule =
+                repository
+                        .createRule(tsRule.getKey())
+                        .setName(tsRule.getName())
+                        .setSeverity(tsRule.getSeverity())
+                        .setHtmlDescription(tsRule.getHtmlDescription())
+                        .setStatus(RuleStatus.READY);
+
+        if (tsRule.isHasDebtRemediation()) {
+            DebtRemediationFunction debtRemediationFn = null;
+            RulesDefinition.DebtRemediationFunctions funcs = sonarRule.debtRemediationFunctions();
+
+            switch (tsRule.getDebtRemediationFunction()) {
+                case LINEAR:
+                    debtRemediationFn = funcs.linear(tsRule.getDebtRemediationScalar());
+                    break;
+
+                case LINEAR_OFFSET:
+                    debtRemediationFn = funcs.linearWithOffset(tsRule.getDebtRemediationScalar(), tsRule.getDebtRemediationOffset());
+                    break;
+
+                case CONSTANT_ISSUE:
+                    debtRemediationFn = funcs.constantPerIssue(tsRule.getDebtRemediationScalar());
+                    break;
             }
-        });
+
+            sonarRule.setDebtRemediationFunction(debtRemediationFn);
+        }
+
+        RuleType type = null;
+
+        if (tsRule.getDebtType() != null && RuleType.names().contains(tsRule.getDebtType())) {
+            // Try and parse it as a new-style rule type (since 5.5 SQALE's been replaced
+            // with something simpler, and there's really only three buckets)
+            type = RuleType.valueOf(tsRule.getDebtType());
+        }
+
+        if (type == null) {
+            type = RuleType.CODE_SMELL;
+        }
+
+        sonarRule.setType(type);
     }
 
     private void loadCoreRules() {
-        InputStream coreRulesStream = EsRulesDefinition.class.getResourceAsStream(CORE_RULES_CONFIG_RESOURCE_PATH);
-        loadRules(coreRulesStream, eslintCoreRules);
+        InputStream coreRulesStream = EsRulesDefinition.class.getResourceAsStream(EsRulesDefinition.CORE_RULES_CONFIG_RESOURCE_PATH);
+        EsRulesDefinition.loadRules(coreRulesStream, eslintCoreRules);
     }
 
     private void loadCustomRules() {
-        if (this.settings == null)
+        if (settings == null)
             return;
 
         List<String> configKeys = settings.getKeysStartingWith(EsLintPlugin.SETTING_ES_RULE_CONFIGS);
@@ -138,63 +179,18 @@ public class EsRulesDefinition implements RulesDefinition {
 
             String rulesConfig = settings.getString(cfgKey);
             InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
-            loadRules(rulesConfigStream, eslintRules);
+            EsRulesDefinition.loadRules(rulesConfigStream, eslintRules);
         }
     }
 
-    private void createRule(NewRepository repository, EsLintRule tsRule) {
-        NewRule sonarRule = 
-                    repository
-                    .createRule(tsRule.key)
-                    .setName(tsRule.name)
-                    .setSeverity(tsRule.severity)
-                    .setHtmlDescription(tsRule.htmlDescription)
-                    .setStatus(RuleStatus.READY);
-
-        if (tsRule.hasDebtRemediation) {
-            DebtRemediationFunction debtRemediationFn = null;
-            DebtRemediationFunctions funcs = sonarRule.debtRemediationFunctions();
-
-            switch (tsRule.debtRemediationFunction)
-            {
-                case LINEAR:
-                    debtRemediationFn = funcs.linear(tsRule.debtRemediationScalar);
-                    break;
-
-                case LINEAR_OFFSET:
-                    debtRemediationFn = funcs.linearWithOffset(tsRule.debtRemediationScalar, tsRule.debtRemediationOffset);
-                    break;
-
-                case CONSTANT_ISSUE:
-                    debtRemediationFn = funcs.constantPerIssue(tsRule.debtRemediationScalar);
-                    break;
-            }
-
-            sonarRule.setDebtRemediationFunction(debtRemediationFn);
-        }
-        
-        RuleType type = null;
-
-        if (tsRule.debtType != null && RuleType.names().contains(tsRule.debtType)) {
-            // Try and parse it as a new-style rule type (since 5.5 SQALE's been replaced
-            // with something simpler, and there's really only three buckets)
-            type = RuleType.valueOf(tsRule.debtType);
-        }
-        
-        if (type == null) {
-            type = RuleType.CODE_SMELL;
-        }
-                
-        sonarRule.setType(type);
-    }
-
-    public void define(Context context) {
-        NewRepository repository =
+    @Override
+    public void define(RulesDefinition.Context context) {
+        RulesDefinition.NewRepository repository =
                 context
-                .createRepository(REPOSITORY_NAME, EsLintLanguage.LANGUAGE_KEY)
+                        .createRepository(EsRulesDefinition.REPOSITORY_NAME, EsLintLanguage.LANGUAGE_KEY)
                         .setName("ESLint Analyzer");
 
-        createRule(repository, ESLINT_UNKNOWN_RULE);
+        createRule(repository, EsRulesDefinition.ESLINT_UNKNOWN_RULE);
 
         // add the ESLint builtin core rules
         for (EsLintRule coreRule : eslintCoreRules) {

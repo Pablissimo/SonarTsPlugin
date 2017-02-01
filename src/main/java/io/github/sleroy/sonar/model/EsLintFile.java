@@ -30,6 +30,7 @@ public class EsLintFile {
     }
 
     public void setMessages(List<EsLintIssue> messages) {
+        //noinspection AssignmentToCollectionOrArrayFieldFromParameter
         this.messages = messages;
     }
 

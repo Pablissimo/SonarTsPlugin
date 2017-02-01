@@ -12,22 +12,22 @@ import org.sonar.api.utils.ValidationMessages;
 public class EsLintRuleProfile extends ProfileDefinition {
     public static final String PROFILE_NAME = "eslint";
 
+    private static void activateRule(RulesProfile profile, String ruleKey) {
+        profile.activateRule(Rule.create(EsRulesDefinition.REPOSITORY_NAME, ruleKey), null);
+    }
+
     @Override
     public RulesProfile createProfile(ValidationMessages validation) {
         RulesProfile profile = RulesProfile.create("EsLint", EsLintLanguage.LANGUAGE_KEY);
 
         EsRulesDefinition rules = new EsRulesDefinition();
 
-        activateRule(profile, EsRulesDefinition.ESLINT_UNKNOWN_RULE.key);
+        EsLintRuleProfile.activateRule(profile, EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey());
 
         for (EsLintRule coreRule : rules.getCoreRules()) {
-            activateRule(profile, coreRule.key);
+            EsLintRuleProfile.activateRule(profile, coreRule.getKey());
         }
 
         return profile;
-    }
-
-    private static void activateRule(RulesProfile profile, String ruleKey) {
-        profile.activateRule(Rule.create(EsRulesDefinition.REPOSITORY_NAME, ruleKey), null);
     }
 }
