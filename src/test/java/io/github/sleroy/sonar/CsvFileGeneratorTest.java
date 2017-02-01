@@ -33,15 +33,15 @@ public class CsvFileGeneratorTest {
             while ((str = fr.readLine()) != null) {
                 System.out.println(str);
                 String[] strings = str.split(";");
-                String key = clean(strings[0]);
-                String message = clean(strings[1]);
+                String key = this.clean(strings[0]);
+                String message = this.clean(strings[1]);
                 lines.add(MessageFormat.format("{0}=true", key));
                 lines.add(MessageFormat.format("{0}.name={1}", key, message));
                 lines.add(MessageFormat.format("{0}.severity=MINOR", key));
                 lines.add(MessageFormat.format("{0}.debtFunc=CONSTANT_ISSUE", key));
                 lines.add(MessageFormat.format("{0}.debtScalar=1min", key));
                 lines.add("");
-                keys.add("\"" + key + "\"");
+                keys.add("\"angular-" + key + "\"");
 
             }
             FileUtils.writeLines(new File("src\\main\\resources\\rules.properties"), lines);

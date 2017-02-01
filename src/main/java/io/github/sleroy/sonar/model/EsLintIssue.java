@@ -9,11 +9,11 @@ public class EsLintIssue {
     private String ruleId;
     private int severity;
     private int column;
-    private int line;
+    private int line = 1;
     private String source;
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -21,7 +21,7 @@ public class EsLintIssue {
     }
 
     public String getMessage() {
-        return this.message;
+        return message;
     }
 
     public void setMessage(String message) {
@@ -34,7 +34,7 @@ public class EsLintIssue {
      * @return the rule name.
      */
     public String getRuleId() {
-        return this.ruleId;
+        return ruleId;
     }
 
     public void setRuleId(String ruleId) {
@@ -43,7 +43,7 @@ public class EsLintIssue {
 
 
     public int getSeverity() {
-        return this.severity;
+        return severity;
     }
 
     public void setSeverity(int severity) {
@@ -51,7 +51,7 @@ public class EsLintIssue {
     }
 
     public int getColumn() {
-        return this.column;
+        return column;
     }
 
     public void setColumn(int column) {
@@ -59,7 +59,7 @@ public class EsLintIssue {
     }
 
     public int getLine() {
-        return this.line;
+        return line;
     }
 
     public void setLine(int line) {
@@ -67,7 +67,7 @@ public class EsLintIssue {
     }
 
     public String getSource() {
-        return this.source;
+        return source;
     }
 
     public void setSource(String source) {
@@ -77,13 +77,13 @@ public class EsLintIssue {
     @Override
     public String toString() {
         return "EsLintIssue{" +
-                "name='" + this.name + '\'' +
-                ", message='" + this.message + '\'' +
-                ", ruleId='" + this.ruleId + '\'' +
-                ", severity=" + this.severity +
-                ", column=" + this.column +
-                ", line=" + this.line +
-                ", source='" + this.source + '\'' +
+                "name='" + name + '\'' +
+                ", message='" + message + '\'' +
+                ", ruleId='" + ruleId + '\'' +
+                ", severity=" + severity +
+                ", column=" + column +
+                ", line=" + line +
+                ", source='" + source + '\'' +
                 '}';
     }
 }

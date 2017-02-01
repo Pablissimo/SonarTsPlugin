@@ -21,12 +21,11 @@ public class EsLintRuleProfileTest {
 
     @Before
     public void setUp() throws Exception {
-        this.validationMessages = ValidationMessages.create();
-        this.ruleProfile = new EsLintRuleProfile();
-        this.expectedRuleNames = new HashSet<String>(Arrays.asList(
+        validationMessages = ValidationMessages.create();
+        ruleProfile = new EsLintRuleProfile();
+        expectedRuleNames = new HashSet<String>(Arrays.asList(
                 EsRulesDefinition.ESLINT_UNKNOWN_RULE.getKey(),
-                "component-limit", "controller-as-route", "controller-as-vm", "controller-as", "deferred", "di-unused", "directive-restrict", "empty-controller", "no-controller", "no-inline-template", "no-run-logic", "no-services", "on-watch", "prefer-component", "no-cookiestore", "no-directive-replace", "no-http-callback", "component-name", "constant-name", "controller-name", "directive-name", "factory-name", "file-name", "filter-name", "module-name", "provider-name", "service-name", "value-name", "di-order", "di", "dumb-inject", "function-type", "module-dependency-order", "no-service-method", "one-dependency-per-line", "rest-service", "watchers-execution", "angularelement", "definedundefined", "document-service", "foreach", "interval-service", "json-functions", "log", "no-angular-mock", "no-jquery-angularelement", "timeout-service", "typecheck-array", "typecheck-date", "typecheck-function", "typecheck-number", "typecheck-object", "typecheck-string", "window-service", "on-destroy"
-
+                "angular-component-limit", "angular-controller-as-route", "angular-controller-as-vm", "angular-controller-as", "angular-deferred", "angular-di-unused", "angular-directive-restrict", "angular-empty-controller", "angular-no-controller", "angular-no-inline-template", "angular-no-run-logic", "angular-no-services", "angular-on-watch", "angular-prefer-component", "angular-no-cookiestore", "angular-no-directive-replace", "angular-no-http-callback", "angular-component-name", "angular-constant-name", "angular-controller-name", "angular-directive-name", "angular-factory-name", "angular-file-name", "angular-filter-name", "angular-module-name", "angular-provider-name", "angular-service-name", "angular-value-name", "angular-di-order", "angular-di", "angular-dumb-inject", "angular-function-type", "angular-module-dependency-order", "angular-no-service-method", "angular-one-dependency-per-line", "angular-rest-service", "angular-watchers-execution", "angular-angularelement", "angular-definedundefined", "angular-document-service", "angular-foreach", "angular-interval-service", "angular-json-functions", "angular-log", "angular-no-angular-mock", "angular-no-jquery-angularelement", "angular-timeout-service", "angular-typecheck-array", "angular-typecheck-date", "angular-typecheck-function", "angular-typecheck-number", "angular-typecheck-object", "angular-typecheck-string", "angular-window-service", "angular-on-destroy"
         ));
     }
 
@@ -36,19 +35,19 @@ public class EsLintRuleProfileTest {
 
     @Test
     public void definesExpectedRules() {
-        RulesProfile profile = this.ruleProfile.createProfile(this.validationMessages);
+        RulesProfile profile = ruleProfile.createProfile(validationMessages);
 
-        for (String ruleName : this.expectedRuleNames) {
+        for (String ruleName : expectedRuleNames) {
             assertNotNull("Expected rule missing in plugin: " + ruleName, profile.getActiveRule(EsRulesDefinition.REPOSITORY_NAME, ruleName));
         }
     }
 
     @Test
     public void definesUnexpectedRules() {
-        RulesProfile profile = this.ruleProfile.createProfile(this.validationMessages);
+        RulesProfile profile = ruleProfile.createProfile(validationMessages);
 
         for (ActiveRule rule : profile.getActiveRules()) {
-            assertTrue("Unexpected rule in plugin: " + rule.getRuleKey(), this.expectedRuleNames.contains(rule.getRuleKey()));
+            assertTrue("Unexpected rule in plugin: " + rule.getRuleKey(), expectedRuleNames.contains(rule.getRuleKey()));
         }
     }
 }
