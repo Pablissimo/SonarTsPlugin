@@ -1,11 +1,15 @@
 package io.github.sleroy.sonar.model;
 
+/**
+ * This class is the model for an issue as found by EsLint.
+ */
 public class EsLintIssue {
     private String name;
     private EsLintPosition startPosition;
     private EsLintPosition endPosition;
     private String failure;
     private String ruleName;
+    private String fileName;
 
     public String getName() {
         return name;
@@ -39,11 +43,24 @@ public class EsLintIssue {
         this.failure = failure;
     }
 
+    /**
+     * Returns the rule name.
+     *
+     * @return the rule name.
+     */
     public String getRuleName() {
         return ruleName;
     }
 
     public void setRuleName(String ruleName) {
         this.ruleName = ruleName;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 }
