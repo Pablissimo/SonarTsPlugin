@@ -35,27 +35,27 @@ public class PathResolverImpl implements PathResolver {
 
         // Fall back to a file system search if null or doesn't exist
         if (propertyValue == null || propertyValue.isEmpty()) {
-            PathResolverImpl.LOG.info("Path {} not specified", settingKey);
+            LOG.debug("Path {} not specified", settingKey);
             return Optional.empty();
         } else {
-            PathResolverImpl.LOG.info("Found {} Lint path to be '{}'", settingKey, propertyValue);
+            LOG.debug("Found {} Lint path to be '{}'", settingKey, propertyValue);
         }
 
-        Optional<String> absolutePath = getAbsolutePath(context, propertyValue);
-        PathResolverImpl.LOG.info("EsLint Absolute path is {}", absolutePath);
+        Optional<String> absolutePath = this.getAbsolutePath(context, propertyValue);
+        LOG.debug("EsLint Absolute path is {}", absolutePath);
         return absolutePath;
     }
 
     @Override
     public Optional<String> getPathFromSetting(SensorContext context, String settingKey, String defaultValue) {
-        Optional<String> path = getPathFromSetting(context, settingKey);
+        Optional<String> path = this.getPathFromSetting(context, settingKey);
 
         // Fall back to a file system search if null or doesn't exist
         if (path.isPresent()) {
             return path;
         } else {
-            PathResolverImpl.LOG.info("Path {} not specified, falling back to {}", settingKey, defaultValue);
-            return this.getAbsolutePath(context, defaultValue);
+            LOG.debug("Path {} not specified, falling back to {}", settingKey, defaultValue);
+            return getAbsolutePath(context, defaultValue);
         }
     }
 
@@ -70,13 +70,13 @@ public class PathResolverImpl implements PathResolver {
     public Optional<String> getAbsolutePath(SensorContext context, String path) {
         if (path != null) {
             File candidateFile = new File(path);
-            PathResolverImpl.LOG.info("#1 Trying to resolve path in {}", candidateFile);
+            LOG.debug("#1 Trying to resolve path in {}", candidateFile);
             if (!candidateFile.isAbsolute()) {
                 candidateFile = new File(context.fileSystem().baseDir().getAbsolutePath(), path);
-                PathResolverImpl.LOG.info("#2 Trying to resolve path in {}", candidateFile);
+                LOG.debug("#2 Trying to resolve path in {}", candidateFile);
             }
 
-            if (!doesFileExist(candidateFile)) {
+            if (!PathResolverImpl.doesFileExist(candidateFile)) {
                 return Optional.empty();
             }
 
