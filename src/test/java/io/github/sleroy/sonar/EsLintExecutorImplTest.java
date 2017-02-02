@@ -162,7 +162,7 @@ public class EsLintExecutorImplTest {
         Command theSecondCommand = capturedCommands.get(1);
 
 
-        assertTrue(theSecondCommand.toCommandLine().contains("\"first batch\" \"second batch\""));
+        assertTrue(theSecondCommand.toCommandLine().contains("\"second batch\""));
 
     }
 
