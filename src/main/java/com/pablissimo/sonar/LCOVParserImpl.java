@@ -153,9 +153,9 @@ public class LCOVParserImpl implements LCOVParser {
     
     // Try to accommodate Angular projects that, when the angular template loader's used
     // by checking for a ! in the filepath if the path isn't found - have a bash at seeking
-    // everything after the ! as a second fallback pass
-    if (inputFile == null && filePath.contains("!") && (filePath.indexOf("!") + 1) < filePath.length()) {
-        String amendedPath = filePath.substring(filePath.indexOf("!") + 1);
+    // everything after the last ! as a second fallback pass
+    if (inputFile == null && filePath.contains("!") && (filePath.lastIndexOf("!") + 1) < filePath.length()) {
+        String amendedPath = filePath.substring(filePath.lastIndexOf("!") + 1);
         inputFile = context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(amendedPath));
     }
     
