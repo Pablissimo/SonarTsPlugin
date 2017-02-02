@@ -33,10 +33,12 @@ public class EsRulesDefinition implements RulesDefinition {
             "eslint-issue",
             Severity.MAJOR,
             "EsLint issues that are not yet known to the plugin",
-            "No description for ESLint rule");
+            "No description for ESLint rule",
+            "");
     private static final Logger LOG = LoggerFactory.getLogger(EsRulesDefinition.class);
     @SuppressWarnings("HardcodedFileSeparator")
     private static final String CORE_RULES_CONFIG_RESOURCE_PATH = "/eslint/eslint-rules.properties";
+    private static final String DEFAULT_TAGS = "eslint" ;
 
     private final Settings settings;
     private final List<EsLintRule> eslintCoreRules = new ArrayList<>(100);
@@ -82,6 +84,7 @@ public class EsRulesDefinition implements RulesDefinition {
             String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", EsRulesDefinition.DEFAULT_RULE_DEBT_SCALAR);
             String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", EsRulesDefinition.DEFAULT_RULE_DEBT_OFFSET);
             String debtType = properties.getProperty(propKey + ".debtType", EsRulesDefinition.DEFAULT_RULE_DEBT_TYPE);
+            String tags = properties.getProperty(propKey + ".tags", EsRulesDefinition.DEFAULT_TAGS);
 
             EsLintRule tsRule = null;
 
@@ -97,7 +100,8 @@ public class EsRulesDefinition implements RulesDefinition {
                         debtRemediationFunctionEnum,
                         debtRemediationScalar,
                         debtRemediationOffset,
-                        debtType
+                        debtType,
+                        tags
                 );
 
             }
@@ -108,7 +112,8 @@ public class EsRulesDefinition implements RulesDefinition {
                         ruleId,
                         ruleSeverity,
                         ruleName,
-                        ruleDescription
+                        ruleDescription,
+                        tags
                 );
             }
             tsRule.setHtmlDescription(ruleDescription);

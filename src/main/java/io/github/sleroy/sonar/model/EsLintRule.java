@@ -23,12 +23,14 @@ public class EsLintRule {
             String key,
             String severity,
             String name,
-            String htmlDescription
+            String htmlDescription,
+            String tags
     ) {
         this.setKey(key);
         this.setSeverity(severity);
         this.setName(name);
         this.setHtmlDescription(htmlDescription);
+        this.setTags(tags);
 
         setDebtRemediationFunction(Type.CONSTANT_ISSUE);
         setDebtRemediationScalar("0min");
@@ -44,12 +46,14 @@ public class EsLintRule {
             Type debtRemediationFunction,
             String debtRemediationScalar,
             String debtRemediationOffset,
-            String debtType
+            String debtType,
+            String tags
     ) {
         this.setKey(key);
         this.setSeverity(severity);
         this.setName(name);
         this.setHtmlDescription(htmlDescription);
+        this.setTags(tags);
 
         setHasDebtRemediation(true);
         this.setDebtRemediationFunction(debtRemediationFunction);
