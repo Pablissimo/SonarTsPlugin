@@ -1,6 +1,11 @@
 package io.github.sleroy.sonar.model;
 
+import org.sonar.api.internal.google.common.base.Splitter;
+import org.sonar.api.internal.google.common.base.Strings;
 import org.sonar.api.server.debt.DebtRemediationFunction;
+import org.sonar.api.server.debt.DebtRemediationFunction.Type;
+
+import java.util.List;
 
 public class EsLintRule {
     private String key;
@@ -9,7 +14,7 @@ public class EsLintRule {
     private String htmlDescription;
 
     private boolean hasDebtRemediation;
-    private DebtRemediationFunction.Type debtRemediationFunction;
+    private Type debtRemediationFunction;
     private String debtRemediationScalar;
     private String debtRemediationOffset;
     private String debtType;
@@ -23,15 +28,15 @@ public class EsLintRule {
             String name,
             String htmlDescription
     ) {
-        setKey(key);
-        setSeverity(severity);
-        setName(name);
-        setHtmlDescription(htmlDescription);
+        this.setKey(key);
+        this.setSeverity(severity);
+        this.setName(name);
+        this.setHtmlDescription(htmlDescription);
 
-        this.setDebtRemediationFunction(DebtRemediationFunction.Type.CONSTANT_ISSUE);
-        this.setDebtRemediationScalar("0min");
-        this.setDebtRemediationOffset("0min");
-        this.setDebtType(null);
+        setDebtRemediationFunction(Type.CONSTANT_ISSUE);
+        setDebtRemediationScalar("0min");
+        setDebtRemediationOffset("0min");
+        setDebtType(null);
     }
 
     public EsLintRule(
@@ -39,25 +44,25 @@ public class EsLintRule {
             String severity,
             String name,
             String htmlDescription,
-            DebtRemediationFunction.Type debtRemediationFunction,
+            Type debtRemediationFunction,
             String debtRemediationScalar,
             String debtRemediationOffset,
             String debtType
     ) {
-        setKey(key);
-        setSeverity(severity);
-        setName(name);
-        setHtmlDescription(htmlDescription);
+        this.setKey(key);
+        this.setSeverity(severity);
+        this.setName(name);
+        this.setHtmlDescription(htmlDescription);
 
-        this.setHasDebtRemediation(true);
-        setDebtRemediationFunction(debtRemediationFunction);
-        setDebtRemediationScalar(debtRemediationScalar);
-        setDebtRemediationOffset(debtRemediationOffset);
-        setDebtType(debtType);
+        setHasDebtRemediation(true);
+        this.setDebtRemediationFunction(debtRemediationFunction);
+        this.setDebtRemediationScalar(debtRemediationScalar);
+        this.setDebtRemediationOffset(debtRemediationOffset);
+        this.setDebtType(debtType);
     }
 
     public String getKey() {
-        return this.key;
+        return key;
     }
 
     public void setKey(String key) {
@@ -65,7 +70,7 @@ public class EsLintRule {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -73,7 +78,7 @@ public class EsLintRule {
     }
 
     public String getSeverity() {
-        return this.severity;
+        return severity;
     }
 
     public void setSeverity(String severity) {
@@ -81,7 +86,7 @@ public class EsLintRule {
     }
 
     public String getHtmlDescription() {
-        return this.htmlDescription;
+        return htmlDescription;
     }
 
     public void setHtmlDescription(String htmlDescription) {
@@ -89,23 +94,23 @@ public class EsLintRule {
     }
 
     public boolean isHasDebtRemediation() {
-        return this.hasDebtRemediation;
+        return hasDebtRemediation;
     }
 
     public void setHasDebtRemediation(boolean hasDebtRemediation) {
         this.hasDebtRemediation = hasDebtRemediation;
     }
 
-    public DebtRemediationFunction.Type getDebtRemediationFunction() {
-        return this.debtRemediationFunction;
+    public Type getDebtRemediationFunction() {
+        return debtRemediationFunction;
     }
 
-    public void setDebtRemediationFunction(DebtRemediationFunction.Type debtRemediationFunction) {
+    public void setDebtRemediationFunction(Type debtRemediationFunction) {
         this.debtRemediationFunction = debtRemediationFunction;
     }
 
     public String getDebtRemediationScalar() {
-        return this.debtRemediationScalar;
+        return debtRemediationScalar;
     }
 
     public void setDebtRemediationScalar(String debtRemediationScalar) {
@@ -113,7 +118,7 @@ public class EsLintRule {
     }
 
     public String getDebtRemediationOffset() {
-        return this.debtRemediationOffset;
+        return debtRemediationOffset;
     }
 
     public void setDebtRemediationOffset(String debtRemediationOffset) {
@@ -121,7 +126,7 @@ public class EsLintRule {
     }
 
     public String getDebtType() {
-        return this.debtType;
+        return debtType;
     }
 
     public void setDebtType(String debtType) {
@@ -129,7 +134,7 @@ public class EsLintRule {
     }
 
     public String getTags() {
-        return tags;
+        return this.tags;
     }
 
     public void setTags(String tags) {
@@ -139,24 +144,29 @@ public class EsLintRule {
     @Override
     public String toString() {
         return "EsLintRule{" +
-                "key='" + this.key + '\'' +
-                ", name='" + this.name + '\'' +
-                ", severity='" + this.severity + '\'' +
-                ", htmlDescription='" + this.htmlDescription + '\'' +
-                ", hasDebtRemediation=" + this.hasDebtRemediation +
-                ", debtRemediationFunction=" + this.debtRemediationFunction +
-                ", debtRemediationScalar='" + this.debtRemediationScalar + '\'' +
-                ", debtRemediationOffset='" + this.debtRemediationOffset + '\'' +
-                ", debtType='" + this.debtType + '\'' +
-                ", tags='" + this.tags + '\'' +
+                "key='" + key + '\'' +
+                ", name='" + name + '\'' +
+                ", severity='" + severity + '\'' +
+                ", htmlDescription='" + htmlDescription + '\'' +
+                ", hasDebtRemediation=" + hasDebtRemediation +
+                ", debtRemediationFunction=" + debtRemediationFunction +
+                ", debtRemediationScalar='" + debtRemediationScalar + '\'' +
+                ", debtRemediationOffset='" + debtRemediationOffset + '\'' +
+                ", debtType='" + debtType + '\'' +
+                ", tags='" + tags + '\'' +
                 '}';
     }
 
     /**
      * Returns the list of tags as an array.
+     *
      * @return the list of tags
      */
     public String[] getTagsAsArray() {
-        return this.tags.split(",");
+        if (Strings.isNullOrEmpty(this.tags)) return new String[0];
+
+        Splitter splitter = Splitter.on(',').omitEmptyStrings().trimResults();
+        List<String> split = splitter.splitToList(this.tags.trim());
+        return split.toArray(new String[split.size()]);
     }
 }
