@@ -1,7 +1,9 @@
 package io.github.sleroy.sonar.model;
 
-import org.sonar.api.internal.google.common.base.Splitter;
-import org.sonar.api.internal.google.common.base.Strings;
+
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import org.sonar.api.server.debt.DebtRemediationFunction;
 import org.sonar.api.server.debt.DebtRemediationFunction.Type;
 
@@ -166,7 +168,7 @@ public class EsLintRule {
         if (Strings.isNullOrEmpty(this.tags)) return new String[0];
 
         Splitter splitter = Splitter.on(',').omitEmptyStrings().trimResults();
-        List<String> split = splitter.splitToList(this.tags.trim());
+        List<String> split = Lists.newArrayList(splitter.split(this.tags.trim()));
         return split.toArray(new String[split.size()]);
     }
 }

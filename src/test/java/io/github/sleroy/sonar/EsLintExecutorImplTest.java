@@ -159,7 +159,7 @@ public class EsLintExecutorImplTest {
 
         assertEquals(2, capturedCommands.size());
 
-      
+
 
     }
 
