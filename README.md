@@ -16,6 +16,8 @@ This is plugin for SonarQube 5.6+ for analysing projects with Javascript content
 * EsLint for code quality information
 * EsLint AngularJS extension
 
+**Notice**: if you disagree with the severity evaluation of the EsLint rules inside SonarQube that I provided, please send a P/R on the file `eslint-rules.properties`.
+
 It's presented only for the interested, and the brave.
 
 ##Requirements
