@@ -8,8 +8,11 @@ import org.sonar.api.rule.RuleStatus;
 import org.sonar.api.rule.Severity;
 import org.sonar.api.rules.RuleType;
 import org.sonar.api.server.debt.DebtRemediationFunction;
-import org.sonar.api.server.debt.DebtRemediationFunction.Type;
 import org.sonar.api.server.rule.RulesDefinition;
+import org.sonar.api.server.rule.RulesDefinition.Context;
+import org.sonar.api.server.rule.RulesDefinition.DebtRemediationFunctions;
+import org.sonar.api.server.rule.RulesDefinition.NewRepository;
+import org.sonar.api.server.rule.RulesDefinition.NewRule;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -50,8 +53,8 @@ public class EsRulesDefinition implements RulesDefinition {
 
         this.settings = settings;
 
-        loadCoreRules();
-        loadCustomRules();
+        this.loadCoreRules();
+        this.loadCustomRules();
     }
 
     public static void loadRules(InputStream stream, List<EsLintRule> rulesCollection) {
@@ -60,7 +63,7 @@ public class EsRulesDefinition implements RulesDefinition {
         try {
             properties.load(stream);
         } catch (IOException e) {
-            EsRulesDefinition.LOG.error("Error while loading ESLint rules: {}", e.getMessage());
+            LOG.error("Error while loading ESLint rules: {}", e.getMessage());
         }
 
         for (String propKey : properties.stringPropertyNames()) {
@@ -75,19 +78,19 @@ public class EsRulesDefinition implements RulesDefinition {
 
             String ruleId = propKey;
             String ruleName = properties.getProperty(propKey + ".name", ruleId.replace("-", " "));
-            String ruleSeverity = properties.getProperty(propKey + ".severity", EsRulesDefinition.DEFAULT_RULE_SEVERITY);
-            String ruleDescription = properties.getProperty(propKey + ".description", EsRulesDefinition.DEFAULT_RULE_DESCRIPTION);
+            String ruleSeverity = properties.getProperty(propKey + ".severity", DEFAULT_RULE_SEVERITY);
+            String ruleDescription = properties.getProperty(propKey + ".description", DEFAULT_RULE_DESCRIPTION);
 
             String debtRemediationFunction = properties.getProperty(propKey + ".debtFunc", null);
-            String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", EsRulesDefinition.DEFAULT_RULE_DEBT_SCALAR);
-            String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", EsRulesDefinition.DEFAULT_RULE_DEBT_OFFSET);
-            String debtType = properties.getProperty(propKey + ".debtType", EsRulesDefinition.DEFAULT_RULE_DEBT_TYPE);
+            String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", DEFAULT_RULE_DEBT_SCALAR);
+            String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", DEFAULT_RULE_DEBT_OFFSET);
+            String debtType = properties.getProperty(propKey + ".debtType", DEFAULT_RULE_DEBT_TYPE);
 
             EsLintRule tsRule = null;
 
             // try to apply the specified debt remediation function
             if (debtRemediationFunction != null) {
-                Type debtRemediationFunctionEnum = Type.valueOf(debtRemediationFunction);
+                DebtRemediationFunction.Type debtRemediationFunctionEnum = DebtRemediationFunction.Type.valueOf(debtRemediationFunction);
 
                 tsRule = new EsLintRule(
                         ruleId,
@@ -118,18 +121,20 @@ public class EsRulesDefinition implements RulesDefinition {
         rulesCollection.sort((final EsLintRule r1, final EsLintRule r2) -> r1.getKey().compareTo(r2.getKey()));
     }
 
-    private static void createRule(RulesDefinition.NewRepository repository, EsLintRule tsRule) {
-        RulesDefinition.NewRule sonarRule =
+    private static void createRule(NewRepository repository, EsLintRule tsRule) {
+        NewRule sonarRule =
                 repository
                         .createRule(tsRule.getKey())
                         .setName(tsRule.getName())
                         .setSeverity(tsRule.getSeverity())
                         .setHtmlDescription(tsRule.getHtmlDescription())
-                        .setStatus(RuleStatus.READY);
+                        .setStatus(RuleStatus.READY).
+                setTags(tsRule.getTagsAsArray());
+
 
         if (tsRule.isHasDebtRemediation()) {
             DebtRemediationFunction debtRemediationFn = null;
-            RulesDefinition.DebtRemediationFunctions funcs = sonarRule.debtRemediationFunctions();
+            DebtRemediationFunctions funcs = sonarRule.debtRemediationFunctions();
 
             switch (tsRule.getDebtRemediationFunction()) {
                 case LINEAR:
@@ -164,53 +169,53 @@ public class EsRulesDefinition implements RulesDefinition {
     }
 
     private void loadCoreRules() {
-        InputStream coreRulesStream = EsRulesDefinition.class.getResourceAsStream(EsRulesDefinition.CORE_RULES_CONFIG_RESOURCE_PATH);
-        EsRulesDefinition.loadRules(coreRulesStream, eslintCoreRules);
+        InputStream coreRulesStream = EsRulesDefinition.class.getResourceAsStream(CORE_RULES_CONFIG_RESOURCE_PATH);
+        loadRules(coreRulesStream, this.eslintCoreRules);
     }
 
     private void loadCustomRules() {
-        if (settings == null)
+        if (this.settings == null)
             return;
 
-        List<String> configKeys = settings.getKeysStartingWith(EsLintPlugin.SETTING_ES_RULE_CONFIGS);
+        List<String> configKeys = this.settings.getKeysStartingWith(EsLintPlugin.SETTING_ES_RULE_CONFIGS);
 
         for (String cfgKey : configKeys) {
             if (!cfgKey.endsWith("config"))
                 continue;
 
-            String rulesConfig = settings.getString(cfgKey);
+            String rulesConfig = this.settings.getString(cfgKey);
             InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
-            EsRulesDefinition.loadRules(rulesConfigStream, eslintRules);
+            loadRules(rulesConfigStream, this.eslintRules);
         }
     }
 
     @Override
-    public void define(RulesDefinition.Context context) {
-        RulesDefinition.NewRepository repository =
+    public void define(Context context) {
+        NewRepository repository =
                 context
-                        .createRepository(EsRulesDefinition.REPOSITORY_NAME, EsLintLanguage.LANGUAGE_KEY)
+                        .createRepository(REPOSITORY_NAME, EsLintLanguage.LANGUAGE_KEY)
                         .setName("ESLint Analyzer");
 
-        createRule(repository, EsRulesDefinition.ESLINT_UNKNOWN_RULE);
+        EsRulesDefinition.createRule(repository, ESLINT_UNKNOWN_RULE);
 
         // add the ESLint builtin core rules
-        for (EsLintRule coreRule : eslintCoreRules) {
-            createRule(repository, coreRule);
+        for (EsLintRule coreRule : this.eslintCoreRules) {
+            EsRulesDefinition.createRule(repository, coreRule);
         }
 
         // add additional custom ESLint rules
-        for (EsLintRule customRule : eslintRules) {
-            createRule(repository, customRule);
+        for (EsLintRule customRule : this.eslintRules) {
+            EsRulesDefinition.createRule(repository, customRule);
         }
 
         repository.done();
     }
 
     public List<EsLintRule> getCoreRules() {
-        return eslintCoreRules;
+        return this.eslintCoreRules;
     }
 
     public List<EsLintRule> getRules() {
-        return eslintRules;
+        return this.eslintRules;
     }
 }
