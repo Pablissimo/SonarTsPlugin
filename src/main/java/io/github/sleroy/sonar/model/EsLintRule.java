@@ -1,13 +1,8 @@
 package io.github.sleroy.sonar.model;
 
 
-import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import org.sonar.api.server.debt.DebtRemediationFunction;
+import org.apache.commons.lang3.StringUtils;
 import org.sonar.api.server.debt.DebtRemediationFunction.Type;
-
-import java.util.List;
 
 public class EsLintRule {
     private String key;
@@ -165,10 +160,9 @@ public class EsLintRule {
      * @return the list of tags
      */
     public String[] getTagsAsArray() {
-        if (Strings.isNullOrEmpty(this.tags)) return new String[0];
+        if (StringUtils.isEmpty(this.tags)) return new String[0];
 
-        Splitter splitter = Splitter.on(',').omitEmptyStrings().trimResults();
-        List<String> split = Lists.newArrayList(splitter.split(this.tags.trim()));
-        return split.toArray(new String[split.size()]);
+
+        return tags.trim().split(",");
     }
 }
