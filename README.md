@@ -3,6 +3,7 @@ SonarEsLintPlugin
 
 SonarQube plugin for EsLint linter and its extensions. The code is based on the TypeScript plugin published by Pablissimo. [https://github.com/Pablissimo/SonarEsLintPlugin](https://github.com/Pablissimo/SonarEsLintPlugin)
 
+Download [https://github.com/sleroy/SonarEsLintPlugin/releases/download/v0.1.1/sonar-eslint-plugin-0.1.1.jar](the plugin)
 
 Basically this plugin launches EsLint and colelcts its results into SonarQube. It may be slower than the own SonarQube javascript parser that I recommend to use for most usages. However if you are interested by AngularJS coding rules, uses my plugin :-)
 
