@@ -2,12 +2,14 @@ language: java
 jdk:
   - oraclejdk8
   
-addons:
-  artifacts:
-    s3_region: "us-west-2"
-    paths:
-    -  $(ls ./target/*.jar | tr "\n" ":")
-    target_paths: builds/$TRAVIS_BRANCH/$TRAVIS_BUILD_NUMBER
-
+deploy:
+  provider: releases
+  api_key: "travis1"
+  file: "target/*.jar"
+  file_glob: "true"
+  skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
 after_success:
   - mvn cobertura:cobertura coveralls:report

@@ -45,6 +45,7 @@ public class EsRulesDefinitionTest {
                 "custom-rule-1.name=test rule #1\n" +
                 "custom-rule-1.severity=MAJOR\n" +
                 "custom-rule-1.description=#1 description\n" +
+                        "custom-rule-1.tags=angular,eslint, typscript\n" +
                 "\n"
             );
 

@@ -14,7 +14,7 @@ public class EsLintRuleTest {
             "key",
             Severity.MAJOR,
             "name",
-            "<html></html>"
+            "<html></html>",""
         );
 
         assertEquals("key", rule.getKey());
@@ -38,7 +38,7 @@ public class EsLintRuleTest {
                 DebtRemediationFunction.Type.LINEAR_OFFSET,
             "1min",
             "2min",
-            RuleType.CODE_SMELL.name()
+            RuleType.CODE_SMELL.name(),""
         );
 
         assertEquals("key", rule.getKey());

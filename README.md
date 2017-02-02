@@ -14,7 +14,9 @@ Basically this plugin launches EsLint and colelcts its results into SonarQube. I
 
 This is plugin for SonarQube 5.6+ for analysing projects with Javascript content that supports:
 * EsLint for code quality information
-* EsLint angularJS extension
+* EsLint AngularJS extension
+
+**Notice**: if you disagree with the severity evaluation of the EsLint rules inside SonarQube that I provided, please send a P/R on the file `eslint-rules.properties`.
 
 It's presented only for the interested, and the brave.
 
@@ -22,10 +24,6 @@ It's presented only for the interested, and the brave.
 * Java 1.8+
 * SonarQube 5.6 LTS+
 * EsLint 3+ (Tested on 3.14)
-
-##Building
-* Download the source
-* Build with maven, *mvn clean && mvn install*
 
 ##Installation
 * Install Node.js
@@ -43,6 +41,24 @@ Optional steps :
 * If LCOV data available, add *sonar.ts.lcov.reportpath=lcov.dat* to your sonar-project.properties file (replace lcov.dat with your lcov output, will be sought relative to the sonar-project.properties file)
 * Run ```sonar-runner``` or ```sonar-scanner```
 * EsLint rule breaches should be shown in the web view
+
+
+##EsLint installation and configuration
+By default, SonarEsLintPlugin will look for a version of EsLint installed locally within your project (i.e. in node_modules\eslint\bin), relative to the sonar-project.properties file. This may not be what you want, so you can set this directly via the ```sonar.ts.eslintpath``` configuration setting:
+* At project level
+* Globally, for all projects
+
+If analysis is failing, run ```sonar-runner``` with the ```-X -e``` options for more diagnostic information, including a note of where the plugin is searching for ```eslint```. Bear in mind that if running on a build server, the account running the build will need access to the path to ```eslint```.
+
+By default, SonarEsLintPlugin will look for a EsLint configuration file called eslint.json next to the sonar-project.properties file. You can override this using the ```sonar.ts.eslintconfigpath``` configuration setting if this isn't the case for your project.
+
+Here an configuration example for .eslintrc.json
+
+```
+{
+    "extends":  ["angular", "eslint:recommended"]
+}
+```
 
 ##Configuration
 
@@ -92,15 +108,6 @@ sonar.eslint.eslintconfigpath=eslint.json
 </tbody>
 </table>
 
-##EsLint installation and configuration
-By default, SonarEsLintPlugin will look for a version of EsLint installed locally within your project (i.e. in node_modules\eslint\bin), relative to the sonar-project.properties file. This may not be what you want, so you can set this directly via the ```sonar.ts.eslintpath``` configuration setting:
-* At project level
-* Globally, for all projects
-
-If analysis is failing, run ```sonar-runner``` with the ```-X -e``` options for more diagnostic information, including a note of where the plugin is searching for ```eslint```. Bear in mind that if running on a build server, the account running the build will need access to the path to ```eslint```.
-
-By default, SonarEsLintPlugin will look for a EsLint configuration file called eslint.json next to the sonar-project.properties file. You can override this using the ```sonar.ts.eslintconfigpath``` configuration setting if this isn't the case for your project.
-
 ## EsLint Custom Rules
 
 To present custom EsLint rules in SonarQube analysis, you can provide a configuration that maps the EsLint rules from your `sonar.ts.eslintrulesdir`
@@ -127,6 +134,10 @@ a configuration for that rule in SonarEsLintPlugin could look as follows:
 
 ##Licence
 MIT
+
+##Building
+* Download the source
+* Build with maven, *mvn clean && mvn install*
 
 ##Contributors
 Thanks to the following for contributions to the plugin:

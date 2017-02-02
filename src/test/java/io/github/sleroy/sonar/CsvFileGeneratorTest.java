@@ -2,6 +2,7 @@ package io.github.sleroy.sonar;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -21,7 +22,7 @@ import static org.apache.commons.lang3.StringUtils.removeStart;
  */
 public class CsvFileGeneratorTest {
 
-
+    @Ignore
     @Test
     public void test() {
         try (BufferedReader fr = new BufferedReader(new FileReader(new File("C:\\rules.csv")))) {
@@ -42,6 +43,7 @@ public class CsvFileGeneratorTest {
                 lines.add(MessageFormat.format("{0}.debtScalar=1min", key));
                 lines.add("");
                 keys.add("\"" + key + "\"");
+
 
             }
             FileUtils.writeLines(new File("src\\main\\resources\\rules.properties"), lines);

@@ -33,10 +33,12 @@ public class EsRulesDefinition implements RulesDefinition {
             "eslint-issue",
             Severity.MAJOR,
             "EsLint issues that are not yet known to the plugin",
-            "No description for ESLint rule");
+            "No description for ESLint rule",
+            "");
     private static final Logger LOG = LoggerFactory.getLogger(EsRulesDefinition.class);
     @SuppressWarnings("HardcodedFileSeparator")
     private static final String CORE_RULES_CONFIG_RESOURCE_PATH = "/eslint/eslint-rules.properties";
+    private static final String DEFAULT_TAGS = "eslint" ;
 
     private final Settings settings;
     private final List<EsLintRule> eslintCoreRules = new ArrayList<>(100);
@@ -60,7 +62,7 @@ public class EsRulesDefinition implements RulesDefinition {
         try {
             properties.load(stream);
         } catch (IOException e) {
-            EsRulesDefinition.LOG.error("Error while loading ESLint rules: {}", e.getMessage());
+            EsRulesDefinition.LOG.error("Error while loading ESLint rules: {}", e.getMessage(), e);
         }
 
         for (String propKey : properties.stringPropertyNames()) {
@@ -82,6 +84,7 @@ public class EsRulesDefinition implements RulesDefinition {
             String debtRemediationScalar = properties.getProperty(propKey + ".debtScalar", EsRulesDefinition.DEFAULT_RULE_DEBT_SCALAR);
             String debtRemediationOffset = properties.getProperty(propKey + ".debtOffset", EsRulesDefinition.DEFAULT_RULE_DEBT_OFFSET);
             String debtType = properties.getProperty(propKey + ".debtType", EsRulesDefinition.DEFAULT_RULE_DEBT_TYPE);
+            String tags = properties.getProperty(propKey + ".tags", EsRulesDefinition.DEFAULT_TAGS);
 
             EsLintRule tsRule = null;
 
@@ -97,7 +100,8 @@ public class EsRulesDefinition implements RulesDefinition {
                         debtRemediationFunctionEnum,
                         debtRemediationScalar,
                         debtRemediationOffset,
-                        debtType
+                        debtType,
+                        tags
                 );
 
             }
@@ -108,7 +112,8 @@ public class EsRulesDefinition implements RulesDefinition {
                         ruleId,
                         ruleSeverity,
                         ruleName,
-                        ruleDescription
+                        ruleDescription,
+                        tags
                 );
             }
             tsRule.setHtmlDescription(ruleDescription);
@@ -125,7 +130,9 @@ public class EsRulesDefinition implements RulesDefinition {
                         .setName(tsRule.getName())
                         .setSeverity(tsRule.getSeverity())
                         .setHtmlDescription(tsRule.getHtmlDescription())
-                        .setStatus(RuleStatus.READY);
+                        .setStatus(RuleStatus.READY).
+                        setTags(tsRule.getTagsAsArray());
+
 
         if (tsRule.isHasDebtRemediation()) {
             DebtRemediationFunction debtRemediationFn = null;
@@ -143,6 +150,8 @@ public class EsRulesDefinition implements RulesDefinition {
                 case CONSTANT_ISSUE:
                     debtRemediationFn = funcs.constantPerIssue(tsRule.getDebtRemediationScalar());
                     break;
+                default:
+                    throw new UnsupportedOperationException("Unknown debt evaluation function " + tsRule.getDebtRemediationFunction());
             }
 
             sonarRule.setDebtRemediationFunction(debtRemediationFn);
@@ -179,8 +188,10 @@ public class EsRulesDefinition implements RulesDefinition {
                 continue;
 
             String rulesConfig = settings.getString(cfgKey);
-            InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
-            EsRulesDefinition.loadRules(rulesConfigStream, eslintRules);
+            if (rulesConfig != null) {
+                InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
+                EsRulesDefinition.loadRules(rulesConfigStream, eslintRules);
+            }
         }
     }
 
