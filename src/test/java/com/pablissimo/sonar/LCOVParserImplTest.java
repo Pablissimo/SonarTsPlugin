@@ -57,6 +57,18 @@ public class LCOVParserImplTest {
     }
     
     @Test
+    public void parsesAngularTemplateLoaderOutput_IfPassedThroughMultipleLoaders() {
+        Map<InputFile, NewCoverage> coverage = executeForTestCase("angularmanybangs");
+        DefaultCoverage c = (DefaultCoverage) coverage.get(this.inputFile);
+        
+        assertEquals((Integer) 3, c.hitsByLine().get(1));
+        assertEquals((Integer) 0, c.hitsByLine().get(2));
+        assertEquals((Integer) 1, c.hitsByLine().get(3));
+        
+        assertEquals(3, c.linesToCover());
+    }
+    
+    @Test
     public void handlesNoContent() {
         Map<InputFile, NewCoverage> coverage = executeForTestCase("blank");
        
