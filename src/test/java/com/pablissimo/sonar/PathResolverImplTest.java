@@ -13,17 +13,15 @@ import org.sonar.api.batch.sensor.internal.SensorContextTester;
 public class PathResolverImplTest {
     private PathResolverImpl resolver;
     private SensorContextTester sensorContext;
-    
-    private String existingFileAbsPath;
-    
+
+    private File existingFile;
+
     @Before
     public void setUp() throws Exception {
         URL filePath = PathResolverImplTest.class.getClassLoader().getResource("./existing.ts");
-        File existingFile = new File(filePath.toURI());
+        existingFile = new File(filePath.toURI());
         String parentPath = existingFile.getParent();
-        
-        this.existingFileAbsPath = existingFile.getAbsolutePath();
-        
+
         this.sensorContext = SensorContextTester.create(new File(parentPath));
         this.sensorContext.settings().setProperty("path key", "existing.ts");
         
@@ -39,20 +37,20 @@ public class PathResolverImplTest {
     @Test
     public void returnsAbsolutePathToFile_ifSpecifiedAndExists() {
         String result = this.resolver.getPath(this.sensorContext, "path key", "not me");
-        assertEquals(this.existingFileAbsPath, result);
+        assertSamePath(this.existingFile, result);
     }
     
     @Test
     public void returnsAbsolutePathToFallbackFile_ifPrimaryNotConfiguredAndFallbackExists() {
         String result = this.resolver.getPath(this.sensorContext, "new path key", "existing.ts");
-        assertEquals(this.existingFileAbsPath, result);
+        assertSamePath(this.existingFile, result);
     }
     
     @Test
     public void returnsAbsolutePathToFallbackFile_ifPrimaryNotConfiguredButEmptyAndFallbackExists() {
         this.sensorContext.settings().setProperty("new path key",  "");
         String result = this.resolver.getPath(this.sensorContext, "new path key", "existing.ts");
-        assertEquals(this.existingFileAbsPath, result);
+        assertSamePath(this.existingFile, result);
     }
     
     @Test
@@ -70,8 +68,21 @@ public class PathResolverImplTest {
     
     @Test
     public void returnsAbsolutePathToFile_ifAlreadyAbsoluteAndExists() {
-        this.sensorContext.settings().setProperty("new path key", this.existingFileAbsPath);
+        this.sensorContext.settings().setProperty("new path key", this.existingFile.getAbsolutePath());
         String result = this.resolver.getPath(this.sensorContext, "new path key", "not me");
-        assertEquals(this.existingFileAbsPath, result);
+        assertSamePath(this.existingFile, result);
+    }
+
+    /**
+     * Asserts that the provided path is the same as the argument. Paths are converted in File objects to avoid case-sensitive issues on some filesystems.
+     * @param existingFile the path to test against
+     * @param argument the argument
+     */
+    private void assertSamePath(File existingFile, String argument) {
+        if (argument == null)
+            assertEquals(existingFile, argument);
+        else {
+            assertEquals(existingFile, new File(argument));
+        }
     }
 }
