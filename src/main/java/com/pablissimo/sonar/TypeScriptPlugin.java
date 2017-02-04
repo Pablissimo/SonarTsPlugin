@@ -153,7 +153,7 @@ public class TypeScriptPlugin implements Plugin {
     
     public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.coverage.forceZeroIfUnspecified";
     public static final String SETTING_IGNORE_NOT_FOUND = "sonar.ts.coverage.ignoreNotFound";
-    public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.coverage.lcovReportpath";
+    public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.coverage.lcovReportPath";
     
     public static final String SETTING_TS_LINT_ENABLED = "sonar.ts.tslint.enabled";
     public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslint.path";

@@ -166,10 +166,6 @@ public class TsLintExecutorImpl implements TsLintExecutor {
     }
 
     private String getCommandOutput(Command thisCommand, StreamConsumer stdOutConsumer, StreamConsumer stdErrConsumer, File tslintOutputFile, Integer timeoutMs) {
-        LOG.debug("Executing TsLint with command: " + thisCommand.toCommandLine());
-
-        // Timeout is specified per file, not per batch (which can vary a lot)
-        // so multiply it up
         this.createExecutor().execute(thisCommand, stdOutConsumer, stdErrConsumer, timeoutMs);
 
         return getFileContent(tslintOutputFile);
