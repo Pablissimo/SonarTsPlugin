@@ -6,29 +6,35 @@ import org.sonar.api.config.Settings;
 public class TsLintExecutorConfig {
     public static final String CONFIG_FILENAME = "tslint.json";
     public static final String TSLINT_FALLBACK_PATH = "node_modules/tslint/bin/tslint";
-    
+
     private String pathToTsLint;
     private String configFile;
     private String rulesDir;
     private String pathToTsConfig;
     private boolean shouldPerformTypeCheck;
-    
+    private String pathToTsLintOutput;
+
     private Integer timeoutMs;
-    
+
     public static TsLintExecutorConfig fromSettings(Settings settings, SensorContext ctx, PathResolver resolver) {
         TsLintExecutorConfig toReturn = new TsLintExecutorConfig();
-        
+
         toReturn.setPathToTsLint(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH));
         toReturn.setConfigFile(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME));
         toReturn.setRulesDir(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null));
         toReturn.setPathToTsConfig(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PROJECT_PATH, null));
-        
+        toReturn.setPathToTsLintOutput(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_OUTPUT_PATH, null));
+
         toReturn.setTimeoutMs(Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)));
         toReturn.setShouldPerformTypeCheck(settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK));
-        
+
         return toReturn;
     }
-    
+
+    public Boolean useExistingTsLintOutput() {
+        return this.pathToTsLintOutput != null && !this.pathToTsLintOutput.isEmpty();
+    }
+
     public Boolean useTsConfigInsteadOfFileList() {
         return this.pathToTsConfig != null && !this.pathToTsConfig.isEmpty();
     }
@@ -72,6 +78,15 @@ public class TsLintExecutorConfig {
     public void setPathToTsConfig(String pathToTsConfig) {
         this.pathToTsConfig = pathToTsConfig;
     }
+
+    public String getPathToTsLintOutput() {
+        return this.pathToTsLintOutput;
+    }
+
+    public void setPathToTsLintOutput(String pathToTsLintOutput) {
+        this.pathToTsLintOutput = pathToTsLintOutput;
+    }
+
 
     public boolean shouldPerformTypeCheck() {
         return this.shouldPerformTypeCheck;

@@ -22,15 +22,15 @@ public class TsLintSensor implements Sensor {
     private PathResolver resolver;
     private TsLintExecutor executor;
     private TsLintParser parser;
-    
-    public TsLintSensor(Settings settings, PathResolver resolver, 
+
+    public TsLintSensor(Settings settings, PathResolver resolver,
             TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
         this.resolver = resolver;
         this.executor = executor;
         this.parser = parser;
     }
-    
+
     @Override
     public void describe(SensorDescriptor desc) {
         desc
@@ -39,14 +39,14 @@ public class TsLintSensor implements Sensor {
     }
 
     @Override
-    public void execute(SensorContext ctx) {    
+    public void execute(SensorContext ctx) {
         if (!this.settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_ENABLED)) {
             LOG.debug("Skipping tslint execution - " + TypeScriptPlugin.SETTING_TS_LINT_ENABLED + " set to false");
             return;
         }
-        
+
         TsLintExecutorConfig config = TsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
-        
+
         if (config.getPathToTsLint() == null) {
             LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
             return;
@@ -76,7 +76,7 @@ public class TsLintSensor implements Sensor {
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
-        
+
         List<String> jsonResults = this.executor.execute(config, paths);
 
         Map<String, List<TsLintIssue>> issues = this.parser.parse(jsonResults);
@@ -89,7 +89,7 @@ public class TsLintSensor implements Sensor {
         // Each issue bucket will contain info about a single file
         for (String filePath : issues.keySet()) {
             List<TsLintIssue> batchIssues = issues.get(filePath);
-            
+
             if (batchIssues == null || batchIssues.size() == 0) {
                 continue;
             }
@@ -100,7 +100,7 @@ public class TsLintSensor implements Sensor {
             }
 
             InputFile file = fileMap.get(filePath);
-            
+
             for (TsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll
                 // fall back to the generic 'tslint-issue' rule
@@ -109,18 +109,18 @@ public class TsLintSensor implements Sensor {
                     ruleName = TsRulesDefinition.TSLINT_UNKNOWN_RULE.key;
                 }
 
-                NewIssue newIssue = 
+                NewIssue newIssue =
                         ctx
                         .newIssue()
                         .forRule(RuleKey.of(TsRulesDefinition.REPOSITORY_NAME, ruleName));
-                
-                NewIssueLocation newIssueLocation = 
+
+                NewIssueLocation newIssueLocation =
                         newIssue
                         .newLocation()
                         .on(file)
                         .message(issue.getFailure())
                         .at(file.selectLine(issue.getStartPosition().getLine() + 1));
-                
+
                 newIssue.at(newIssueLocation);
                 newIssue.save();
             }

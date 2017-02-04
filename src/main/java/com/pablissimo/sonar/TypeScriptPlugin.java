@@ -91,7 +91,7 @@ import org.sonar.api.*;
         description = "Maximum time to wait for TsLint execution to finish before aborting (in milliseconds)",
         project = true,
         global = false
-    )/*,
+    ),
     @Property(
         key = TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK,
         defaultValue = "false",
@@ -102,14 +102,23 @@ import org.sonar.api.*;
         global = false
     ),
     @Property(
-        key = TypeScriptPlugin.SETTING_TS_LINT_TSCONFIG_PATH,
+        key = TypeScriptPlugin.SETTING_TS_LINT_PROJECT_PATH,
         defaultValue = "",
         type = PropertyType.STRING,
         name = "Path to tsconfig.json file, if required",
         description = "Required if tslinttypecheck parameter specified, the path to the tsconfig.json file that describes the files to lint and build",
         project = true,
         global = false
-    )*/
+    ),
+    @Property(
+        key = TypeScriptPlugin.SETTING_TS_LINT_OUTPUT_PATH,
+        defaultValue = "",
+        type = PropertyType.STRING,
+        name = "Path to TSLint JSON output file",
+        description = "If set, the contents of this file will be used to discover linting issues rather than the plugin running tslint itself",
+        project = true,
+        global = false
+    )
 })
 public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludetypedefinitionfiles";
@@ -124,6 +133,7 @@ public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_TS_RULE_CONFIGS = "sonar.ts.ruleconfigs";
     public static final String SETTING_TS_LINT_TYPECHECK = "sonar.ts.tslinttypecheck";
     public static final String SETTING_TS_LINT_PROJECT_PATH = "sonar.ts.tslintprojectpath";
+    public static final String SETTING_TS_LINT_OUTPUT_PATH = "sonar.ts.tslintoutputpath";
 
     @Override
     public void define(Context ctx) {
@@ -135,7 +145,7 @@ public class TypeScriptPlugin implements Plugin {
             .addExtension(TsLintSensor.class)
             .addExtension(CombinedCoverageSensor.class)
             .addExtension(TsRulesDefinition.class);
-        
+
         // Additional services to be DI'd into the above
         ctx.addExtension(PathResolverImpl.class);
         ctx.addExtension(TsLintExecutorImpl.class);
