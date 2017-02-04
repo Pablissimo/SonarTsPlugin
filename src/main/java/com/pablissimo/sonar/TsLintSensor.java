@@ -72,7 +72,7 @@ public class TsLintSensor implements Sensor {
                 continue;
             }
 
-            String pathAdjusted = file.absolutePath().replace('\\', '/').toLowerCase();
+            String pathAdjusted = file.absolutePath().replace('\\', '/');
             paths.add(pathAdjusted);
             fileMap.put(pathAdjusted, file);
         }
@@ -94,14 +94,12 @@ public class TsLintSensor implements Sensor {
                 continue;
             }
 
-            String lowerFilePath = filePath.toLowerCase();
-
-            if (!fileMap.containsKey(lowerFilePath)) {
-                LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + lowerFilePath);
+            if (!fileMap.containsKey(filePath)) {
+                LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;
             }
 
-            InputFile file = fileMap.get(lowerFilePath);
+            InputFile file = fileMap.get(filePath);
 
             for (TsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll

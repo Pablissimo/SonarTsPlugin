@@ -91,7 +91,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         }
 
         if (config.useAlreadyExistsTsLintOutput()) {
-            LOG.debug("Running with exists JSON file");
+            LOG.debug("Running with existing JSON file '" + config.getPathToTsLintOutput() + "' instead of calling tslint");
             List<String> toReturn = new ArrayList<String>();
             toReturn.add(this.getFileContent(new File(config.getPathToTsLintOutput())));
             return toReturn;

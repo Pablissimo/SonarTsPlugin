@@ -114,8 +114,8 @@ import org.sonar.api.*;
         key = TypeScriptPlugin.SETTING_TS_LINT_OUTPUT_PATH,
         defaultValue = "",
         type = PropertyType.STRING,
-        name = "Path to TSLint Json output file, if required",
-        description = "Required if TSLint running before SonarQube checks",
+        name = "Path to TSLint JSON output file",
+        description = "If set, the contents of this file will be used to discover linting issues rather than the plugin running tslint itself",
         project = true,
         global = false
     )
