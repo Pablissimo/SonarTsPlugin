@@ -23,8 +23,7 @@ public class TsLintSensor implements Sensor {
     private TsLintExecutor executor;
     private TsLintParser parser;
 
-    public TsLintSensor(Settings settings, PathResolver resolver,
-            TsLintExecutor executor, TsLintParser parser) {
+    public TsLintSensor(Settings settings, PathResolver resolver, TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
         this.resolver = resolver;
         this.executor = executor;
