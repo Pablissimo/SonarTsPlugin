@@ -31,7 +31,7 @@ public class TsLintExecutorConfig {
         return toReturn;
     }
 
-    public Boolean useAlreadyExistsTsLintOutput() {
+    public Boolean useExistingTsLintOutput() {
         return this.pathToTsLintOutput != null && !this.pathToTsLintOutput.isEmpty();
     }
 

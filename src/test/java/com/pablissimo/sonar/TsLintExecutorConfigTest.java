@@ -79,6 +79,22 @@ public class TsLintExecutorConfigTest {
 
         assertFalse(config.useTsConfigInsteadOfFileList());
     }
+    
+    @Test
+    public void useExistingTsLintOutput_returnsTrueIfPathSet() {
+        TsLintExecutorConfig config = getNewConfig();
+        config.setPathToTsLintOutput("/path/to/tslint/json/output");
+        
+        assertTrue(config.useExistingTsLintOutput());
+    }
+    
+    @Test
+    public void useExistingTsLintOutput_returnsFalseIfPathNotSet() {
+        TsLintExecutorConfig config = getNewConfig();
+        config.setPathToTsLintOutput("");
+        
+        assertFalse(config.useExistingTsLintOutput());
+    }
 
     @Test
     public void fromSettings_initialisesFromSettingsAndResolver() {

@@ -90,7 +90,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
             throw new IllegalArgumentException("files");
         }
 
-        if (config.useAlreadyExistsTsLintOutput()) {
+        if (config.useExistingTsLintOutput()) {
             LOG.debug("Running with existing JSON file '" + config.getPathToTsLintOutput() + "' instead of calling tslint");
             List<String> toReturn = new ArrayList<String>();
             toReturn.add(this.getFileContent(new File(config.getPathToTsLintOutput())));
