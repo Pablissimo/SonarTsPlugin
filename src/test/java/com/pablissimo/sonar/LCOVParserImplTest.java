@@ -119,6 +119,11 @@ public class LCOVParserImplTest {
         parser.parseFile(nonExistent);
     }
     
+    @Test
+    public void doesNotThrow_withWindowsStyleAngularCLIPaths() {
+        executeForTestCase("angularwindowspaths");
+    }
+    
     private Map<InputFile, NewCoverage> executeForTestCase(String testName) {
         File lcovFile = resource(testName);
         LCOVParser parser = getParser(lcovFile);

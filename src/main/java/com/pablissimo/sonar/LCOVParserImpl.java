@@ -24,6 +24,8 @@ package com.pablissimo.sonar;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -148,14 +150,25 @@ public class LCOVParserImpl implements LCOVParser {
   private FileData loadCurrentFileData(final Map<InputFile, FileData> files, String line) {
     String filePath = line.substring(SF.length());
     FileData fileData = null;
-    // some tools (like Istanbul, Karma) provide relative paths, so let's consider them relative to project directory
-    InputFile inputFile = context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(filePath));
     
+    // some tools (like Istanbul, Karma) provide relative paths, so let's consider them relative to project directory
+    InputFile inputFile = null;
+    try {
+        Paths.get(filePath);
+        inputFile = context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(filePath));    
+    }
+    catch (InvalidPathException ex) {
+        LOG.debug("LCOV file referred to path that appears invalid (not just not on disk): " + filePath);
+    }   
+        
     // Try to accommodate Angular projects that, when the angular template loader's used
     // by checking for a ! in the filepath if the path isn't found - have a bash at seeking
     // everything after the ! as a second fallback pass
     if (inputFile == null && filePath.contains("!") && (filePath.indexOf("!") + 1) < filePath.length()) {
         String amendedPath = filePath.substring(filePath.indexOf("!") + 1);
+        
+        LOG.debug("Failed to resolve " + filePath + " as a valid source file, so attempting " + amendedPath + " instead");
+        
         inputFile = context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(amendedPath));
     }
     
@@ -166,6 +179,7 @@ public class LCOVParserImpl implements LCOVParser {
         files.put(inputFile, fileData);
       }
     } else {
+      LOG.debug("Failed to resolve path " + filePath + " to a file in the analysis set");
       unresolvedPaths.add(filePath);
     }
     return fileData;
