@@ -29,12 +29,6 @@ This is plugin for SonarQube 5.6+ for analysing projects with TypeScript content
 * Importing LCOV files for unit test coverage information
 * NCLOC metric generation
 
-It's unfinished in the following respects:
-* Incomplete unit test coverage of the plugin
-* No support for code duplication metrics
-
-It's presented only for the interested, and the brave.
-
 ##Requirements
 * Java 1.8+
 * SonarQube 5.6 LTS+
