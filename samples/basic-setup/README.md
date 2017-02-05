@@ -4,7 +4,7 @@ This sample project can be analysed by SonarQube to demonstrate:
 * Linting information from ```tslint```, configured via a ```tslint.json``` file
 * Code coverage metrics from an LCOV file
 
-You can see a live example of the results of analysing this project at [https://sonar.pablissimo.com](https://sonar.pablissimo.com).
+You can see a live example of the results of analysing this project at [https://sonar.pablissimo.com](https://sonar.pablissimo.com/dashboard?id=com.pablissimo.sonar%3Abasic-setup).
 
 ##Building and analysing
 
