@@ -66,8 +66,8 @@ import org.sonar.api.*;
         deprecatedKey = TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE_PREV,
         defaultValue = "false",
         type = PropertyType.BOOLEAN,
-        name = "Force zero coverage if unspecified for file",
-        description = "Forces coverage of a file to be set to 0% when no report is provided for it",
+        name = "Force zero coverage",
+        description = "Forces coverage of all source file to be set to 0% when no coverage report is provided",
         project = true,
         global = false
     ),
