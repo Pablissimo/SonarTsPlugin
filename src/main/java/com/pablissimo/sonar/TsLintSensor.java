@@ -23,8 +23,7 @@ public class TsLintSensor implements Sensor {
     private TsLintExecutor executor;
     private TsLintParser parser;
 
-    public TsLintSensor(Settings settings, PathResolver resolver,
-            TsLintExecutor executor, TsLintParser parser) {
+    public TsLintSensor(Settings settings, PathResolver resolver, TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
         this.resolver = resolver;
         this.executor = executor;
@@ -65,7 +64,8 @@ public class TsLintSensor implements Sensor {
         }
 
         List<String> paths = new ArrayList<String>();
-        HashMap<String, InputFile> fileMap = new HashMap<String, InputFile>();
+        HashMap<String, InputFile> absoluteFileMap = new HashMap<String, InputFile>();
+        HashMap<String, InputFile> relativeFileMap = new HashMap<String, InputFile>();
 
         for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (skipTypeDefFiles && file.file().getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
@@ -74,7 +74,8 @@ public class TsLintSensor implements Sensor {
 
             String pathAdjusted = file.absolutePath().replace('\\', '/');
             paths.add(pathAdjusted);
-            fileMap.put(pathAdjusted, file);
+            absoluteFileMap.put(pathAdjusted, file);
+            relativeFileMap.put(file.relativePath().replace('\\', '/'), file);
         }
 
         List<String> jsonResults = this.executor.execute(config, paths);
@@ -94,12 +95,15 @@ public class TsLintSensor implements Sensor {
                 continue;
             }
 
-            if (!fileMap.containsKey(filePath)) {
+            InputFile matchingFile = absoluteFileMap.get(filePath);
+            if (matchingFile == null) {
+                matchingFile = relativeFileMap.get(filePath);
+            }
+            
+            if (matchingFile == null) {
                 LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
                 continue;
             }
-
-            InputFile file = fileMap.get(filePath);
 
             for (TsLintIssue issue : batchIssues) {
                 // Make sure the rule we're violating is one we recognise - if not, we'll
@@ -117,9 +121,9 @@ public class TsLintSensor implements Sensor {
                 NewIssueLocation newIssueLocation =
                         newIssue
                         .newLocation()
-                        .on(file)
+                        .on(matchingFile)
                         .message(issue.getFailure())
-                        .at(file.selectLine(issue.getStartPosition().getLine() + 1));
+                        .at(matchingFile.selectLine(issue.getStartPosition().getLine() + 1));
 
                 newIssue.at(newIssueLocation);
                 newIssue.save();

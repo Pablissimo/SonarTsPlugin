@@ -135,6 +135,31 @@ public class TsLintSensorTest {
     }
     
     @Test
+    public void execute_addsIssues_evenIfReportedAgainstRelativePaths() {
+        TsLintIssue issue = new TsLintIssue();
+        issue.setFailure("failure");
+        issue.setRuleName("rule name");
+        issue.setName(this.file.relativePath().replace("\\",  "/"));
+
+        TsLintPosition startPosition = new TsLintPosition();
+        startPosition.setLine(0);
+
+        issue.setStartPosition(startPosition);
+
+        List<TsLintIssue> issueList = new ArrayList<TsLintIssue>();
+        issueList.add(issue);
+
+        Map<String, List<TsLintIssue>> issues = new HashMap<String, List<TsLintIssue>>();
+        issues.put(issue.getName(), issueList);
+        
+        when(this.parser.parse(any(List.class))).thenReturn(issues);
+        this.sensor.execute(this.context);
+        
+        assertEquals(1, this.context.allIssues().size());
+        assertEquals("rule name", this.context.allIssues().iterator().next().ruleKey().rule());
+    }
+    
+    @Test
     public void execute_doesNotThrow_ifParserReturnsNoResult() {
         when(this.parser.parse(any(List.class))).thenReturn(null);
         

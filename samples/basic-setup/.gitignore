@@ -1,0 +1,6 @@
+node_modules/
+tmp/
+src/*.js
+test/*.js
+*.map
+html/
