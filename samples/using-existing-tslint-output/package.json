@@ -1,0 +1,25 @@
+{
+  "name": "basic-app",
+  "version": "1.0.0",
+
+  "scripts": {
+    "test": "karma start --single-run --code-coverage && tslint --force --format json --config tslint.json --out issues.json src/MyApp.ts test/MyAppTests.ts"
+  },
+
+  "dependencies": {
+    "@types/jasmine": "^2.5.35",
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.4.1",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-cli": "^1.0.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-typescript": "^2.1.7",
+    "typescript": "latest",
+    "tslint": "^4.4.2"
+  },
+
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "karma-typescript": "^2.1.7"
+  }
+}
