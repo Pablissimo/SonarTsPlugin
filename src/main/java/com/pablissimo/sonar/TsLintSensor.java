@@ -9,10 +9,16 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.issue.NewIssue;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleKey;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 public class TsLintSensor implements Sensor {
@@ -22,7 +28,7 @@ public class TsLintSensor implements Sensor {
     private PathResolver resolver;
     private TsLintExecutor executor;
     private TsLintParser parser;
-
+    
     public TsLintSensor(Settings settings, PathResolver resolver, TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
         this.resolver = resolver;
@@ -64,20 +70,16 @@ public class TsLintSensor implements Sensor {
         }
 
         List<String> paths = new ArrayList<String>();
-        HashMap<String, InputFile> absoluteFileMap = new HashMap<String, InputFile>();
-        HashMap<String, InputFile> relativeFileMap = new HashMap<String, InputFile>();
 
         for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
-            if (skipTypeDefFiles && file.file().getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION)) {
+            if (shouldSkipFile(file.file(), skipTypeDefFiles)) {
                 continue;
             }
 
-            String pathAdjusted = file.absolutePath().replace('\\', '/');
+            String pathAdjusted = file.absolutePath();
             paths.add(pathAdjusted);
-            absoluteFileMap.put(pathAdjusted, file);
-            relativeFileMap.put(file.relativePath().replace('\\', '/'), file);
         }
-
+        
         List<String> jsonResults = this.executor.execute(config, paths);
 
         Map<String, List<TsLintIssue>> issues = this.parser.parse(jsonResults);
@@ -95,14 +97,29 @@ public class TsLintSensor implements Sensor {
                 continue;
             }
 
-            InputFile matchingFile = absoluteFileMap.get(filePath);
-            if (matchingFile == null) {
-                matchingFile = relativeFileMap.get(filePath);
+            File matchingFile = ctx.fileSystem().resolvePath(filePath);
+            InputFile inputFile = null;
+            
+            if (shouldSkipFile(matchingFile, skipTypeDefFiles)) {
+                continue;
             }
             
-            if (matchingFile == null) {
-                LOG.warn("TsLint reported issues against a file that wasn't sent to it - will be ignored: " + filePath);
+            if (matchingFile != null) {
+                try {
+                    inputFile = ctx.fileSystem().inputFile(ctx.fileSystem().predicates().is(matchingFile));
+                }
+                catch (IllegalArgumentException e) {
+                    LOG.error("Failed to resolve " + filePath + " to a single path", e);
+                    continue;
+                }
+            }
+            
+            if (inputFile == null) {
+                LOG.warn("TsLint reported issues against a file that isn't in the analysis set - will be ignored: " + filePath);
                 continue;
+            }
+            else {
+                LOG.debug("Handling TsLint output for '" + filePath + "' reporting against '" + inputFile.absolutePath() + "'");
             }
 
             for (TsLintIssue issue : batchIssues) {
@@ -121,13 +138,17 @@ public class TsLintSensor implements Sensor {
                 NewIssueLocation newIssueLocation =
                         newIssue
                         .newLocation()
-                        .on(matchingFile)
+                        .on(inputFile)
                         .message(issue.getFailure())
-                        .at(matchingFile.selectLine(issue.getStartPosition().getLine() + 1));
+                        .at(inputFile.selectLine(issue.getStartPosition().getLine() + 1));
 
                 newIssue.at(newIssueLocation);
                 newIssue.save();
             }
         }
+    }
+    
+    private boolean shouldSkipFile(File f, boolean skipTypeDefFiles) {
+        return skipTypeDefFiles && f.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION);
     }
 }
