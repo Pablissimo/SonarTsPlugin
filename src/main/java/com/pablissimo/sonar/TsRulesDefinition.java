@@ -128,7 +128,7 @@ public class TsRulesDefinition implements RulesDefinition {
                     ruleDescription
                 );
             }
-
+            
             rulesCollection.add(tsRule);
         }
 
@@ -203,7 +203,7 @@ public class TsRulesDefinition implements RulesDefinition {
         for (TsLintRule customRule : tslintRules) {
             createRule(repository, customRule);
         }
-
+        
         repository.done();
     }
 
