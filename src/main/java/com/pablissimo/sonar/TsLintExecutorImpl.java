@@ -144,8 +144,6 @@ public class TsLintExecutorImpl implements TsLintExecutor {
             LOG.debug("Split " + files.size() + " files into " + batches.size() + " batches for processing");
 
             for (int i = 0; i < batches.size(); i++) {
-                StringBuilder outputBuilder = new StringBuilder();
-
                 List<String> thisBatch = batches.get(i);
 
                 Command thisCommand = getBaseCommand(config, tslintOutputFilePath);
