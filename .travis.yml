@@ -8,6 +8,6 @@ addons:
     paths:
     -  $(ls ./target/*.jar | tr "\n" ":")
     target_paths: builds/$TRAVIS_BRANCH/$TRAVIS_BUILD_NUMBER
-
+  sonarqube
 after_success:
-  - mvn clean test jacoco:report coveralls:report
+  - mvn clean test jacoco:report coveralls:report sonar:sonar -Dsonar.host.url=$SONAR_URL

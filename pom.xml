@@ -46,6 +46,9 @@
     <sonar.buildVersion>5.6</sonar.buildVersion>
     <jdk.min.version>1.8</jdk.min.version>
     <sslr.version>1.21</sslr.version>
+    
+    <sonar.junit.reportsPath>target/surefire-reports</sonar.junit.reportsPath>
+    <sonar.jacoco.reportPaths>target/jacoco.exec</sonar.jacoco.reportPaths>
   </properties>
 
   <dependencies>
@@ -208,6 +211,12 @@
                   </configuration>
               </execution>
           </executions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.sonarsource.scanner.maven</groupId>
+        <artifactId>sonar-maven-plugin</artifactId>
+        <version>3.2</version>
       </plugin>
     </plugins>
   </build>
