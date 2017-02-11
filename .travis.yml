@@ -9,4 +9,4 @@ addons:
     -  $(ls ./target/*.jar | tr "\n" ":")
     target_paths: builds/$TRAVIS_BRANCH/$TRAVIS_BUILD_NUMBER
 after_success:
-  - mvn clean test jacoco:report coveralls:report sonar:sonar -Dsonar.host.url=$SONAR_URL-Dsonar.login=$SONAR_TOKEN
+  - mvn clean test jacoco:report coveralls:report sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN
