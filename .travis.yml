@@ -10,4 +10,4 @@ addons:
     target_paths: builds/$TRAVIS_BRANCH/$TRAVIS_BUILD_NUMBER
 
 after_success:
-  - mvn coveralls:report
+  - mvn clean test jacoco:report coveralls:report
