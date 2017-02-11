@@ -8,6 +8,6 @@ addons:
     paths:
     -  $(ls ./target/*.jar | tr "\n" ":")
     target_paths: builds/$TRAVIS_BRANCH/$TRAVIS_BUILD_NUMBER
-
 after_success:
-  - mvn cobertura:cobertura coveralls:report
+  - mvn clean test jacoco:report coveralls:report 
+  - test $TRAVIS_PULL_REQUEST = "false" && mvn sonar:sonar -Dsonar.language=java -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN
