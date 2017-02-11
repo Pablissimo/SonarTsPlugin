@@ -14,9 +14,7 @@ import com.google.gson.GsonBuilder;
 import com.pablissimo.sonar.model.TsLintIssue;
 
 @BatchSide
-public class TsLintParserImpl implements TsLintParser {
-    private static final Logger LOG = LoggerFactory.getLogger(TsLintParserImpl.class);
-    
+public class TsLintParserImpl implements TsLintParser {    
     public Map<String, List<TsLintIssue>> parse(List<String> toParse) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
