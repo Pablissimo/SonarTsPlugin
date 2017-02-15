@@ -23,7 +23,7 @@ public class TsLintSensor implements Sensor {
     private PathResolver resolver;
     private TsLintExecutor executor;
     private TsLintParser parser;
-    
+
     public TsLintSensor(Settings settings, PathResolver resolver, TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
         this.resolver = resolver;
@@ -47,13 +47,16 @@ public class TsLintSensor implements Sensor {
 
         TsLintExecutorConfig config = TsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
 
-        if (config.getPathToTsLint() == null) {
-            LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
-            return;
-        }
-        else if (config.getConfigFile() == null && config.getPathToTsConfig() == null) {
-            LOG.warn("Path to tslint.json and tsconfig.json configuration files either not defined or not found - at least one is required. Skipping tslint analysis.");
-            return;
+        if (!config.useExistingTsLintOutput()) {
+            if (config.getPathToTsLint() == null) {
+                LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
+                return;
+            } else {
+                if (config.getConfigFile() == null && config.getPathToTsConfig() == null) {
+                    LOG.warn("Path to tslint.json and tsconfig.json configuration files either not defined or not found - at least one is required. Skipping tslint analysis.");
+                    return;
+                }
+            }
         }
 
         boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
@@ -74,7 +77,7 @@ public class TsLintSensor implements Sensor {
             String pathAdjusted = file.absolutePath();
             paths.add(pathAdjusted);
         }
-        
+
         List<String> jsonResults = this.executor.execute(config, paths);
 
         Map<String, List<TsLintIssue>> issues = this.parser.parse(jsonResults);
@@ -94,11 +97,11 @@ public class TsLintSensor implements Sensor {
 
             File matchingFile = ctx.fileSystem().resolvePath(filePath);
             InputFile inputFile = null;
-            
+
             if (shouldSkipFile(matchingFile, skipTypeDefFiles)) {
                 continue;
             }
-            
+
             if (matchingFile != null) {
                 try {
                     inputFile = ctx.fileSystem().inputFile(ctx.fileSystem().predicates().is(matchingFile));
@@ -108,7 +111,7 @@ public class TsLintSensor implements Sensor {
                     continue;
                 }
             }
-            
+
             if (inputFile == null) {
                 LOG.warn("TsLint reported issues against a file that isn't in the analysis set - will be ignored: " + filePath);
                 continue;
@@ -142,7 +145,7 @@ public class TsLintSensor implements Sensor {
             }
         }
     }
-    
+
     private boolean shouldSkipFile(File f, boolean skipTypeDefFiles) {
         return skipTypeDefFiles && f.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION);
     }
