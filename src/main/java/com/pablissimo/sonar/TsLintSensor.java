@@ -3,6 +3,7 @@ package com.pablissimo.sonar;
 import com.pablissimo.sonar.model.TsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.rule.ActiveRule;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
@@ -14,6 +15,7 @@ import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleKey;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class TsLintSensor implements Sensor {
@@ -23,7 +25,7 @@ public class TsLintSensor implements Sensor {
     private PathResolver resolver;
     private TsLintExecutor executor;
     private TsLintParser parser;
-    
+
     public TsLintSensor(Settings settings, PathResolver resolver, TsLintExecutor executor, TsLintParser parser) {
         this.settings = settings;
         this.resolver = resolver;
@@ -47,13 +49,16 @@ public class TsLintSensor implements Sensor {
 
         TsLintExecutorConfig config = TsLintExecutorConfig.fromSettings(this.settings, ctx, this.resolver);
 
-        if (config.getPathToTsLint() == null) {
-            LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
-            return;
-        }
-        else if (config.getConfigFile() == null && config.getPathToTsConfig() == null) {
-            LOG.warn("Path to tslint.json and tsconfig.json configuration files either not defined or not found - at least one is required. Skipping tslint analysis.");
-            return;
+        if (!config.useExistingTsLintOutput()) {
+            if (config.getPathToTsLint() == null) {
+                LOG.warn("Path to tslint not defined or not found. Skipping tslint analysis.");
+                return;
+            } else {
+                if (config.getConfigFile() == null && config.getPathToTsConfig() == null) {
+                    LOG.warn("Path to tslint.json and tsconfig.json configuration files either not defined or not found - at least one is required. Skipping tslint analysis.");
+                    return;
+                }
+            }
         }
 
         boolean skipTypeDefFiles = settings.getBoolean(TypeScriptPlugin.SETTING_EXCLUDE_TYPE_DEFINITION_FILES);
@@ -64,9 +69,10 @@ public class TsLintSensor implements Sensor {
             ruleNames.add(rule.ruleKey().rule());
         }
 
+        FileSystem fs = ctx.fileSystem();
         List<String> paths = new ArrayList<String>();
 
-        for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
+        for (InputFile file : fs.inputFiles(fs.predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (shouldSkipFile(file.file(), skipTypeDefFiles)) {
                 continue;
             }
@@ -74,7 +80,7 @@ public class TsLintSensor implements Sensor {
             String pathAdjusted = file.absolutePath();
             paths.add(pathAdjusted);
         }
-        
+
         List<String> jsonResults = this.executor.execute(config, paths);
 
         Map<String, List<TsLintIssue>> issues = this.parser.parse(jsonResults);
@@ -82,6 +88,15 @@ public class TsLintSensor implements Sensor {
         if (issues == null) {
             LOG.warn("TsLint returned no result at all");
             return;
+        }
+
+        File baseDir = fs.baseDir();
+        String baseDirPath = baseDir.getPath();
+        String baseDirCanonicalPath = null;
+        try {
+            baseDirCanonicalPath = baseDir.getCanonicalPath();
+        } catch (IOException e) {
+            LOG.error("Failed to canonicalize " + baseDirPath, e);
         }
 
         // Each issue bucket will contain info about a single file
@@ -92,23 +107,26 @@ public class TsLintSensor implements Sensor {
                 continue;
             }
 
-            File matchingFile = ctx.fileSystem().resolvePath(filePath);
+            if (baseDirCanonicalPath != null) {
+                filePath = filePath.replace(baseDirCanonicalPath, baseDirPath);
+            }
+            File matchingFile = fs.resolvePath(filePath);
             InputFile inputFile = null;
-            
+
             if (shouldSkipFile(matchingFile, skipTypeDefFiles)) {
                 continue;
             }
-            
+
             if (matchingFile != null) {
                 try {
-                    inputFile = ctx.fileSystem().inputFile(ctx.fileSystem().predicates().is(matchingFile));
+                    inputFile = fs.inputFile(fs.predicates().is(matchingFile));
                 }
                 catch (IllegalArgumentException e) {
                     LOG.error("Failed to resolve " + filePath + " to a single path", e);
                     continue;
                 }
             }
-            
+
             if (inputFile == null) {
                 LOG.warn("TsLint reported issues against a file that isn't in the analysis set - will be ignored: " + filePath);
                 continue;
@@ -142,7 +160,7 @@ public class TsLintSensor implements Sensor {
             }
         }
     }
-    
+
     private boolean shouldSkipFile(File f, boolean skipTypeDefFiles) {
         return skipTypeDefFiles && f.getName().toLowerCase().endsWith("." + TypeScriptLanguage.LANGUAGE_DEFINITION_EXTENSION);
     }
