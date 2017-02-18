@@ -156,7 +156,7 @@ public class TsRulesDefinitionTest {
         assertEquals(Severity.MAJOR, rule5.severity());
         assertEquals("#5 description", rule5.htmlDescription());
         assertEquals(RuleType.VULNERABILITY, rule5.type());
-        
+
         assertEquals("30min", rule5.debtRemediationFunction().gapMultiplier());
         assertEquals("15min", rule5.debtRemediationFunction().baseEffort());
     }
@@ -186,6 +186,18 @@ public class TsRulesDefinitionTest {
 
         Settings settings = mock(Settings.class);
         when(settings.getKeysStartingWith(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS)).thenReturn(new ArrayList<String>());
+
+        TsRulesDefinition rulesDef = new TsRulesDefinition(settings);
+        List<TsLintRule> rules = rulesDef.getRules();
+        assertNotNull(rules);
+        assertEquals(0, rules.size());
+    }
+
+    @Test
+    public void CheckCustomRulesInhibited() {
+
+        Settings settings = mock(Settings.class);
+        when(settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_DISALLOW_CUSTOM_RULES)).thenReturn(true);
 
         TsRulesDefinition rulesDef = new TsRulesDefinition(settings);
         List<TsLintRule> rules = rulesDef.getRules();

@@ -130,6 +130,15 @@ import org.sonar.api.*;
         description = "If set, the contents of this file will parsed for linting issues rather than the plugin running tslint itself",
         project = true,
         global = false
+    ),
+    @Property(
+        key = TypeScriptPlugin.SETTING_TS_LINT_DISALLOW_CUSTOM_RULES,
+        defaultValue = "false",
+        type = PropertyType.BOOLEAN,
+        name = "Disallow the usage of custom rules",
+        description = "If set to true, custom rules will no longer be used for analysis",
+        project = false,
+        global = true
     )
 })
 public class TypeScriptPlugin implements Plugin {
@@ -150,11 +159,11 @@ public class TypeScriptPlugin implements Plugin {
 
     // Current settings
     public static final String SETTING_EXCLUDE_TYPE_DEFINITION_FILES = "sonar.ts.excludeTypeDefinitionFiles";
-    
+
     public static final String SETTING_FORCE_ZERO_COVERAGE = "sonar.ts.coverage.forceZeroIfUnspecified";
     public static final String SETTING_IGNORE_NOT_FOUND = "sonar.ts.coverage.ignoreNotFound";
     public static final String SETTING_LCOV_REPORT_PATH = "sonar.ts.coverage.lcovReportPath";
-    
+
     public static final String SETTING_TS_LINT_ENABLED = "sonar.ts.tslint.enabled";
     public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslint.path";
     public static final String SETTING_TS_LINT_CONFIG_PATH = "sonar.ts.tslint.configPath";
@@ -164,8 +173,9 @@ public class TypeScriptPlugin implements Plugin {
     public static final String SETTING_TS_LINT_TYPECHECK = "sonar.ts.tslint.typeCheck";
     public static final String SETTING_TS_LINT_PROJECT_PATH = "sonar.ts.tslint.projectPath";
     public static final String SETTING_TS_LINT_OUTPUT_PATH = "sonar.ts.tslint.outputPath";
+    public static final String SETTING_TS_LINT_DISALLOW_CUSTOM_RULES = "sonar.ts.disallowcustomrules";
 
-    
+
     @Override
     public void define(Context ctx) {
         // Core components - the actual sensors doing the work or configuring
