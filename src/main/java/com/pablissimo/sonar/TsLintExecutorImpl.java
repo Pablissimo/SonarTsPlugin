@@ -31,7 +31,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
     private String preparePath(String path) {
         if (path == null) {
-            return null;
+            return "";
         }
         else if (path.contains(" ") && this.mustQuoteSpaceContainingPaths) {
             return '"' + path + '"';
@@ -82,6 +82,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         return command;
     }
 
+    @Override
     public List<String> execute(TsLintExecutorConfig config, List<String> files) {
         if (config == null) {
             throw new IllegalArgumentException("config");
@@ -92,7 +93,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
 
         if (config.useExistingTsLintOutput()) {
             LOG.debug("Running with existing JSON file '" + config.getPathToTsLintOutput() + "' instead of calling tslint");
-            List<String> toReturn = new ArrayList<String>();
+            List<String> toReturn = new ArrayList<>();
             toReturn.add(this.getFileContent(new File(config.getPathToTsLintOutput())));
             return toReturn;
         }
@@ -108,7 +109,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         StringStreamConsumer stdOutConsumer = new StringStreamConsumer();
         StringStreamConsumer stdErrConsumer = new StringStreamConsumer();
 
-        List<String> toReturn = new ArrayList<String>();
+        List<String> toReturn = new ArrayList<>();
 
         if (config.useTsConfigInsteadOfFileList()) {
             LOG.debug("Running against a single project JSON file");
@@ -121,8 +122,8 @@ public class TsLintExecutorImpl implements TsLintExecutor {
             int baseCommandLength = baseCommand.toCommandLine().length();
             int availableForBatching = MAX_COMMAND_LENGTH - baseCommandLength;
 
-            List<List<String>> batches = new ArrayList<List<String>>();
-            List<String> currentBatch = new ArrayList<String>();
+            List<List<String>> batches = new ArrayList<>();
+            List<String> currentBatch = new ArrayList<>();
             batches.add(currentBatch);
 
             int currentBatchLength = 0;
@@ -132,7 +133,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
                 // +1 for the space we'll be adding between filenames
                 if (currentBatchLength + nextPath.length() + 1 > availableForBatching) {
                     // Too long to add to this batch, create new
-                    currentBatch = new ArrayList<String>();
+                    currentBatch = new ArrayList<>();
                     currentBatchLength = 0;
                     batches.add(currentBatch);
                 }

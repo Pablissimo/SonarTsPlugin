@@ -8,6 +8,7 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
 
 @BatchSide
+@FunctionalInterface
 public interface LOCSensor {
     Map<InputFile, Set<Integer>> execute(SensorContext ctx);
 }
