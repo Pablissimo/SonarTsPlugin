@@ -63,12 +63,15 @@ public class TsRulesDefinition implements RulesDefinition {
         List<String> configKeys = settings.getKeysStartingWith(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS);
 
         for (String cfgKey : configKeys) {
-            if (!cfgKey.endsWith("config"))
+            if (!cfgKey.endsWith("config")) {
                 continue;
+            }
 
             String rulesConfig = settings.getString(cfgKey);
-            InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
-            loadRules(rulesConfigStream, tslintRules);
+            if (rulesConfig != null) {
+                InputStream rulesConfigStream = new ByteArrayInputStream(rulesConfig.getBytes(Charset.defaultCharset()));
+                loadRules(rulesConfigStream, tslintRules);
+            }
         }
     }
 
@@ -78,18 +81,19 @@ public class TsRulesDefinition implements RulesDefinition {
         try {
             properties.load(stream);
         } catch (IOException e) {
-            LOG.error("Error while loading TsLint rules: " + e.getMessage());
+            LOG.error("Error while loading TsLint rules", e);
         }
 
         for(String propKey : properties.stringPropertyNames()) {
-
-            if (propKey.contains("."))
+            if (propKey.contains(".")) {
                 continue;
+            }
 
             String ruleEnabled = properties.getProperty(propKey);
 
-            if (!ruleEnabled.equals("true"))
+            if (!"true".equals(ruleEnabled)) {
                 continue;
+            }
 
             String ruleId = propKey;
             String ruleName = properties.getProperty(propKey + ".name", ruleId.replace("-", " "));

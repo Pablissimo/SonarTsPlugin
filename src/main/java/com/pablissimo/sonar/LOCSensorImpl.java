@@ -28,7 +28,7 @@ public class LOCSensorImpl implements LOCSensor {
     }
 
     private Set<Integer> getNonCommentLineNumbers(InputFile inputFile) {
-        HashSet<Integer> toReturn = new HashSet<Integer>();
+        HashSet<Integer> toReturn = new HashSet<>();
 
         int lineNumber = 0;
         
@@ -75,7 +75,7 @@ public class LOCSensorImpl implements LOCSensor {
                     }
                     isEOF = true;
                     line = line.replaceAll("\\n|\\t|\\s", "");
-                    if ((!line.equals("")) && !isACommentLine) {
+                    if (!("".equals(line) || isACommentLine)) {
                         toReturn.add(lineNumber);
                     }
                 } else {
@@ -94,8 +94,9 @@ public class LOCSensorImpl implements LOCSensor {
         return toReturn;
     }
 
+    @Override
     public Map<InputFile, Set<Integer>> execute(SensorContext ctx) {
-        HashMap<InputFile, Set<Integer>> toReturn = new HashMap<InputFile, Set<Integer>>();
+        HashMap<InputFile, Set<Integer>> toReturn = new HashMap<>();
         
         Iterable<InputFile> affectedFiles = 
                 ctx

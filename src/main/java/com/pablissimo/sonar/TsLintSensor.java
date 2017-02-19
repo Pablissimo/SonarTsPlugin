@@ -88,10 +88,11 @@ public class TsLintSensor implements Sensor {
         }
 
         // Each issue bucket will contain info about a single file
-        for (String filePath : issues.keySet()) {
-            List<TsLintIssue> batchIssues = issues.get(filePath);
+        for (Map.Entry<String, List<TsLintIssue>> kvp : issues.entrySet()) {
+            String filePath = kvp.getKey();
+            List<TsLintIssue> batchIssues = kvp.getValue();
 
-            if (batchIssues == null || batchIssues.size() == 0) {
+            if (batchIssues == null || batchIssues.isEmpty()) {
                 continue;
             }
 

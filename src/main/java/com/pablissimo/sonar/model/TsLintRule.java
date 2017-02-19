@@ -8,7 +8,7 @@ public class TsLintRule {
     public final String severity;
     public final String htmlDescription;
 
-    public boolean hasDebtRemediation;
+    public final boolean hasDebtRemediation;
     public final DebtRemediationFunction.Type debtRemediationFunction;
     public final String debtRemediationScalar;
     public final String debtRemediationOffset;
@@ -24,7 +24,8 @@ public class TsLintRule {
         this.severity = severity;
         this.name = name;
         this.htmlDescription = htmlDescription;
-
+        
+        this.hasDebtRemediation = false;
         this.debtRemediationFunction = DebtRemediationFunction.Type.CONSTANT_ISSUE;
         this.debtRemediationScalar = "0min";
         this.debtRemediationOffset = "0min";
