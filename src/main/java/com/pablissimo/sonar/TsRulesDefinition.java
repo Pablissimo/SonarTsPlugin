@@ -60,6 +60,11 @@ public class TsRulesDefinition implements RulesDefinition {
         if (this.settings == null)
             return;
 
+        if (settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_DISALLOW_CUSTOM_RULES)) {
+            LOG.info("Usage of custom rules is inhibited");
+            return;
+        }
+
         List<String> configKeys = settings.getKeysStartingWith(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS);
 
         for (String cfgKey : configKeys) {
@@ -132,7 +137,7 @@ public class TsRulesDefinition implements RulesDefinition {
                     ruleDescription
                 );
             }
-            
+
             rulesCollection.add(tsRule);
         }
 
@@ -140,7 +145,7 @@ public class TsRulesDefinition implements RulesDefinition {
     }
 
     private void createRule(NewRepository repository, TsLintRule tsRule) {
-        NewRule sonarRule = 
+        NewRule sonarRule =
                     repository
                     .createRule(tsRule.key)
                     .setName(tsRule.name)
@@ -169,7 +174,7 @@ public class TsRulesDefinition implements RulesDefinition {
 
             sonarRule.setDebtRemediationFunction(debtRemediationFn);
         }
-        
+
         RuleType type = null;
 
         if (tsRule.debtType != null && RuleType.names().contains(tsRule.debtType)) {
@@ -177,11 +182,11 @@ public class TsRulesDefinition implements RulesDefinition {
             // with something simpler, and there's really only three buckets)
             type = RuleType.valueOf(tsRule.debtType);
         }
-        
+
         if (type == null) {
             type = RuleType.CODE_SMELL;
         }
-                
+
         sonarRule.setType(type);
     }
 
@@ -203,7 +208,7 @@ public class TsRulesDefinition implements RulesDefinition {
         for (TsLintRule customRule : tslintRules) {
             createRule(repository, customRule);
         }
-        
+
         repository.done();
     }
 

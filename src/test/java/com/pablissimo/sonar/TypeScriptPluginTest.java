@@ -57,7 +57,7 @@ public class TypeScriptPluginTest {
         Annotation annotation = plugin.getClass().getAnnotations()[0];
         Properties propertiesAnnotation = (Properties) annotation;
 
-        assertEquals(12, propertiesAnnotation.value().length);
+        assertEquals(13, propertiesAnnotation.value().length);
 
         Property[] properties = propertiesAnnotation.value();
         assertNotNull(findPropertyByName(properties,
@@ -84,6 +84,8 @@ public class TypeScriptPluginTest {
             TypeScriptPlugin.SETTING_TS_LINT_PROJECT_PATH));
         assertNotNull(findPropertyByName(properties,
             TypeScriptPlugin.SETTING_TS_LINT_OUTPUT_PATH));
+        assertNotNull(findPropertyByName(properties,
+            TypeScriptPlugin.SETTING_TS_LINT_DISALLOW_CUSTOM_RULES));
     }
 
     @Test
