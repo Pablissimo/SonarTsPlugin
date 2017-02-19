@@ -52,7 +52,7 @@ public class LCOVParserImpl implements LCOVParser {
 
   private final Map<InputFile, NewCoverage> coverageByFile;
   private final SensorContext context;
-  private final List<String> unresolvedPaths = new ArrayList<String>();
+  private final List<String> unresolvedPaths = new ArrayList<>();
 
   private static final Logger LOG = Loggers.get(LCOVParser.class);
 
@@ -82,6 +82,7 @@ public class LCOVParserImpl implements LCOVParser {
     return unresolvedPaths;
   }
   
+  @Override
   public Map<InputFile, NewCoverage> parseFile(File file) {
       final List<String> lines;
       try 
@@ -96,8 +97,9 @@ public class LCOVParserImpl implements LCOVParser {
       return parse(lines);
   }
 
+  @Override
   public Map<InputFile, NewCoverage> parse(List<String> lines) {
-    final Map<InputFile, FileData> files = new HashMap<InputFile, FileData>();
+    final Map<InputFile, FileData> files = new HashMap<>();
     FileData fileData = null;
 
     for (String line : lines) {
@@ -133,7 +135,7 @@ public class LCOVParserImpl implements LCOVParser {
 
     }
 
-    Map<InputFile, NewCoverage> coveredFiles = new HashMap<InputFile, NewCoverage>();
+    Map<InputFile, NewCoverage> coveredFiles = new HashMap<>();
     for (Map.Entry<InputFile, FileData> e : files.entrySet()) {
       NewCoverage newCoverage = context.newCoverage().onFile(e.getKey()).ofType(CoverageType.UNIT);
       e.getValue().save(newCoverage);
@@ -158,14 +160,14 @@ public class LCOVParserImpl implements LCOVParser {
         inputFile = context.fileSystem().inputFile(context.fileSystem().predicates().hasPath(filePath));    
     }
     catch (InvalidPathException ex) {
-        LOG.debug("LCOV file referred to path that appears invalid (not just not on disk): " + filePath);
+        LOG.warn("LCOV file referred to path that appears invalid (not just not on disk): " + filePath, ex);
     }   
         
     // Try to accommodate Angular projects that, when the angular template loader's used
     // by checking for a ! in the filepath if the path isn't found - have a bash at seeking
     // everything after the last ! as a second fallback pass
-    if (inputFile == null && filePath.contains("!") && (filePath.lastIndexOf("!") + 1) < filePath.length()) {
-        String amendedPath = filePath.substring(filePath.lastIndexOf("!") + 1);
+    if (inputFile == null && filePath.contains("!") && (filePath.lastIndexOf('!') + 1) < filePath.length()) {
+        String amendedPath = filePath.substring(filePath.lastIndexOf('!') + 1);
         
         LOG.debug("Failed to resolve " + filePath + " as a valid source file, so attempting " + amendedPath + " instead");
         
@@ -189,12 +191,12 @@ public class LCOVParserImpl implements LCOVParser {
     /**
      * line number -> branch number -> taken
      */
-    private Map<Integer, Map<String, Integer>> branches = new HashMap<Integer, Map<String, Integer>>();
+    private Map<Integer, Map<String, Integer>> branches = new HashMap<>();
 
     /**
      * line number -> execution count
      */
-    private Map<Integer, Integer> hits = new HashMap<Integer, Integer>();
+    private Map<Integer, Integer> hits = new HashMap<>();
 
     /**
      * Number of lines in the file

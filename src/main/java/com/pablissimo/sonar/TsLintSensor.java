@@ -67,7 +67,7 @@ public class TsLintSensor implements Sensor {
             ruleNames.add(rule.ruleKey().rule());
         }
 
-        List<String> paths = new ArrayList<String>();
+        List<String> paths = new ArrayList<>();
 
         for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (shouldSkipFile(file.file(), skipTypeDefFiles)) {
@@ -88,10 +88,11 @@ public class TsLintSensor implements Sensor {
         }
 
         // Each issue bucket will contain info about a single file
-        for (String filePath : issues.keySet()) {
-            List<TsLintIssue> batchIssues = issues.get(filePath);
+        for (Map.Entry<String, List<TsLintIssue>> kvp : issues.entrySet()) {
+            String filePath = kvp.getKey();
+            List<TsLintIssue> batchIssues = kvp.getValue();
 
-            if (batchIssues == null || batchIssues.size() == 0) {
+            if (batchIssues == null || batchIssues.isEmpty()) {
                 continue;
             }
 

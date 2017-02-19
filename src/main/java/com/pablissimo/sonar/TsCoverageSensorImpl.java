@@ -36,9 +36,6 @@ public class TsCoverageSensorImpl implements TsCoverageSensor {
 
     private static final Logger LOG = LoggerFactory.getLogger(TsCoverageSensorImpl.class);
 
-    public TsCoverageSensorImpl() {
-    }
-
     private void saveZeroValueForAllFiles(SensorContext context, Map<InputFile, Set<Integer>> nonCommentLineNumbersByFile) {
         for (InputFile inputFile : context.fileSystem().inputFiles(context.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
           saveZeroValue(inputFile, context, nonCommentLineNumbersByFile.get(inputFile));
@@ -131,15 +128,18 @@ public class TsCoverageSensorImpl implements TsCoverageSensor {
         return file;
     }
 
+    @Override
     public void execute(SensorContext ctx, Map<InputFile, Set<Integer>> nonCommentLineNumbersByFile) {
-        if (nonCommentLineNumbersByFile == null) {
-            nonCommentLineNumbersByFile = new HashMap<InputFile, Set<Integer>>();
+        Map<InputFile, Set<Integer>> nonCommentLineMap = nonCommentLineNumbersByFile;
+        
+        if (nonCommentLineMap == null) {
+            nonCommentLineMap = new HashMap<>();
         }
         
         if (isLCOVReportProvided(ctx)) {
-            saveMeasureFromLCOVFile(ctx, nonCommentLineNumbersByFile);
+            saveMeasureFromLCOVFile(ctx, nonCommentLineMap);
         } else if (isForceZeroCoverageActivated(ctx)) {
-            saveZeroValueForAllFiles(ctx, nonCommentLineNumbersByFile);
+            saveZeroValueForAllFiles(ctx, nonCommentLineMap);
         }
     }
 }
