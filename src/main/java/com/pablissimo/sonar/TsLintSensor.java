@@ -41,7 +41,7 @@ public class TsLintSensor implements Sensor {
     @Override
     public void execute(SensorContext ctx) {
         if (!this.settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_ENABLED)) {
-            LOG.debug("Skipping tslint execution - " + TypeScriptPlugin.SETTING_TS_LINT_ENABLED + " set to false");
+            LOG.debug("Skipping tslint execution - {} - set to false", TypeScriptPlugin.SETTING_TS_LINT_ENABLED);
             return;
         }
 
@@ -114,11 +114,11 @@ public class TsLintSensor implements Sensor {
             }
 
             if (inputFile == null) {
-                LOG.warn("TsLint reported issues against a file that isn't in the analysis set - will be ignored: " + filePath);
+                LOG.warn("TsLint reported issues against a file that isn't in the analysis set - will be ignored: {}", filePath);
                 continue;
             }
             else {
-                LOG.debug("Handling TsLint output for '" + filePath + "' reporting against '" + inputFile.absolutePath() + "'");
+                LOG.debug("Handling TsLint output for '{}' reporting against '{}'", filePath, inputFile.absolutePath());
             }
 
             for (TsLintIssue issue : batchIssues) {

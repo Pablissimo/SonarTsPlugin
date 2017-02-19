@@ -16,11 +16,11 @@ public class PathResolverImpl implements PathResolver {
 
         // Fall back to a file system search if null or doesn't exist
         if (toReturn == null || toReturn.isEmpty()) {
-            LOG.debug("Path " + settingKey + " not specified, falling back to " + defaultValue);
+            LOG.debug("Path {} not specified, falling back to {}", settingKey, defaultValue);
             toReturn = defaultValue;
         }
         else {
-            LOG.debug("Found " + settingKey + " Lint path to be '" + toReturn + "'");
+            LOG.debug("Found {} path to be '{}'", settingKey, toReturn);
         }
         
         return getAbsolutePath(context, toReturn);

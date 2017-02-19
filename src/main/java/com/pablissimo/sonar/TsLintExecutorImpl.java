@@ -92,7 +92,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         }
 
         if (config.useExistingTsLintOutput()) {
-            LOG.debug("Running with existing JSON file '" + config.getPathToTsLintOutput() + "' instead of calling tslint");
+            LOG.debug("Running with existing JSON file '{}' instead of calling tslint", config.getPathToTsLintOutput());
             List<String> toReturn = new ArrayList<>();
             toReturn.add(this.getFileContent(new File(config.getPathToTsLintOutput())));
             return toReturn;
@@ -104,7 +104,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
         String tslintOutputFilePath = tslintOutputFile.getAbsolutePath();
         Command baseCommand = getBaseCommand(config, tslintOutputFilePath);
 
-        LOG.debug("Using a temporary path for TsLint output: " + tslintOutputFilePath);
+        LOG.debug("Using a temporary path for TsLint output: {}", tslintOutputFilePath);
 
         StringStreamConsumer stdOutConsumer = new StringStreamConsumer();
         StringStreamConsumer stdErrConsumer = new StringStreamConsumer();
@@ -142,7 +142,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
                 currentBatchLength += nextPath.length() + 1;
             }
 
-            LOG.debug("Split " + files.size() + " files into " + batches.size() + " batches for processing");
+            LOG.debug("Split {} files into {} batches for processing", files.size(), batches.size());
 
             for (int i = 0; i < batches.size(); i++) {
                 List<String> thisBatch = batches.get(i);
@@ -153,7 +153,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
                     thisCommand.addArgument(thisBatch.get(fileIndex));
                 }
 
-                LOG.debug("Executing TsLint with command: " + thisCommand.toCommandLine());
+                LOG.debug("Executing TsLint with command: {}", thisCommand.toCommandLine());
 
                 // Timeout is specified per file, not per batch (which can vary a lot)
                 // so multiply it up
