@@ -67,7 +67,7 @@ public class TsLintSensor implements Sensor {
             ruleNames.add(rule.ruleKey().rule());
         }
 
-        List<String> paths = new ArrayList<String>();
+        List<String> paths = new ArrayList<>();
 
         for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (shouldSkipFile(file.file(), skipTypeDefFiles)) {

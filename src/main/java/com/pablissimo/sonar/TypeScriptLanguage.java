@@ -12,6 +12,7 @@ public class TypeScriptLanguage extends AbstractLanguage {
         super(LANGUAGE_KEY, LANGUAGE_NAME);
     }
 
+    @Override
     public String[] getFileSuffixes() {
         return LANGUAGE_EXTENSIONS;
     }

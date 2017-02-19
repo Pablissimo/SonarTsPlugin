@@ -12,12 +12,13 @@ import com.google.gson.GsonBuilder;
 import com.pablissimo.sonar.model.TsLintIssue;
 
 @BatchSide
-public class TsLintParserImpl implements TsLintParser {    
+public class TsLintParserImpl implements TsLintParser {
+    @Override
     public Map<String, List<TsLintIssue>> parse(List<String> toParse) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         
-        List<TsLintIssue> allIssues = new ArrayList<TsLintIssue>();
+        List<TsLintIssue> allIssues = new ArrayList<>();
         
         for (String batch : toParse) {
             TsLintIssue[] batchIssues = gson.fromJson(getFixedUpOutput(batch), TsLintIssue[].class);
@@ -32,11 +33,11 @@ public class TsLintParserImpl implements TsLintParser {
         }
 
         // Remap by filename
-        Map<String, List<TsLintIssue>> toReturn = new HashMap<String, List<TsLintIssue>>();
+        Map<String, List<TsLintIssue>> toReturn = new HashMap<>();
         for (TsLintIssue issue : allIssues) {
             List<TsLintIssue> issuesByFile = toReturn.get(issue.getName());
             if (issuesByFile == null) {
-                issuesByFile = new ArrayList<TsLintIssue>();
+                issuesByFile = new ArrayList<>();
                 toReturn.put(issue.getName(), issuesByFile);
             }
             

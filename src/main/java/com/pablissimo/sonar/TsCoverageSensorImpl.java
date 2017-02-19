@@ -133,7 +133,7 @@ public class TsCoverageSensorImpl implements TsCoverageSensor {
         Map<InputFile, Set<Integer>> nonCommentLineMap = nonCommentLineNumbersByFile;
         
         if (nonCommentLineMap == null) {
-            nonCommentLineMap = new HashMap<InputFile, Set<Integer>>();
+            nonCommentLineMap = new HashMap<>();
         }
         
         if (isLCOVReportProvided(ctx)) {

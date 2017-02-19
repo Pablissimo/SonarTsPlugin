@@ -136,12 +136,7 @@ public class TsRulesDefinition implements RulesDefinition {
             rulesCollection.add(tsRule);
         }
 
-        Collections.sort(rulesCollection, new Comparator<TsLintRule>() {
-            @Override
-            public int compare(TsLintRule r1, TsLintRule r2) {
-                return r1.key.compareTo(r2.key);
-            }
-        });
+        Collections.sort(rulesCollection, (TsLintRule r1, TsLintRule r2) -> r1.key.compareTo(r2.key));
     }
 
     private void createRule(NewRepository repository, TsLintRule tsRule) {
@@ -190,6 +185,7 @@ public class TsRulesDefinition implements RulesDefinition {
         sonarRule.setType(type);
     }
 
+    @Override
     public void define(Context context) {
         NewRepository repository =
                 context
