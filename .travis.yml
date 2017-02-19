@@ -4,11 +4,19 @@ jdk:
   
 script: ./travis.sh
   
+cache:
+  directories:
+    - $HOME/.m2/repository
+
+before_cache:
+  # remove all the artifacts (JAR, ZIP) that are installed in local repo because of mvn deploy
+  - rm -rf $HOME/.m2/repository/com/pablissimo
+  - find $HOME/.m2 -name resolver-status.properties -exec rm {} \;
+  
 addons:
   artifacts:
     s3_region: "us-west-2"
     paths:
     -  $(ls ./target/*.jar | tr "\n" ":")
     target_paths: builds/$TRAVIS_BRANCH/$TRAVIS_BUILD_NUMBER
-after_success:
-  - mvn clean test jacoco:report coveralls:report 
+
