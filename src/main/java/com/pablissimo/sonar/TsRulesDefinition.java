@@ -62,6 +62,7 @@ public class TsRulesDefinition implements RulesDefinition {
 
         if (settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_DISALLOW_CUSTOM_RULES)) {
             LOG.info("Usage of custom rules is inhibited");
+            return;
         }
 
         List<String> configKeys = settings.getKeysStartingWith(TypeScriptPlugin.SETTING_TS_RULE_CONFIGS);
