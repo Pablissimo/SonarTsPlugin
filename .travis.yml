@@ -10,5 +10,4 @@ addons:
     paths:
     -  $(ls ./target/*.jar | tr "\n" ":")
     target_paths: builds/$TRAVIS_BRANCH/$TRAVIS_BUILD_NUMBER
-after_success:
-  - mvn clean test jacoco:report coveralls:report 
+
