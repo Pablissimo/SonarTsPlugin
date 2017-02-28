@@ -72,7 +72,7 @@ sonar.tests=src/app
 sonar.test.inclusions=**/*.spec.ts
 
 sonar.ts.tslint.configPath=tslint.json
-sonar.ts.coverage.lcovReportpath=test-results/coverage/coverage.lcov
+sonar.ts.coverage.lcovReportPath=test-results/coverage/coverage.lcov
 ```
 - See the [Analysis Parameters](http://docs.sonarqube.org/display/SONAR/Analysis+Parameters) documentation page for general configuration options.
 - See the [Narrowing the Focus](http://docs.sonarqube.org/display/SONAR/Narrowing+the+Focus) documentation page for configuration options related to which files to include.
