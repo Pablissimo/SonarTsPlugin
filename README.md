@@ -103,7 +103,7 @@ sonar.ts.coverage.lcovReportpath=test-results/coverage/coverage.lcov
 <tr><td>sonar.ts.coverage.ignoreNotFound</td><td><b>Optional</b></td><td>Controls if a single file should be reported as 0% covered if it doesn't appear in the LCOV report, defaults to false</td></tr>
 <tr><td>sonar.ts.tslint.timeout</td><td><b>Optional</b></td><td>Max time to wait for `tslint` to finish processing a single file (in milliseconds), defaults to 60 seconds</td></tr>
 <tr><td>sonar.ts.tslint.rulesDir</td><td><b>Optional</b></td><td>Path to a folder containing custom `tslint` rules referenced in tslint.json, if any is required</td></tr>
-<tr><td>sonar.ts.coverage.lcovReportpath</td><td><b>Optional</b></td><td>Path to an LCOV code-coverage report to be used to calculate coverage metrics for your project</td></tr>
+<tr><td>sonar.ts.coverage.lcovReportPath</td><td><b>Optional</b></td><td>Path to an LCOV code-coverage report to be used to calculate coverage metrics for your project</td></tr>
 </tbody>
 </table>
 
