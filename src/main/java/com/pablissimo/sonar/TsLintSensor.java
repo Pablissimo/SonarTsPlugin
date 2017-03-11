@@ -3,6 +3,7 @@ package com.pablissimo.sonar;
 import com.pablissimo.sonar.model.TsLintIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.rule.ActiveRule;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
@@ -14,6 +15,7 @@ import org.sonar.api.config.Settings;
 import org.sonar.api.rule.RuleKey;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 public class TsLintSensor implements Sensor {
@@ -67,9 +69,10 @@ public class TsLintSensor implements Sensor {
             ruleNames.add(rule.ruleKey().rule());
         }
 
+        FileSystem fs = ctx.fileSystem();
         List<String> paths = new ArrayList<>();
 
-        for (InputFile file : ctx.fileSystem().inputFiles(ctx.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
+        for (InputFile file : fs.inputFiles(fs.predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
             if (shouldSkipFile(file.file(), skipTypeDefFiles)) {
                 continue;
             }
@@ -87,6 +90,15 @@ public class TsLintSensor implements Sensor {
             return;
         }
 
+        File baseDir = fs.baseDir();
+        String baseDirPath = baseDir.getPath();
+        String baseDirCanonicalPath = null;
+        try {
+            baseDirCanonicalPath = baseDir.getCanonicalPath();
+        } catch (IOException e) {
+            LOG.error("Failed to canonicalize " + baseDirPath, e);
+        }
+
         // Each issue bucket will contain info about a single file
         for (Map.Entry<String, List<TsLintIssue>> kvp : issues.entrySet()) {
             String filePath = kvp.getKey();
@@ -96,7 +108,10 @@ public class TsLintSensor implements Sensor {
                 continue;
             }
 
-            File matchingFile = ctx.fileSystem().resolvePath(filePath);
+            if (baseDirCanonicalPath != null) {
+                filePath = filePath.replace(baseDirCanonicalPath, baseDirPath);
+            }
+            File matchingFile = fs.resolvePath(filePath);
             InputFile inputFile = null;
 
             if (shouldSkipFile(matchingFile, skipTypeDefFiles)) {
@@ -105,7 +120,7 @@ public class TsLintSensor implements Sensor {
 
             if (matchingFile != null) {
                 try {
-                    inputFile = ctx.fileSystem().inputFile(ctx.fileSystem().predicates().is(matchingFile));
+                    inputFile = fs.inputFile(fs.predicates().is(matchingFile));
                 }
                 catch (IllegalArgumentException e) {
                     LOG.error("Failed to resolve " + filePath + " to a single path", e);
