@@ -6,7 +6,7 @@ SonarQube plugin for TypeScript files
 [![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
 [![Coverage Status](https://coveralls.io/repos/github/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/github/Pablissimo/SonarTsPlugin?branch=master)
 
-##Demos
+## Demos
 
 A live deployed demo hitting a few varied TypeScript projects can be found here:
 [https://sonar.pablissimo.com](https://sonar.pablissimo.com).
@@ -17,33 +17,33 @@ A live deployed demo hitting a few varied TypeScript projects can be found here:
 * [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
 * [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
 
-##Sample projects
+## Sample projects
 Some sample projects are provided to demonstrate different configuration options in the [samples/](https://github.com/Pablissimo/SonarTsPlugin/tree/master/samples) folder.
 
 * [basic-setup](https://github.com/Pablissimo/SonarTsPlugin/tree/master/samples/basic-setup) - a standard `tslint` pass with code coverage
 * [using-existing-tslint-output](https://github.com/Pablissimo/SonarTsPlugin/tree/master/samples/using-existing-tslint-output) - as above, but re-using the output of a build-step `tslint` pass rather than the plugin running it itself
 
-##Integrations		
+## Integrations		
 
 * [Running TSLint within SonarQube on a TFS build](http://blogs.blackmarble.co.uk/blogs/rfennell/post/2016/07/05/Running-TSLint-within-SonarQube-on-a-TFS-build) - [Richard Fennell](https://github.com/rfennell)
 
-##Overview
+## Overview
 
 This is plugin for SonarQube 5.6+ for analysing projects with TypeScript content that supports:
 * TsLint for code quality information
 * Importing LCOV files for unit test coverage information
 * NCLOC metric generation
 
-##Requirements
+## Requirements
 * Java 1.8+
 * SonarQube 5.6 LTS+
 * TsLint 2.4.0+
 
-##Building
+## Building
 * Download the source
 * Build with maven, *mvn clean && mvn install*
 
-##Installation
+## Installation
 * Install Node.js
 * Install TsLint (2.4.0+) with `npm install -g tslint`, or ensure it is installed locally against your project
   * If you're installing globally, find the path to TsLint and copy it - will be similar to ```C:\Users\[Username]\AppData\Roaming\npm\node_modules\tslint\bin\tslint``` on Windows
@@ -57,9 +57,9 @@ This is plugin for SonarQube 5.6+ for analysing projects with TypeScript content
 * Run ```sonar-runner``` or ```sonar-scanner```
 * TsLint rule breaches should be shown in the web view
 
-##Configuration
+## Configuration
 
-###Example project configuration
+### Example project configuration
 This is an example of what a project configuration file (`sonar-project.properties`) could look like:
 ```
 sonar.projectKey=company:my-application
@@ -78,7 +78,7 @@ sonar.ts.coverage.lcovReportPath=test-results/coverage/coverage.lcov
 - See the [Narrowing the Focus](http://docs.sonarqube.org/display/SONAR/Narrowing+the+Focus) documentation page for configuration options related to which files to include.
 - See the rest of this README for the SonarTsPlugin specific configuration options. 
 
-###Global configuration options
+### Global configuration options
 
 <table>
 <thead>
@@ -88,7 +88,7 @@ sonar.ts.coverage.lcovReportPath=test-results/coverage/coverage.lcov
 </tbody>
 </table>
 
-###Project-level configuration options
+### Project-level configuration options
 
 <table>
 <thead>
@@ -138,15 +138,15 @@ For example, let's take the `export-name` rule from the [tslint-microsoft-contri
 * For documentation about the `technical debt` parameters look [here](http://docs.sonarqube.org/display/PLUG/Rule+Remediation+Costs) and [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/debt/DebtRemediationFunction.html)
 * For possible values for `debtType` go [here](http://javadocs.sonarsource.org/5.2/apidocs/org/sonar/api/server/rule/RulesDefinition.SubCharacteristics.html)
 
-##Licence
+## Licence
 MIT
 
-##Contributors
+## Contributors
 Thanks to the following for contributions to the plugin:
 * [Alex Krauss](https://github.com/alexkrauss) and [Manuel Huber](https://github.com/nelo112) for work on improving compatibility with *nix OSes
 * [schnee3](https://github.com/schnee3) for giving us some NCLOC support
 * [drywolf](https://github.com/drywolf) for TSX file and better custom rule mapping
 * [NikitaEgorov](https://github.com/NikitaEgorov) for changes to support consuming existing tslint output
 
-##With thanks
+## With thanks
 * The LCOV parser is directly copied from the community JavaScript SonarQube plug-in, which is LGPL'd.
