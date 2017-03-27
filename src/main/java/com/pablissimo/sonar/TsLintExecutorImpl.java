@@ -44,7 +44,7 @@ public class TsLintExecutorImpl implements TsLintExecutor {
     private Command getBaseCommand(TsLintExecutorConfig config, String tempPath) {
         Command command =
                 Command
-                .create("node")
+                .create(config.getPathToNode())
                 .addArgument(this.preparePath(config.getPathToTsLint()))
                 .addArgument("--format")
                 .addArgument("json");

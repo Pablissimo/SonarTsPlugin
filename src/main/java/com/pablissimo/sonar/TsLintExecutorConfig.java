@@ -6,7 +6,9 @@ import org.sonar.api.config.Settings;
 public class TsLintExecutorConfig {
     public static final String CONFIG_FILENAME = "tslint.json";
     public static final String TSLINT_FALLBACK_PATH = "node_modules/tslint/bin/tslint";
+    public static final String NODE_FALLBACK_PATH = "node";
 
+    private String pathToNode;
     private String pathToTsLint;
     private String configFile;
     private String rulesDir;
@@ -24,6 +26,7 @@ public class TsLintExecutorConfig {
         toReturn.setRulesDir(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null));
         toReturn.setPathToTsConfig(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PROJECT_PATH, null));
         toReturn.setPathToTsLintOutput(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_OUTPUT_PATH, null));
+        toReturn.setPathToNode(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_NODE_PATH, NODE_FALLBACK_PATH));
 
         toReturn.setTimeoutMs(Math.max(5000, settings.getInt(TypeScriptPlugin.SETTING_TS_LINT_TIMEOUT)));
         toReturn.setShouldPerformTypeCheck(settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK));
@@ -94,5 +97,13 @@ public class TsLintExecutorConfig {
 
     public void setShouldPerformTypeCheck(boolean performTypeCheck) {
         this.shouldPerformTypeCheck = performTypeCheck;
+    }
+
+    public String getPathToNode() {
+        return pathToNode;
+    }
+
+    public void setPathToNode(String pathToNode) {
+        this.pathToNode = pathToNode;
     }
 }
