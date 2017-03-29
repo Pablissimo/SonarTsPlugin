@@ -47,7 +47,7 @@ This is plugin for SonarQube 5.6+ for analysing projects with TypeScript content
 * Install Node.js
 * Install TsLint (2.4.0+) with `npm install -g tslint`, or ensure it is installed locally against your project
   * If you're installing globally, find the path to TsLint and copy it - will be similar to ```C:\Users\[Username]\AppData\Roaming\npm\node_modules\tslint\bin\tslint``` on Windows
-* Copy .jar file (from ```target/``` after build, or downloaded from [Releases page](https://github.com/Pablissimo/SonarTsPlugin/releases)) to SonarQube extensions folder
+* Copy .jar file (from ```target/``` after build, or downloaded from [Releases page](https://github.com/Pablissimo/SonarTsPlugin/releases)) to SonarQube extensions/plugins folder
 * Restart SonarQube server
 * Browse to SonarQube web interface, login as Admin, hit up Settings
 * Find the TypeScript tab, paste in the TsLint path
