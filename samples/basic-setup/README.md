@@ -1,4 +1,4 @@
-#Basic setup example
+# Basic setup example
 This sample project can be analysed by SonarQube to demonstrate:
 
 * Linting information from ```tslint```, configured via a ```tslint.json``` file
@@ -6,7 +6,7 @@ This sample project can be analysed by SonarQube to demonstrate:
 
 You can see a live example of the results of analysing this project at [https://sonar.pablissimo.com](https://sonar.pablissimo.com/dashboard?id=com.pablissimo.sonar%3Abasic-setup).
 
-##Building and analysing
+## Building and analysing
 
 * Run ```npm install``` from the cloned repo folder
 * Run ```npm test``` to regenerate code coverage information
@@ -16,7 +16,7 @@ To analyse with SonarQube just run ```sonar-scanner -X``` from the cloned repo f
 
 * The -X flag will give us diagnostic information during the run, so you can see what the plugin is up to
 
-##Breaking down the sonar-project.properties file
+## Breaking down the sonar-project.properties file
 
 The sample has a ```sonar-project.properties``` file that controls how the analysis gets run. We haven't specified anything here that isn't its default or automatically detected - these are explained under the table.
 
