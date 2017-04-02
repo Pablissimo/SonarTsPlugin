@@ -17,6 +17,14 @@ A live deployed demo hitting a few varied TypeScript projects can be found here:
 * [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
 * [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
 
+The plugin is tested against different permutations of the SonarQube server and scanner using the sample projects listed below. The test servers are as follows:
+
+* [v5.6.6](https://v566.sonar.pablissimo.com)
+* [v6.0](https://v60.sonar.pablissimo.com)
+* [v6.1](https://v61.sonar.pablissimo.com)
+* [v6.2](https://v62.sonar.pablissimo.com)
+* [v6.3](https://v63.sonar.pablissimo.com)
+
 ## Sample projects
 Some sample projects are provided to demonstrate different configuration options in the [samples/](https://github.com/Pablissimo/SonarTsPlugin/tree/master/samples) folder.
 
