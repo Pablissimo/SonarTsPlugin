@@ -12,10 +12,8 @@ A live deployed demo hitting a few varied TypeScript projects can be found here:
 [https://sonar.pablissimo.com](https://sonar.pablissimo.com).
 
 * [basic-setup](https://sonar.pablissimo.com/dashboard?id=com.pablissimo.sonar%3Abasic-setup)
-* [Microsoft TypeScript Compiler](https://sonar.pablissimo.com/overview?id=18739)
-* [Turbulenz Engine](https://sonar.pablissimo.com/overview?id=20352)
-* [Microsoft Visual Studio Code](https://sonar.pablissimo.com/overview?id=19179)
-* [Angular Framework](https://sonar.pablissimo.com/overview?id=18822)
+* [using-existing-tslint-output](https://sonar.pablissimo.com/dashboard?id=com.pablissimo.sonar%3Ausing-existing-tslint-output)
+* [Microsoft TypeScript Compiler](https://sonar.pablissimo.com/dashboard?id=TypeScript)
 
 The plugin is tested against different permutations of the SonarQube server and scanner using the sample projects listed below. The test servers are as follows:
 
