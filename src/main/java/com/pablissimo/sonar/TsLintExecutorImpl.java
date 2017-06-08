@@ -47,7 +47,8 @@ public class TsLintExecutorImpl implements TsLintExecutor {
                 .create("node")
                 .addArgument(this.preparePath(config.getPathToTsLint()))
                 .addArgument("--format")
-                .addArgument("json");
+                .addArgument("json")
+                .setDirectory(config.getBasedir());
 
         String rulesDir = config.getRulesDir();
         if (rulesDir != null && rulesDir.length() > 0) {

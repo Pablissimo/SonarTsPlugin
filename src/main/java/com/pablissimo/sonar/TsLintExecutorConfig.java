@@ -1,5 +1,7 @@
 package com.pablissimo.sonar;
 
+import java.io.File;
+
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.config.Settings;
 
@@ -15,10 +17,12 @@ public class TsLintExecutorConfig {
     private String pathToTsLintOutput;
 
     private Integer timeoutMs;
+    private File baseDir;
 
     public static TsLintExecutorConfig fromSettings(Settings settings, SensorContext ctx, PathResolver resolver) {
         TsLintExecutorConfig toReturn = new TsLintExecutorConfig();
 
+        toReturn.setBasedir(ctx.fileSystem().baseDir());
         toReturn.setPathToTsLint(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_PATH, TSLINT_FALLBACK_PATH));
         toReturn.setConfigFile(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_CONFIG_PATH, CONFIG_FILENAME));
         toReturn.setRulesDir(resolver.getPath(ctx, TypeScriptPlugin.SETTING_TS_LINT_RULES_DIR, null));
@@ -29,6 +33,14 @@ public class TsLintExecutorConfig {
         toReturn.setShouldPerformTypeCheck(settings.getBoolean(TypeScriptPlugin.SETTING_TS_LINT_TYPECHECK));
 
         return toReturn;
+    }
+
+    public File getBasedir() {
+        return this.baseDir;
+    }
+
+    private void setBasedir(File baseDir) {
+        this.baseDir = baseDir;
     }
 
     public Boolean useExistingTsLintOutput() {
@@ -95,4 +107,5 @@ public class TsLintExecutorConfig {
     public void setShouldPerformTypeCheck(boolean performTypeCheck) {
         this.shouldPerformTypeCheck = performTypeCheck;
     }
+
 }
