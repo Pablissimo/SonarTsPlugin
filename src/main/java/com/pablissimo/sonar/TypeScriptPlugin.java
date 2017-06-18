@@ -166,6 +166,7 @@ public class TypeScriptPlugin implements Plugin {
 
     public static final String SETTING_TS_LINT_ENABLED = "sonar.ts.tslint.enabled";
     public static final String SETTING_TS_LINT_PATH = "sonar.ts.tslint.path";
+    public static final String SETTING_TS_LINT_NODE_PATH = "sonar.ts.tslint.nodePath";
     public static final String SETTING_TS_LINT_CONFIG_PATH = "sonar.ts.tslint.configPath";
     public static final String SETTING_TS_LINT_TIMEOUT = "sonar.ts.tslint.timeout";
     public static final String SETTING_TS_LINT_RULES_DIR = "sonar.ts.tslint.rulesDir";

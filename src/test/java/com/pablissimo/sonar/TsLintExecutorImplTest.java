@@ -48,6 +48,7 @@ public class TsLintExecutorImplTest {
 
         // Setup a default config, which each method will mutate as required
         this.config = new TsLintExecutorConfig();
+        this.config.setPathToNode("node");
         this.config.setPathToTsLint("path/to/tslint");
         this.config.setConfigFile("path/to/config");
         this.config.setRulesDir("path/to/rules");
