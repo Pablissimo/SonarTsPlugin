@@ -151,4 +151,12 @@ public class TsCoverageSensorImplTest {
         verify(fileCoverage, times(1)).save();
         verify(this.sensor).getParser(eq(this.context),argThat(files -> files.length == 2));
     }
+
+    @Test
+    public void doesNotCallParser_WhenBadLCOVPathSupplied() {
+        when(this.lcovFile.isFile()).thenReturn(false);
+
+        this.sensor.execute(this.context, null);
+        verify(this.parser, never()).coverageByFile();
+    }    
 }
