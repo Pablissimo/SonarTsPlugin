@@ -74,7 +74,7 @@ public class LCOVParserImpl implements LCOVParser {
     return new LCOVParserImpl(lines, context);
   }
 
-  Map<InputFile, NewCoverage> coverageByFile() {
+  public Map<InputFile, NewCoverage> coverageByFile() {
     return coverageByFile;
   }
 

@@ -10,6 +10,7 @@ import org.sonar.api.batch.sensor.coverage.NewCoverage;
 
 @BatchSide
 public interface LCOVParser {
+    Map<InputFile, NewCoverage> coverageByFile();
     Map<InputFile, NewCoverage> parseFile(File file);
     Map<InputFile, NewCoverage> parse(List<String> lines);
 }

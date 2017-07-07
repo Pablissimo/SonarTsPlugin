@@ -78,7 +78,7 @@ public class TsCoverageSensorImplTest {
         when(this.settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH)).thenReturn("");
         
         this.sensor.execute(this.context, null);
-        verify(this.parser, never()).parseFile(any(java.io.File.class));
+        verify(this.parser, never()).coverageByFile();
     }
 
     @Test
@@ -129,10 +129,26 @@ public class TsCoverageSensorImplTest {
         NewCoverage fileCoverage = spy(this.context.newCoverage());
         allFilesCoverage.put(this.file, fileCoverage);
         
-        when(this.parser.parseFile(this.lcovFile)).thenReturn(allFilesCoverage);
+        when(this.parser.coverageByFile()).thenReturn(allFilesCoverage);
 
         this.sensor.execute(this.context, null);
 
         verify(fileCoverage, times(1)).save();
+    }
+
+    @Test
+    public void saveCoverage_WhenMultipleLCOVPathsSupplied() {
+        when(this.settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH)).thenReturn("lcovpath,lcovpath2");
+
+        HashMap<InputFile, NewCoverage> allFilesCoverage = new HashMap<InputFile, NewCoverage>();
+        NewCoverage fileCoverage = spy(this.context.newCoverage());
+        allFilesCoverage.put(this.file, fileCoverage);
+
+        when(this.parser.coverageByFile()).thenReturn(allFilesCoverage);
+        doReturn(this.lcovFile).when(this.sensor).getIOFile(any(File.class), eq("lcovpath2"));
+
+        this.sensor.execute(this.context, null);
+        verify(fileCoverage, times(1)).save();
+        verify(this.sensor).getParser(eq(this.context),argThat(files -> files.length == 2));
     }
 }
