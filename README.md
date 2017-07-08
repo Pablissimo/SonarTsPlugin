@@ -111,6 +111,8 @@ sonar.ts.coverage.lcovReportPath=test-results/coverage/coverage.lcov
 <tr><td>sonar.ts.tslint.rulesDir</td><td><b>Optional</b></td><td>Path to a folder containing custom `tslint` rules referenced in tslint.json, if any is required</td></tr>
 <tr><td>sonar.ts.coverage.lcovReportPath</td><td><b>Optional</b></td><td>Path to an LCOV code-coverage report to be used to calculate coverage metrics for your project</td></tr>
 <tr><td>sonar.ts.tslint.nodePath</td><td><b>Optional</b></td><td>Path to custom node to execute</td></tr>
+<tr><td>sonar.ts.tslint.projectPath</td><td><b>Optional</b></td><td>Path to tsconfig.json that describes the TypeScript files in your project to analyse, rather than letting SonarQube search for them automatically. Required to allow `sonar.ts.tslint.typeCheck` to work.</td></tr>
+<tr><td>sonar.ts.tslint.typeCheck</td><td><b>Optional</b></td><td>If true, asks `tslint` to run type-checking, allowing `tslint` rules that need type information to operate. Requires that you have specified `sonsr.ts.tslint.projectPath`.</td></tr>
 </tbody>
 </table>
 
