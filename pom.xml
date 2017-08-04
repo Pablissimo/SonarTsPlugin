@@ -183,6 +183,7 @@
         <version>1.0-beta-1</version>
         <executions>
           <execution>
+          	<phase>package</phase>
             <goals>
               <goal>native2ascii</goal>
             </goals>
