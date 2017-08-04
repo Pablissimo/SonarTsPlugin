@@ -12,10 +12,10 @@
   <inceptionYear>2013</inceptionYear>
   <url>https://github.com/pablissimo/SonarTsPlugin</url>
   
-  <organisation>
+  <organization>
     <name>Paul O'Neill (pablissimo) and contributors</name>
     <url>https://github.com/pablissimo/SonarTsPlugin</url>
-  </organisation>
+  </organization>
   
   <developers>
     <developer>
@@ -183,6 +183,7 @@
         <version>1.0-beta-1</version>
         <executions>
           <execution>
+          	<phase>package</phase>
             <goals>
               <goal>native2ascii</goal>
             </goals>
