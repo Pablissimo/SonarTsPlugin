@@ -28,13 +28,25 @@ import org.sonar.api.batch.sensor.coverage.CoverageType;
 import org.sonar.api.batch.sensor.coverage.NewCoverage;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TsCoverageSensorImpl implements TsCoverageSensor {
 
     private static final Logger LOG = LoggerFactory.getLogger(TsCoverageSensorImpl.class);
+
+    /**
+     * Returns list of paths provided by "propertyValue" (divided by comma)
+     */
+    private static List<String> parseReportsProperty(String propertyValue) {
+        List<String> reportPaths = new ArrayList<>();
+        for (String path : propertyValue.split(",")) {
+            if (!path.trim().isEmpty()) {
+                reportPaths.add(path.trim());
+            }
+        }
+
+        return reportPaths;
+    }
 
     private void saveZeroValueForAllFiles(SensorContext context, Map<InputFile, Set<Integer>> nonCommentLineNumbersByFile) {
         for (InputFile inputFile : context.fileSystem().inputFiles(context.fileSystem().predicates().hasLanguage(TypeScriptLanguage.LANGUAGE_KEY))) {
@@ -63,19 +75,29 @@ public class TsCoverageSensorImpl implements TsCoverageSensor {
           newCoverage.save();
     }
     
-    protected void saveMeasureFromLCOVFile(SensorContext context, Map<InputFile, Set<Integer>> nonCommentLineNumbersByFile) {
-        String providedPath = context.settings().getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH);
-        File lcovFile = getIOFile(context.fileSystem().baseDir(), providedPath);
+    protected void saveMeasureFromLCOVFile(SensorContext context, Map<InputFile, Set<Integer>> nonCommentLineNumbersByFile, List<String> reportPaths) {
+        LinkedList<File> lcovFiles =new LinkedList<>();
+        for(String providedPath: reportPaths) {
 
-        if (!lcovFile.isFile()) {
-            LOG.warn("No coverage information will be saved because LCOV file cannot be analysed. Provided LCOV file path: {}", providedPath);
+            File lcovFile = getIOFile(context.fileSystem().baseDir(), providedPath);
+
+            if (lcovFile.isFile()) {
+                lcovFiles.add(lcovFile);
+            } else {
+                LOG.warn("No coverage information will be saved because LCOV file cannot be found.");
+                LOG.warn("Provided LCOV file path: {}. Seek file with path: {}", providedPath, lcovFile.getAbsolutePath());
+            }
+        }
+
+        if(lcovFiles.isEmpty()) {
+            LOG.warn("No coverage information will be saved because all LCOV files cannot be found.");
             return;
         }
 
-        LOG.info("Analysing {}", lcovFile);
+        LOG.info("Analysing {}", lcovFiles);
 
-        LCOVParser parser = getParser(context, new File[]{ lcovFile });
-        Map<InputFile, NewCoverage> coveredFiles = parser.parseFile(lcovFile);
+        LCOVParser parser = getParser(context, lcovFiles.toArray(new File[lcovFiles.size()]));
+        Map<InputFile, NewCoverage> coveredFiles = parser.coverageByFile();
         
         final boolean ignoreNotFound = isIgnoreNotFoundActivated(context);
         
@@ -115,10 +137,6 @@ public class TsCoverageSensorImpl implements TsCoverageSensor {
         return ctx.settings().getBoolean(TypeScriptPlugin.SETTING_IGNORE_NOT_FOUND);
     }
 
-    private boolean isLCOVReportProvided(SensorContext ctx) {
-        return StringUtils.isNotBlank(ctx.settings().getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
-    }
-
     public File getIOFile(File baseDir, String path) {
         File file = new File(path);
         if (!file.isAbsolute()) {
@@ -131,13 +149,14 @@ public class TsCoverageSensorImpl implements TsCoverageSensor {
     @Override
     public void execute(SensorContext ctx, Map<InputFile, Set<Integer>> nonCommentLineNumbersByFile) {
         Map<InputFile, Set<Integer>> nonCommentLineMap = nonCommentLineNumbersByFile;
-        
+        List<String> reportPaths = parseReportsProperty(ctx.settings().getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH));
+
         if (nonCommentLineMap == null) {
             nonCommentLineMap = new HashMap<>();
         }
         
-        if (isLCOVReportProvided(ctx)) {
-            saveMeasureFromLCOVFile(ctx, nonCommentLineMap);
+        if (!reportPaths.isEmpty()) {
+            saveMeasureFromLCOVFile(ctx, nonCommentLineMap, reportPaths);
         } else if (isForceZeroCoverageActivated(ctx)) {
             saveZeroValueForAllFiles(ctx, nonCommentLineMap);
         }
