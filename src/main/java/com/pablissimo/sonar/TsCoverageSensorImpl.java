@@ -39,9 +39,12 @@ public class TsCoverageSensorImpl implements TsCoverageSensor {
      */
     private static List<String> parseReportsProperty(String propertyValue) {
         List<String> reportPaths = new ArrayList<>();
-        for (String path : propertyValue.split(",")) {
-            if (!path.trim().isEmpty()) {
-                reportPaths.add(path.trim());
+
+        if (StringUtils.isNotBlank(propertyValue)) {
+            for (String path : propertyValue.split(",")) {
+                if (!path.trim().isEmpty()) {
+                    reportPaths.add(path.trim());
+                }
             }
         }
 
