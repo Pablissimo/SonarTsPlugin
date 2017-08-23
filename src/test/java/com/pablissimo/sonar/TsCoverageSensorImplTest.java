@@ -74,6 +74,18 @@ public class TsCoverageSensorImplTest {
     }
 
     @Test
+    public void savesNothing_IfNullReportPathAndSettingDisabled() {
+        when(this.settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH)).thenReturn(null);
+        when(this.settings.getBoolean(TypeScriptPlugin.SETTING_FORCE_ZERO_COVERAGE)).thenReturn(false);
+        
+        this.sensor.execute(this.context, null);
+
+        for (int i = 1; i <= this.file.lines(); i++) {
+            assertNull(this.context.lineHits(this.file.key(), CoverageType.UNIT, i));
+        }
+    }
+
+    @Test
     public void doesNotCallParser_WhenNoLCOVPathSupplied() {
         when(this.settings.getString(TypeScriptPlugin.SETTING_LCOV_REPORT_PATH)).thenReturn("");
         
