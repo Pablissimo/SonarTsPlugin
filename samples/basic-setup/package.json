@@ -3,23 +3,19 @@
   "version": "1.0.0",
 
   "scripts": {
-    "test": "karma start --single-run --code-coverage"
+    "test": "karma start --single-run --code-coverage",
+    "pretest" : "node_modules/.bin/tsc -p ."
   },
-
-  "dependencies": {
-    "@types/jasmine": "^2.5.35",
-    "jasmine-core": "^2.5.2",
-    "karma": "^1.4.1",
-    "karma-phantomjs-launcher": "^1.0.2",
-    "karma-cli": "^1.0.1",
-    "karma-jasmine": "^1.1.0",
-    "karma-typescript": "^2.1.7",
-    "typescript": "2.1",
-    "tslint": "^4.4.2"
-  },
-
+ 
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "karma-typescript": "^2.1.7"
+    "@types/jasmine": "2.5.x",
+    "jasmine-core": "2.8.x",
+    "karma": "1.7.x",
+    "karma-phantomjs-launcher": "1.0.x",
+    "karma-cli": "1.0.x",
+    "karma-jasmine": "1.1.x",
+    "karma-typescript": "3.0.x",
+    "typescript": "2.5.x",
+    "tslint": "5.7.x"
   }
 }
