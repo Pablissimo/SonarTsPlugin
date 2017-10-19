@@ -1,4 +1,5 @@
 var x = 1; /*
-this block comment started somewhere unusual but shouldn't
-confuse things any - expecting one line
+* this block comment started somewhere unusual but shouldn't confuse things neither
+*
+* than a blank comment line - expecting one code line and two comment lines
 */

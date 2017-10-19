@@ -1,8 +1,8 @@
-// This line shouldn't be counted
+// This line shouldn't be counted as code
    // Nor should this one
 	// Nor this
-var x = "this one should, though."; // but not get confused by this
+var x = "this one should"; // both as code and comment
 
-// Whitespace above shouldn't count
-x += "but this should";
+// Whitespace above shouldn't count neither as code nor as comment
+x += "but this should be counted as code again";
 
