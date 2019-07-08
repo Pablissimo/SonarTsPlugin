@@ -1,27 +1,12 @@
 SonarTsPlugin
 =============
 
-SonarQube plugin for TypeScript files
+Unofficial and no longer actively supported SonarQube plugin for TypeScript files.
 
-[![Build Status](https://travis-ci.org/Pablissimo/SonarTsPlugin.svg?branch=master)](https://travis-ci.org/Pablissimo/SonarTsPlugin)
-[![Coverage Status](https://coveralls.io/repos/github/Pablissimo/SonarTsPlugin/badge.svg?branch=master)](https://coveralls.io/github/Pablissimo/SonarTsPlugin?branch=master)
+## Important - unofficial, and deprecated
+For a few years this plugin was essentially the only way to get Typescript analysis, unit test and code coverage information into Sonarqube. However the official SonarTS plugin is much better supported, both in support of SonarQube version upgrades and linting rules.
 
-## Demos
-
-A live deployed demo hitting a few varied TypeScript projects can be found here:
-[https://sonar.pablissimo.com](https://sonar.pablissimo.com).
-
-* [basic-setup](https://sonar.pablissimo.com/dashboard?id=com.pablissimo.sonar%3Abasic-setup)
-* [using-existing-tslint-output](https://sonar.pablissimo.com/dashboard?id=com.pablissimo.sonar%3Ausing-existing-tslint-output)
-* [Microsoft TypeScript Compiler](https://sonar.pablissimo.com/dashboard?id=TypeScript)
-
-The plugin is tested against different permutations of the SonarQube server and scanner using the sample projects listed below. The test servers are as follows:
-
-* [v5.6.6](https://v566.sonar.pablissimo.com)
-* [v6.0](https://v60.sonar.pablissimo.com)
-* [v6.1](https://v61.sonar.pablissimo.com)
-* [v6.2](https://v62.sonar.pablissimo.com)
-* [v6.3](https://v63.sonar.pablissimo.com)
+There will be no further updates to this plugin, and it remains here for reference only. I don't have time to continue to support it, and there's little value in doing so when the official plugin covers off almost all its functionality.
 
 ## Sample projects
 Some sample projects are provided to demonstrate different configuration options in the [samples/](https://github.com/Pablissimo/SonarTsPlugin/tree/master/samples) folder.
