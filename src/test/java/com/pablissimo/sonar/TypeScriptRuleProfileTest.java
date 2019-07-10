@@ -38,6 +38,7 @@ public class TypeScriptRuleProfileTest {
                 "completed-docs",
                 "curly",
                 "cyclomatic-complexity",
+                "encoding",
                 "eofline",
                 "file-header",
                 "forin",

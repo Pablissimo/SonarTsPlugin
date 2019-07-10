@@ -97,6 +97,7 @@
             "check-operator",
             "check-separator",
             "check-type"
-        ]
+        ],
+        "encoding": true
     }
 }
