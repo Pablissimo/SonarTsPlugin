@@ -193,6 +193,7 @@ public class TypeScriptPlugin implements Plugin {
         ctx.addExtension(TsLintExecutorImpl.class);
         ctx.addExtension(TsLintParserImpl.class);
         ctx.addExtension(LOCSensorImpl.class);
+		ctx.addExtension(CommentSensorImpl.class);
         ctx.addExtension(TsCoverageSensorImpl.class);
     }
 }

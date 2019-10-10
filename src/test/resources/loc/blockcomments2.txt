@@ -4,6 +4,7 @@
     // like this
     nor by unexpected extra comment block openings
     /* like this
+	should expect six comment lines
  */
  module Whatever {
  }

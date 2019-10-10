@@ -1,5 +1,5 @@
 /*
-    Block comments shouldn't count towards line count - expected 2 lines
+    Block comments should count towards line count - expect 2 code and 1 comment lines
 */
 module Whatever {
 }
